@@ -1,0 +1,4 @@
+*
+!.gitignore
+!*.sublime-project
+!*.sublime-workspace
