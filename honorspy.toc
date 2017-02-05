@@ -1,8 +1,11 @@
 ## Interface: 11200
 ## Title: HonorSpy
-## Notes: record PvP standings of all players
+## Notes: Records PvP standings of all players
 ## Author: kakysha
 ## OptionalDeps: Ace2
+## Version: 0.1
+## X-Category: Battlegrounds/PvP
+## SavedVariables: HonorSpyDB
 
 Libs\AceLibrary\AceLibrary.lua
 Libs\AceOO-2.0\AceOO-2.0.lua
@@ -11,8 +14,8 @@ Libs\AceAddon-2.0\AceAddon-2.0.lua
 Libs\AceConsole-2.0\AceConsole-2.0.lua
 Libs\AceModuleCore-2.0\AceModuleCore-2.0.lua
 Libs\AceDB-2.0\AceDB-2.0.lua
-Libs\AceDebug-2.0\AceDebug-2.0.lua
 Libs\AceLocale-2.2\AceLocale-2.2.lua
+Libs\AceComm-2.0\AceComm-2.0.lua
 
 Libs\Babble-Class-2.2\Babble-Class-2.2.lua
 Libs\Crayon-2.0\Crayon-2.0.lua
@@ -23,3 +26,4 @@ Libs\Tablet-2.0\Tablet-2.0.lua
 
 honorspy.lua
 standings.lua
+export.lua

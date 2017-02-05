@@ -10,7 +10,7 @@ Dependencies: AceLibrary, (optional) Dewdrop-2.0
 ]]
 
 local MAJOR_VERSION = "Tablet-2.0"
-local MINOR_VERSION = "$Revision: 14636 $"
+local MINOR_VERSION = "$Revision: 20636 $"
 
 if not AceLibrary then error(MAJOR_VERSION .. " requires AceLibrary") end
 if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then return end
@@ -466,6 +466,8 @@ do
 				'textB', self.textB or 1,
 				'fakeChild', true,
 				'func', self.func,
+				'onEnterFunc', self.onEnterFunc,
+				'onLeaveFunc', self.onLeaveFunc,
 				'arg1', info.arg1,
 				'arg2', self.arg2,
 				'arg3', self.arg3,
@@ -990,6 +992,9 @@ local function button_OnEnter()
 		this.self:GetScript("OnEnter")()
 	end
 	this.highlight:Show()
+	if this.onEnterFunc then
+		this.onEnterFunc()
+	end
 end
 
 local function button_OnLeave()
@@ -997,6 +1002,9 @@ local function button_OnLeave()
 		this.self:GetScript("OnLeave")()
 	end
 	this.highlight:Hide()
+	if this.onLeaveFunc then
+		this.onLeaveFunc()
+	end
 end
 
 local function NewLine(self)
@@ -1634,6 +1642,80 @@ local function AcquireFrame(self, registration, data, detachedData)
 					end
 					Tablet:assert(type(func) == "function", "func must be a function or method")
 					button.func = func
+					local onEnterFunc = info.onEnterFunc
+					if onEnterFunc then
+						if type(onEnterFunc) == "string" then
+							if type(info.onEnterArg1) ~= "table" then
+								Tablet:error("Cannot call method " .. info.onEnterFunc .. " on a non-table")
+							end
+							onEventFunc = info.onEnterArg1[onEnterFunc]
+							if type(onEnterFunc) ~= "function" then
+								Tablet:error("Method " .. info.onEnterFunc .. " nonexistant")
+							end
+						else
+							if type(onEnterFunc) ~= "function" then
+								Tablet:error("func must be a function or method")
+							end
+						end
+						button.onEnterFunc = onEnterFunc
+						local i = 1
+						while true do
+							local k = 'onEnterArg' .. i
+							if button[k] ~= nil then
+								button[k] = nil
+							else
+								break
+							end
+							i = i + 1
+						end
+						i = 1
+						while true do
+							local k = 'onEnterArg' .. i
+							local v = info[k]
+							if v == nil then
+								break
+							end
+							button[k] = v
+							i = i + 1
+						end
+					end
+					local onLeaveFunc = info.onLeaveFunc
+					if onLeaveFunc then
+						if type(onLeaveFunc) == "string" then
+							if type(info.onLeaveArg1) ~= "table" then
+								Tablet:error("Cannot call method " .. info.onLeaveFunc .. " on a non-table")
+							end
+							onLeaveFunc = info.onLeaveArg1[onLeaveFunc]
+							if type(onLeaveFunc) ~= "function" then
+								Tablet:error("Method " .. info.onLeaveFunc .. " nonexistant")
+							end
+						else
+							if type(onLeaveFunc) ~= "function" then
+								Tablet:error("func must be a function or method")
+							end
+						end
+						button.onLeaveFunc = onLeaveFunc
+						local i = 1
+						while true do
+							local k = 'onLeaveArg' .. i
+							if button[k] ~= nil then
+								button[k] = nil
+							else
+								break
+							end
+							i = i + 1
+						end
+						i = 1
+						while true do
+							local k = 'onLeaveArg' .. i
+							local v = info[k]
+							if v == nil then
+								break
+							end
+							button[k] = v
+							i = i + 1
+						end
+					end
 					button.a1 = info.arg1
 					button.a2 = info.arg2
 					button.a3 = info.arg3
