@@ -1,6 +1,6 @@
 --[[
 Name: AceComm-2.0
-Revision: $Rev: 15440 $
+Revision: $Rev: 17723 $
 Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
 Inspired By: Ace 1.x by Turan (turan@gryphon.com)
 Website: http://www.wowace.com/
@@ -12,11 +12,12 @@ Dependencies: AceLibrary, AceOO-2.0, AceEvent-2.0,
 ]]
 
 local MAJOR_VERSION = "AceComm-2.0"
-local MINOR_VERSION = "$Revision: 15440 $"
+local MINOR_VERSION = "$Revision: 17723 $"
 
 if not AceLibrary then error(MAJOR_VERSION .. " requires AceLibrary") end
 if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then return end
 
+if loadstring("return function(...) return ... end") and AceLibrary:HasInstance(MAJOR_VERSION) then return end -- lua51 check
 if not AceLibrary:HasInstance("AceOO-2.0") then error(MAJOR_VERSION .. " requires AceOO-2.0") end
 
 local _G = getfenv(0)
@@ -375,7 +376,7 @@ local function RefixAceCommChannelsAndEvents()
 	end
 	if AceComm_registry.CUSTOM then
 		for k,v in pairs(AceComm_registry.CUSTOM) do
-			if next(v) then
+			if next(v) and SupposedToBeInChannel(k) then
 				JoinChannel(k)
 				channel = true
 			end
@@ -1204,7 +1205,7 @@ function AceComm:IsCommRegistered(prefix, distribution, customChannel)
 	end
 	if distribution == "CUSTOM" then
 		AceComm:argCheck(customChannel, 4, "nil", "string")
-		if customChannel then
+		if customChannel == "" then
 			AceComm:error('Argument #4 to `IsCommRegistered\' must be a non-zero-length string or nil.')
 		end
 	else
@@ -1213,7 +1214,7 @@ function AceComm:IsCommRegistered(prefix, distribution, customChannel)
 	local registry = AceComm_registry
 	if not distribution then
 		for k,v in pairs(registry) do
-			if distribution == "CUSTOM" then
+			if k == "CUSTOM" then
 				for l,u in pairs(v) do
 					if u[prefix] and u[prefix][self] then
 						return true
@@ -1227,10 +1228,10 @@ function AceComm:IsCommRegistered(prefix, distribution, customChannel)
 		end
 		return false
 	elseif distribution == "CUSTOM" and not customChannel then
-		if not registry[destination] then
+		if not registry[distribution] then
 			return false
 		end
-		for l,u in pairs(registry[destination]) do
+		for l,u in pairs(registry[distribution]) do
 			if u[prefix] and u[prefix][self] then
 				return true
 			end
@@ -1238,9 +1239,9 @@ function AceComm:IsCommRegistered(prefix, distribution, customChannel)
 		return false
 	elseif distribution == "CUSTOM" then
 		customChannel = "AceComm" .. customChannel
-		return registry[destination] and registry[destination][customChannel] and registry[destination][customChannel][prefix] and registry[destination][customChannel][prefix][self] and true or false
+		return registry[distribution] and registry[distribution][customChannel] and registry[distribution][customChannel][prefix] and registry[distribution][customChannel][prefix][self] and true or false
 	end
-	return registry[destination] and registry[destination][prefix] and registry[destination][prefix][self] and true or false
+	return registry[distribution] and registry[distribution][prefix] and registry[distribution][prefix][self] and true or false
 end
 
 function AceComm:OnEmbedDisable(target)

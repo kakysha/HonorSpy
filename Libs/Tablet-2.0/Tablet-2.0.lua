@@ -1244,6 +1244,7 @@ local function AcquireFrame(self, registration, data, detachedData)
 		function tooltip:Hide(newOwner)
 			if self == tooltip or newOwner == nil then
 				old_tooltip_Hide(self)
+				return
 			end
 			self:ClearLines(true)
 			self.owner = nil
@@ -1972,12 +1973,15 @@ function AcquireDetachedFrame(self, registration, data, detachedData)
 	if not tooltip then
 		AcquireFrame(self, {})
 	end
-	local detached = CreateFrame("Frame", "Tablet20DetachedFrame" .. (table.getn(detachedTooltips) + 1), UIParent)
+	local frameName = "Tablet20DetachedFrame" .. (table.getn(detachedTooltips) + 1)
+	local detached = CreateFrame("Frame", frameName, UIParent)
 	table.insert(detachedTooltips, detached)
+	tinsert(UISpecialFrames, frameName);	
 	detached.notInUse = true
 	detached:EnableMouse(not data.locked)
 	detached:EnableMouseWheel(true)
 	detached:SetMovable(true)
+	-- tinsert(UISpecialFrames, frameName);
 	detached:SetPoint(data.anchor or "CENTER", UIParent, data.anchor or "CENTER", data.offsetx or 0, data.offsety or 0)
 
 	detached.numLines = 0

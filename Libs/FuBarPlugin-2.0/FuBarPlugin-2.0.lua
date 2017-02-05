@@ -835,7 +835,6 @@ function FuBarPlugin:OpenMenu(frame)
 		return
 	end
 	Tablet:Close()
-
 	if not Dewdrop:IsRegistered(self:GetFrame()) then
 		if type(self.OnMenuRequest) == "table" and (not self.OnMenuRequest.handler or self.OnMenuRequest.handler == self) and self.OnMenuRequest.type == "group" then
 			Dewdrop:InjectAceOptionsTable(self, self.OnMenuRequest)
@@ -856,12 +855,11 @@ function FuBarPlugin:OpenMenu(frame)
 					if self.OnMenuRequest then
 						self:OnMenuRequest(level, value, false, valueN_1, valueN_2, valueN_3, valueN_4)
 					end
-
 					if not self.overrideMenu then
 						if self.MenuSettings then
 							Dewdrop:AddLine()
 						end
-						self:AddImpliedMenuOptions()
+						-- self:AddImpliedMenuOptions()
 					end
 				else
 					if not self.overrideMenu and self:AddImpliedMenuOptions() then
