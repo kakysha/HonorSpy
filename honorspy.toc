@@ -1,9 +1,9 @@
 ## Interface: 11200
 ## Title: HonorSpy
 ## Notes: Records PvP standings of all players
-## Author: kakysha
+## Author: kakysha, contributors: Mistaboom and Moxie
 ## OptionalDeps: Ace2
-## Version: 1
+## Version: 3
 ## X-Category: Battlegrounds/PvP
 ## SavedVariables: HonorSpyDB
 

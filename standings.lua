@@ -1,5 +1,4 @@
 local T = AceLibrary("Tablet-2.0")
-local D = AceLibrary("Dewdrop-2.0")
 local C = AceLibrary("Crayon-2.0")
 local BC = AceLibrary("Babble-Class-2.2")
 
@@ -83,13 +82,15 @@ function HonorSpyStandings:OnTooltipUpdate()
 			last_seen_human = ""..last_seen.."s"
 		end
 
+		local class_color = BC:GetHexColor(class)
+
 		cat:AddLine(
-			"text", C:Colorize("444444", i).." "..C:Colorize(BC:GetHexColor(class), name),
-			"text2", C:Colorize(BC:GetHexColor(class), string.format("%d", thisWeekHonor)),
-			"text3", C:Colorize(BC:GetHexColor(class), string.format("%d", lastWeekHonor)),
-			"text4", C:Colorize(BC:GetHexColor(class), string.format("%d", standing)),
-			"text5", C:Colorize(BC:GetHexColor(class), string.format("%d", RP)),
-			"text6", C:Colorize(BC:GetHexColor(class), string.format("%d", rank)),
+			"text", C:Colorize("444444", i).." "..C:Colorize(class_color, name),
+			"text2", C:Colorize(class_color, string.format("%d", thisWeekHonor)),
+			"text3", C:Colorize(class_color, string.format("%d", lastWeekHonor)),
+			"text4", C:Colorize(class_color, string.format("%d", standing)),
+			"text5", C:Colorize(class_color, string.format("%d", RP)),
+			"text6", C:Colorize(class_color, string.format("%d", rank)),
 			"func", function() end,
 			"onEnterFunc", function()
 				GameTooltip:SetOwner(this, "ANCHOR_CURSOR")
@@ -101,10 +102,9 @@ function HonorSpyStandings:OnTooltipUpdate()
 			end
 		)
 
-		if (name == playerName) then
-			HonorSpy.player_standing = i;
+		if (tonumber(HonorSpy.db.realm.hs.limit) > 0 and i == tonumber(HonorSpy.db.realm.hs.limit)) then
+			break
 		end
 	end
-	HonorSpy.pool_size = table.getn(t);
 end
 

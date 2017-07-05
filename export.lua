@@ -1,21 +1,4 @@
 function HonorSpy:ExportCSV()
-	local data = HonorSpyStandings:BuildStandingsTable();
-	local text = "";
-	for _, row in pairs(data) do
-		for _, value in pairs(row) do
-			if (type(value) == "number") then
-				if (value < 1486253610) then
-					text = text..string.format("%d", value)..","
-				else
-					text = text..date("!%x %X", value)..","
-				end
-			elseif (type(value) == "string") then
-				text = text..value..","
-			end
-    	end
-    	text = text.."\n"
-	end
-
 	local _G = getfenv(0)
 	local PaneBackdrop  = {
 		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
@@ -48,21 +31,34 @@ function HonorSpy:ExportCSV()
 		editBox:SetWidth(400)
 		editBox:SetHeight(270)
 		editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
-		editBox:SetText(text)
-		editBox:HighlightText(0)
 		
 		scrollArea:SetScrollChild(editBox)
 		
 		local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 		close:SetPoint("TOPRIGHT",frame,"TOPRIGHT")
-		
-		frame:Show()
-	else
-
-		local buttsecks = _G["ARLCopyFrame"]
-		local mudkipz = _G["ARLCopyEdit"]
-
-		mudkipz:SetText(text)
-		buttsecks:Show()
 	end
+
+	local exportwindow = _G["ARLCopyFrame"]
+	local editbox = _G["ARLCopyEdit"]
+
+	local data = HonorSpyStandings:BuildStandingsTable();
+	local text = "";
+	for _, row in pairs(data) do
+		text = ""
+		for _, value in pairs(row) do
+			if (type(value) == "number") then
+				if (value < 1486253610) then
+					text = text..string.format("%d", value)..","
+				else
+					text = text..date("!%x %X", value)..","
+				end
+			elseif (type(value) == "string") then
+				text = text..value..","
+			end
+    	end
+		editbox:Insert(text.."\n")
+	end
+
+	editbox:HighlightText(0)
+	exportwindow:Show()
 end

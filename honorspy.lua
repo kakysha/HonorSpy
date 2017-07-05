@@ -6,14 +6,15 @@ HonorSpy:RegisterDefaults('realm', {
 	hs = {
 		currentStandings = {},
 		last_reset = 0,
-		sort = "ThisWeekHonor"
+		sort = "ThisWeekHonor",
+		limit = 750
 	}
 })
 
 local commPrefix = "HonorSpy";
 HonorSpy:SetCommPrefix(commPrefix)
 
-local VERSION = 2;
+local VERSION = 3;
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
 
@@ -200,25 +201,45 @@ local options = {
 			name = 'Show HonorSpy Standings',
 			desc = 'Show HonorSpy Standings',
 			func = function() HonorSpyStandings:Toggle() end
-		}
+		},
+		search = {
+			type = 'text',
+			name = 'Report specific player standings',
+			desc = 'Report specific player standings',
+			usage = 'player_name',
+			get = false,
+			set = function(playerName) HonorSpy:Report(playerName) end
+		},
 	}
 }
 HonorSpy:RegisterChatCommand({"/honorspy", "/hs"}, options)
 
 -- REPORT
-function HonorSpy:Report()
-	if (not HonorSpy.player_standing) then
-		self:Print("Open HonorSpy table at least once to estimate your standing");
+function HonorSpy:Report(playerOfInterest)
+	if (not playerOfInterest) then
+		playerOfInterest = playerName
+	end
+	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
+
+	local pool_size = 0;
+	local standing = -1;
+	local t = HonorSpyStandings:BuildStandingsTable()
+	local avg_lastchecked = 0;
+	pool_size = table.getn(t);
+	for i = 1, table.getn(t) do
+		if (playerOfInterest == t[i][1]) then
+			standing = i
+		end
+	end
+	if (standing == -1) then
+		self:Print("Player "..playerOfInterest.." not found in table");
 		return
 	end;
-
 			  -- 1   2     3      4		 5		 6		7		8		9	10		11		12		13	14
 	local brk = {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
 	local RP  = {0, 400} -- RP for each bracket
 	local Ranks = {0, 2000} -- RP for each rank
 
-	local standing = HonorSpy.player_standing;
-	local pool_size = HonorSpy.pool_size;
 	local my_bracket = 1;
 	local inside_br_progress = 0;
 	for i = 2,14 do
@@ -235,9 +256,9 @@ function HonorSpy:Report()
 		Ranks[i] = (i-2) * 5000;
 	end
 	local award = RP[my_bracket] + 1000 * inside_br_progress;
-	local RP = HonorSpy.db.realm.hs.currentStandings[playerName].RP;
+	local RP = HonorSpy.db.realm.hs.currentStandings[playerOfInterest].RP;
 	local EstRP = math.floor(RP*0.8+award+.5);
-	local Rank = HonorSpy.db.realm.hs.currentStandings[playerName].rank;
+	local Rank = HonorSpy.db.realm.hs.currentStandings[playerOfInterest].rank;
 	local EstRank = 14;
 	local Progress = math.floor(GetPVPRankProgress()*100);
 	local EstProgress = math.floor((EstRP - math.floor(EstRP/5000)*5000) / 5000*100);
@@ -248,8 +269,11 @@ function HonorSpy:Report()
 		end
 	end
 
-	SendChatMessage("- HonorSpy: Standing = "..standing..",  Bracket = "..my_bracket..",  current RP = "..RP..",  Next Week RP = "..EstRP,"emote")
-	SendChatMessage("- HonorSpy: Current Rank = "..Rank.." ("..Progress.."%), Next Week Rank = "..EstRank.." ("..EstProgress.."%)", "emote")
+	if (playerOfInterest ~= playerName) then
+		SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Report for player "..playerOfInterest,"emote")
+	end
+	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Pool Size = "..pool_size..", Standing = "..standing..",  Bracket = "..my_bracket..",  current RP = "..RP..",  Next Week RP = "..EstRP,"emote")
+	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Current Rank = "..Rank.." ("..Progress.."%), Next Week Rank = "..EstRank.." ("..EstProgress.."%)", "emote")
 end
 
 -- MINIMAP
@@ -307,6 +331,19 @@ function BuildMenu()
 		desc = "Delete all collected data",
 		func = function() purgeData() end,
 	}
+	options.args["limit"] = {
+		type = "text",
+		name = "Limit Rows",
+		desc = "Limits number of rows shown in table",
+		get = function() return HonorSpy.db.realm.hs.limit end,
+		set = function(v) HonorSpy.db.realm.hs.limit = v; HonorSpy:Print("limit = "..tostring(v)) end,
+		usage = "<EP>",
+		-- disabled = function() return not (CanEditOfficerNote() and CanEditPublicNote()) end,
+		validate = function(v)
+		  local n = tonumber(v)
+		  return n and n >= 0 and n < 10000
+		end
+	  }
 
 	return options
 end
