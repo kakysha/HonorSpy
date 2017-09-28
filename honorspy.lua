@@ -260,7 +260,7 @@ function HonorSpy:Report(playerOfInterest)
 	local EstRP = math.floor(RP*0.8+award+.5);
 	local Rank = HonorSpy.db.realm.hs.currentStandings[playerOfInterest].rank;
 	local EstRank = 14;
-	local Progress = math.floor(GetPVPRankProgress()*100);
+	local Progress = math.floor(HonorSpy.db.realm.hs.currentStandings[playerOfInterest].rankProgress*100);
 	local EstProgress = math.floor((EstRP - math.floor(EstRP/5000)*5000) / 5000*100);
 	for i = 3,14 do
 		if (EstRP < Ranks[i]) then
