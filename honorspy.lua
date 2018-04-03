@@ -1,12 +1,13 @@
 HonorSpy = AceLibrary("AceAddon-2.0"):new("AceConsole-2.0", "AceDB-2.0", "AceEvent-2.0", "AceModuleCore-2.0", "FuBarPlugin-2.0", "AceComm-2.0", "AceHook-2.1")
 local T = AceLibrary("Tablet-2.0")
+local L = AceLibrary("AceLocale-2.2"):new("HonorSpy")
 
 HonorSpy:RegisterDB("HonorSpyDB")
 HonorSpy:RegisterDefaults('realm', {
 	hs = {
 		currentStandings = {},
 		last_reset = 0,
-		sort = "ThisWeekHonor",
+		sort = L["ThisWeekHonor"],
 		limit = 750
 	}
 })
@@ -119,7 +120,7 @@ function resetWeek(must_reset_on)
 	inspectedPlayers = {};
 	HonorSpy.db.realm.hs.currentStandings={};
 	HonorSpyStandings:Refresh();
-	HonorSpy:Print("Weekly data was reset");
+	HonorSpy:Print(L["Weekly data was reset"]);
 end
 function checkNeedReset()
 	if (HonorSpy.db.realm.hs.reset_day == nil) then HonorSpy.db.realm.hs.reset_day = 3 end
@@ -140,14 +141,14 @@ function purgeData()
 	StaticPopup_Show("PURGE_DATA")
 end
 StaticPopupDialogs["PURGE_DATA"] = {
-	text = "This will purge ALL addon data, you sure?",
-	button1 = "Yes",
-	button2 = "No",
+	text = L["This will purge ALL addon data, you sure?"],
+	button1 = YES,
+	button2 = NO,
 	OnAccept = function()
 		inspectedPlayers = {};
 		HonorSpy.db.realm.hs.currentStandings={};
 		HonorSpyStandings:Refresh();
-		HonorSpy:Print("All data was purged");
+		HonorSpy:Print(L["All data was purged"]);
 	end,
 	timeout = 0,
 	whileDead = true,
@@ -198,15 +199,15 @@ local options = {
 	args = {
 		show = {
 			type = 'execute',
-			name = 'Show HonorSpy Standings',
-			desc = 'Show HonorSpy Standings',
+			name = L['Show HonorSpy Standings'],
+			desc = L['Show HonorSpy Standings'],
 			func = function() HonorSpyStandings:Toggle() end
 		},
 		search = {
 			type = 'text',
-			name = 'Report specific player standings',
-			desc = 'Report specific player standings',
-			usage = 'player_name',
+			name = L['Report specific player standings'],
+			desc = L['Report specific player standings'],
+			usage = L['player_name'],
 			get = false,
 			set = function(playerName) HonorSpy:Report(playerName) end
 		},
@@ -232,7 +233,7 @@ function HonorSpy:Report(playerOfInterest)
 		end
 	end
 	if (standing == -1) then
-		self:Print("Player "..playerOfInterest.." not found in table");
+		self:Print(string.format(L["Player %s not found in table"], playerOfInterest));
 		return
 	end;
 			  -- 1   2     3      4		 5		 6		7		8		9	10		11		12		13	14
@@ -270,10 +271,10 @@ function HonorSpy:Report(playerOfInterest)
 	end
 
 	if (playerOfInterest ~= playerName) then
-		SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Report for player "..playerOfInterest,"emote")
+		SendChatMessage("- HonorSpy v"..tostring(VERSION)..": "..L["Report for player"].." "..playerOfInterest,"emote")
 	end
-	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Pool Size = "..pool_size..", Standing = "..standing..",  Bracket = "..my_bracket..",  current RP = "..RP..",  Next Week RP = "..EstRP,"emote")
-	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": Current Rank = "..Rank.." ("..Progress.."%), Next Week Rank = "..EstRank.." ("..EstProgress.."%)", "emote")
+	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": "..L["Pool Size"].." = "..pool_size..", "..L["Standing"].." = "..standing..",  "..L["Bracket"].." = "..my_bracket..",  "..L["current RP"].." = "..RP..",  "..L["Next Week RP"].." = "..EstRP,"emote")
+	SendChatMessage("- HonorSpy v"..tostring(VERSION)..": "..L["Current Rank"].." = "..Rank.." ("..Progress.."%), "..L["Next Week Rank"].." = "..EstRank.." ("..EstProgress.."%)", "emote")
 end
 
 -- MINIMAP
@@ -284,15 +285,15 @@ HonorSpy.hasIcon = "Interface\\Icons\\Inv_Misc_Bomb_04"
 function BuildMenu()
 	local options = {
 		type = "group",
-		desc = "HonorSpy options",
+		desc = L["HonorSpy options"],
 		args = { }
 	}
 
-	local days = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+	local days = { L["Sunday"], L["Monday"], L["Tuesday"], L["Wednesday"], L["Thursday"], L["Friday"], L["Saturday"] };
 	options.args["reset_day"] = {
 		type = "text",
-		name = "PvP Week Reset On",
-		desc = "Day of week when new PvP week starts (10AM UTC)",
+		name = L["PvP Week Reset On"],
+		desc = L["Day of week when new PvP week starts (10AM UTC)"],
 		get = function() return days[HonorSpy.db.realm.hs.reset_day+1] end,
 		set = function(v)
 			for k,nv in pairs(days) do
@@ -304,40 +305,40 @@ function BuildMenu()
 	}
 	options.args["sort"] = {
 		type = "text",
-		name = "Sort By",
-		desc = "Set up sorting column",
+		name = L["Sort By"],
+		desc = L["Set up sorting column"],
 		get = function() return HonorSpy.db.realm.hs.sort end,
 		set = function(v)
 			HonorSpy.db.realm.hs.sort = v;
 			HonorSpyStandings:Refresh();
 		end,
-		validate = {"Rank", "ThisWeekHonor"},
+		validate = {L["Rank"], L["ThisWeekHonor"]},
 	}
 	options.args["export"] = {
 		type = "execute",
-		name = "Export to CSV",
-		desc = "Show window with current data in CSV format",
+		name = L["Export to CSV"],
+		desc = L["Show window with current data in CSV format"],
 		func = function() HonorSpy:ExportCSV() end,
 	}
 	options.args["report"] = {
 		type = "execute",
-		name = "Report My Standing",
-		desc = "Reports your current standing as emote",
+		name = L["Report My Standing"],
+		desc = L["Reports your current standing as emote"],
 		func = function() HonorSpy:Report() end,
 	}
 	options.args["purge_data"] = {
 		type = "execute",
-		name = "_ purge all data",
-		desc = "Delete all collected data",
+		name = L["_ purge all data"],
+		desc = L["Delete all collected data"],
 		func = function() purgeData() end,
 	}
 	options.args["limit"] = {
 		type = "text",
-		name = "Limit Rows",
-		desc = "Limits number of rows shown in table",
+		name = L["Limit Rows"],
+		desc = L["Limits number of rows shown in table"],
 		get = function() return HonorSpy.db.realm.hs.limit end,
-		set = function(v) HonorSpy.db.realm.hs.limit = v; HonorSpy:Print("limit = "..tostring(v)) end,
-		usage = "<EP>",
+		set = function(v) HonorSpy.db.realm.hs.limit = v; HonorSpy:Print(L["Limit"].." = "..v) end,
+		usage = L["<EP>"],
 		-- disabled = function() return not (CanEditOfficerNote() and CanEditPublicNote()) end,
 		validate = function(v)
 		  local n = tonumber(v)

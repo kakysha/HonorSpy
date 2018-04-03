@@ -1,25 +1,31 @@
 --[[
-Name: AceDB-2.0
-Revision: $Rev: 14832 $
-Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
-Inspired By: Ace 1.x by Turan (turan@gryphon.com)
-Website: http://www.wowace.com/
-Documentation: http://www.wowace.com/index.php/AceDB-2.0
-SVN: http://svn.wowace.com/root/trunk/Ace2/AceDB-2.0
-Description: Mixin to allow for fast, clean, and featureful saved variable
-             access.
-Dependencies: AceLibrary, AceOO-2.0, AceEvent-2.0
+	Name: AceDB-2.0
+	Revision: $Rev: 17797 $
+	Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
+	Inspired By: Ace 1.x by Turan (turan@gryphon.com)
+	Website: http://www.wowace.com/
+	Documentation: http://www.wowace.com/index.php/AceDB-2.0
+	SVN: http://svn.wowace.com/root/trunk/Ace2/AceDB-2.0
+	Description: Mixin to allow for fast, clean, and featureful saved variable
+	access.
+	Dependencies: AceLibrary, AceOO-2.0, AceEvent-2.0
 ]]
 
 local MAJOR_VERSION = "AceDB-2.0"
-local MINOR_VERSION = "$Revision: 14832 $"
+local MINOR_VERSION = "$Revision: 17797 $"
 
 if not AceLibrary then error(MAJOR_VERSION .. " requires AceLibrary") end
 if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then return end
 
+if loadstring("return function(...) return ... end") and AceLibrary:HasInstance(MAJOR_VERSION) then return end -- lua51 check
 if not AceLibrary:HasInstance("AceOO-2.0") then error(MAJOR_VERSION .. " requires AceOO-2.0") end
 
 local ACTIVE, ENABLED, STATE, TOGGLE_ACTIVE, MAP_ACTIVESUSPENDED, SET_PROFILE, SET_PROFILE_USAGE, PROFILE, PLAYER_OF_REALM, CHOOSE_PROFILE_DESC, CHOOSE_PROFILE_GUI, COPY_PROFILE_DESC, COPY_PROFILE_GUI, OTHER_PROFILE_DESC, OTHER_PROFILE_GUI, OTHER_PROFILE_USAGE, CHARACTER, REALM, CLASS
+
+local function safecall(func,a,b,c,d,e,f,g,h,i)
+	local success, err = pcall(func,a,b,c,d,e,f,g,h,i)
+	if not success then geterrorhandler()(err) end
+end
 
 if GetLocale() == "deDE" then
 	ACTIVE = "Aktiv"
@@ -126,6 +132,27 @@ elseif GetLocale() == "zhCN" then
 	CHARACTER = "\229\173\151\231\172\166: "
 	REALM = "\229\159\159: "
 	CLASS = "\233\128\137\228\187\182\231\177\187: "
+elseif GetLocale() == "ruRU" then
+	ACTIVE = "Активный"
+	ENABLED = "Включён"
+	STATE = "Состояние"
+	TOGGLE_ACTIVE = "Отключить/Запустить аддон."
+	MAP_ACTIVESUSPENDED = { [true] = "|cff00ff00Активный|r", [false] = "|cffff0000Приостановленный|r" }
+	SET_PROFILE = "Установить профиль для этого аддона."
+	SET_PROFILE_USAGE = "{чар || класс || сервер || <название профиля>}"
+	PROFILE = "Профиль"
+	PLAYER_OF_REALM = "%s из %s"
+	CHOOSE_PROFILE_DESC = "Выберите профиль."
+	CHOOSE_PROFILE_GUI = "Выбор"
+	COPY_PROFILE_DESC = "Cкопировать настройки из другого профиля."
+	COPY_PROFILE_GUI = "Скопировать из"
+	OTHER_PROFILE_DESC = "Выбрать другой профиль."
+	OTHER_PROFILE_GUI = "Другое"
+	OTHER_PROFILE_USAGE = "<название профиля>"
+
+	CHARACTER = "Персонаж: "
+	REALM = "Сервер: "
+	CLASS = "Класс: "
 else -- enUS
 	ACTIVE = "Active"
 	ENABLED = "Enabled"
@@ -153,15 +180,15 @@ local AceOO = AceLibrary("AceOO-2.0")
 local AceEvent
 local Mixin = AceOO.Mixin
 local AceDB = Mixin {
-						"RegisterDB",
-						"RegisterDefaults",
-						"ResetDB",
-						"SetProfile",
-						"GetProfile",
-						"ToggleActive",
-						"IsActive",
-						"AcquireDBNamespace",
-					}
+	"RegisterDB",
+	"RegisterDefaults",
+	"ResetDB",
+	"SetProfile",
+	"GetProfile",
+	"ToggleActive",
+	"IsActive",
+	"AcquireDBNamespace",
+}
 local Dewdrop = AceLibrary:HasInstance("Dewdrop-2.0") and AceLibrary("Dewdrop-2.0")
 
 local _G = getfenv(0)
@@ -971,52 +998,66 @@ function AceDB:SetProfile(name, copyFrom)
 	if string.lower(oldName) == string.lower(name) then
 		return
 	end
+	local oldProfileData = db.profile
+	local realName = name
+	if lowerName == "char" then
+		realName = name .. "/" .. charID
+	elseif lowerName == "realm" then
+		realName = name .. "/" .. realmID
+	elseif lowerName == "class" then
+		realName = name .. "/" .. classID
+	end
 	local current = self.class
 	while current and current ~= AceOO.Class do
 		if current.mixins then
 			for mixin in pairs(current.mixins) do
 				if type(mixin.OnEmbedProfileDisable) == "function" then
-					mixin:OnEmbedProfileDisable(self)
+					safecall(mixin.OnEmbedProfileDisable, mixin, self, realName)
 				end
 			end
 		end
 		current = current.super
 	end
 	if type(self.OnProfileDisable) == "function" then
-		self:OnProfileDisable()
-	end
-	local oldProfileData = db.profile
-	local realName = name
-	if lowerName == "char" then
-		realName = name .. "/" .. charID
-	elseif lowerName == "realm/" then
-		realName = name .. "/" .. realmID
-	elseif lowerName == "class/" then
-		realName = name .. "/" .. classID
+		safecall(self.OnProfileDisable, self, realName)
 	end
 	local active = self:IsActive()
 	db.raw.currentProfile[charID] = name
 	rawset(db, 'profile', nil)
+	if db.namespaces then
+		for k,v in pairs(db.namespaces) do
+			rawset(v, 'profile', nil)
+		end
+	end
 	if copyFrom then
 		for k,v in pairs(db.profile) do
 			db.profile[k] = nil
 		end
 		copyTable(db.profile, db.raw.profiles[copyFrom])
 		inheritDefaults(db.profile, db.defaults and db.defaults.profile)
+		if db.namespaces then
+			for l,u in pairs(db.namespaces) do
+				for k,v in pairs(u.profile) do
+					u.profile[k] = nil
+				end
+				copyTable(u.profile, db.raw.namespaces[l].profiles[copyFrom])
+				inheritDefaults(u.profile, u.defaults and u.defaults.profile)
+			end
+		end
 	end
 	local current = self.class
 	while current and current ~= AceOO.Class do
 		if current.mixins then
 			for mixin in pairs(current.mixins) do
 				if type(mixin.OnEmbedProfileEnable) == "function" then
-					mixin:OnEmbedProfileEnable(self, oldName, oldProfileData, copyFrom)
+					safecall(mixin.OnEmbedProfileEnable, mixin, self, oldName, oldProfileData, copyFrom)
 				end
 			end
 		end
 		current = current.super
 	end
 	if type(self.OnProfileEnable) == "function" then
-		self:OnProfileEnable(oldName, oldProfileData, copyFrom)
+		safecall(self.OnProfileEnable, self, oldName, oldProfileData, copyFrom)
 	end
 	if cleanDefaults(oldProfileData, db.defaults and db.defaults.profile) then
 		db.raw.profiles[oldName] = nil
@@ -1038,14 +1079,17 @@ function AceDB:SetProfile(name, copyFrom)
 				if current.mixins then
 					for mixin in pairs(current.mixins) do
 						if type(mixin.OnEmbedEnable) == "function" then
-							mixin:OnEmbedEnable(self)
+							safecall(mixin.OnEmbedEnable, mixin, self)
 						end
 					end
 				end
 				current = current.super
 			end
 			if type(self.OnEnable) == "function" then
-				self:OnEnable()
+				safecall(self.OnEnable, self)
+			end
+			if AceEvent then
+				AceEvent:TriggerEvent("Ace2_AddonEnabled", self)
 			end
 		else
 			local current = self.class
@@ -1053,14 +1097,17 @@ function AceDB:SetProfile(name, copyFrom)
 				if current.mixins then
 					for mixin in pairs(current.mixins) do
 						if type(mixin.OnEmbedDisable) == "function" then
-							mixin:OnEmbedDisable(self)
+							safecall(mixin.OnEmbedDisable, mixin, self)
 						end
 					end
 				end
 				current = current.super
 			end
 			if type(self.OnDisable) == "function" then
-				self:OnDisable()
+				safecall(self.OnDisable, self)
+			end
+			if AceEvent then
+				AceEvent:TriggerEvent("Ace2_AddonDisabled", self)
 			end
 		end
 	end
@@ -1114,14 +1161,17 @@ function AceDB:ToggleActive(state)
 			if current.mixins then
 				for mixin in pairs(current.mixins) do
 					if type(mixin.OnEmbedEnable) == "function" then
-						mixin:OnEmbedEnable(self)
+						safecall(mixin.OnEmbedEnable, mixin, self)
 					end
 				end
 			end
 			current = current.super
 		end
 		if type(self.OnEnable) == "function" then
-			self:OnEnable()
+			safecall(self.OnEnable, self)
+		end
+		if AceEvent then
+			AceEvent:TriggerEvent("Ace2_AddonEnabled", self)
 		end
 	else
 		local current = self.class
@@ -1129,14 +1179,17 @@ function AceDB:ToggleActive(state)
 			if current.mixins then
 				for mixin in pairs(current.mixins) do
 					if type(mixin.OnEmbedDisable) == "function" then
-						mixin:OnEmbedDisable(self)
+						safecall(mixin.OnEmbedDisable, mixin, self)
 					end
 				end
 			end
 			current = current.super
 		end
 		if type(self.OnDisable) == "function" then
-			self:OnDisable()
+			safecall(self.OnDisable, self)
+		end
+		if AceEvent then
+			AceEvent:TriggerEvent("Ace2_AddonDisabled", self)
 		end
 	end
 	return not disable
