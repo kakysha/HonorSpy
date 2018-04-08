@@ -1,6 +1,7 @@
 local T = AceLibrary("Tablet-2.0")
 local C = AceLibrary("Crayon-2.0")
 local BC = AceLibrary("Babble-Class-2.2")
+local L = AceLibrary("AceLocale-2.2"):new("HonorSpy")
 
 HonorSpyStandings = HonorSpy:NewModule("HonorSpyStandings", "AceDB-2.0")
 
@@ -10,7 +11,7 @@ function HonorSpyStandings:OnEnable()
   if not T:IsRegistered("HonorSpyStandings") then
     T:Register("HonorSpyStandings",
       "children", function()
-        T:SetTitle("HonorSpy standings")
+        T:SetTitle(L["HonorSpy standings"])
         self:OnTooltipUpdate()
       end,
   		"showTitleWhenDetached", false,
@@ -50,7 +51,7 @@ function HonorSpyStandings:BuildStandingsTable()
     table.insert(t, {playerName, player.class, player.thisWeekHonor, player.lastWeekHonor, player.standing, player.RP, player.rank, player.last_checked})
   end
   local sort_column = 3; -- ThisWeekHonor
-  if (HonorSpy.db.realm.hs.sort == "Rank") then sort_column = 6; end
+  if (HonorSpy.db.realm.hs.sort == L["Rank"]) then sort_column = 6; end
   table.sort(t, function(a,b)
     return a[sort_column] > b[sort_column]
     end)
@@ -60,12 +61,12 @@ end
 function HonorSpyStandings:OnTooltipUpdate()
 	local cat = T:AddCategory(
 	  "columns", 6,
-	  "text",  C:Orange("Name"),   "child_textR",    1, "child_textG",    1, "child_textB",    1, "child_justify",  "LEFT",
-	  "text2", C:Orange("ThisWeekHonor"),     "child_text2R",   1, "child_text2G",   1, "child_text2B",   1, "child_justify2", "RIGHT",
-	  "text3", C:Orange("LastWeekHonor"),     "child_text3R",   1, "child_text3G",   1, "child_text3B",   1, "child_justify3", "RIGHT",
-	  "text4", C:Orange("Standing"),     "child_text4R",   1, "child_text4G",   1, "child_text4B",   0, "child_justify4", "RIGHT",
-	  "text5", C:Orange("RP"),     "child_text5R",   1, "child_text5G",   1, "child_text5B",   0, "child_justify5", "RIGHT",
-	  "text6", C:Orange("Rank"),     "child_text6R",   1, "child_text6G",   0, "child_text6B",   0, "child_justify6", "RIGHT"
+	  "text",  C:Orange(L["Name"]),   "child_textR",    1, "child_textG",    1, "child_textB",    1, "child_justify",  "LEFT",
+	  "text2", C:Orange(L["ThisWeekHonor"]),     "child_text2R",   1, "child_text2G",   1, "child_text2B",   1, "child_justify2", "RIGHT",
+	  "text3", C:Orange(L["LastWeekHonor"]),     "child_text3R",   1, "child_text3G",   1, "child_text3B",   1, "child_justify3", "RIGHT",
+	  "text4", C:Orange(L["Standing"]),     "child_text4R",   1, "child_text4G",   1, "child_text4B",   0, "child_justify4", "RIGHT",
+	  "text5", C:Orange(L["RP"]),     "child_text5R",   1, "child_text5G",   1, "child_text5B",   0, "child_justify5", "RIGHT",
+	  "text6", C:Orange(L["Rank"]),     "child_text6R",   1, "child_text6G",   0, "child_text6B",   0, "child_justify6", "RIGHT"
 	)
 	local t = self:BuildStandingsTable()
 	for i = 1, table.getn(t) do
@@ -73,13 +74,13 @@ function HonorSpyStandings:OnTooltipUpdate()
 
 		local last_seen, last_seen_human = (time() - last_checked), ""
 		if (last_seen/60/60/24 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60/60/24).."d"
+			last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
 		elseif (last_seen/60/60 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60/60).."h"
+			last_seen_human = ""..math.floor(last_seen/60/60)..L["h"]
 		elseif (last_seen/60 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60).."m"
+			last_seen_human = ""..math.floor(last_seen/60)..L["m"]
 		else
-			last_seen_human = ""..last_seen.."s"
+			last_seen_human = ""..last_seen..L["s"]
 		end
 
 		local class_color = BC:GetHexColor(class)

@@ -1,23 +1,29 @@
 --[[
-Name: AceModuleCore-2.0
-Revision: $Rev: 12441 $
-Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
-Inspired By: Ace 1.x by Turan (turan@gryphon.com)
-Website: http://www.wowace.com/
-Documentation: http://www.wowace.com/index.php/AceModuleCore-2.0
-SVN: http://svn.wowace.com/root/trunk/Ace2/AceModuleCore-2.0
-Description: Mixin to provide a module system so that modules or plugins can
-             use an addon as its core.
-Dependencies: AceLibrary, AceOO-2.0, AceAddon-2.0, Compost-2.0 (optional)
+	Name: AceModuleCore-2.0
+	Revision: $Rev: 17998 $
+	Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
+	Inspired By: Ace 1.x by Turan (turan@gryphon.com)
+	Website: http://www.wowace.com/
+	Documentation: http://www.wowace.com/index.php/AceModuleCore-2.0
+	SVN: http://svn.wowace.com/root/trunk/Ace2/AceModuleCore-2.0
+	Description: Mixin to provide a module system so that modules or plugins can
+	use an addon as its core.
+	Dependencies: AceLibrary, AceOO-2.0, AceAddon-2.0, AceEvent-2.0 (optional), Compost-2.0 (optional)
 ]]
 
 local MAJOR_VERSION = "AceModuleCore-2.0"
-local MINOR_VERSION = "$Revision: 12441 $"
+local MINOR_VERSION = "$Revision: 17998 $"
 
 if not AceLibrary then error(MAJOR_VERSION .. " requires AceLibrary") end
 if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then return end
 
+if loadstring("return function(...) return ... end") and AceLibrary:HasInstance(MAJOR_VERSION) then return end -- lua51 check
 if not AceLibrary:HasInstance("AceOO-2.0") then error(MAJOR_VERSION .. " requires AceOO-2.0") end
+
+local function safecall(func,a,b,c,d,e,f,g)
+	local success, err = pcall(func,a,b,c,d,e,f,g)
+	if not success then geterrorhandler()(err) end
+end
 
 local table_setn
 do
@@ -54,16 +60,17 @@ end
 
 local AceOO = AceLibrary:GetInstance("AceOO-2.0")
 local AceModuleCore = AceOO.Mixin {
-									"NewModule",
-									"HasModule",
-									"GetModule",
-									"IsModule",
-									"IterateModules",
-									"SetModuleMixins", 
-									"SetModuleClass",
-									"IsModuleActive",
-									"ToggleModuleActive"
-								  }
+	"NewModule",
+	"HasModule",
+	"GetModule",
+	"IsModule",
+	"IterateModules",
+	"SetModuleMixins", 
+	"SetModuleClass",
+	"IsModuleActive",
+	"ToggleModuleActive"
+}
+local AceEvent
 
 local Compost = AceLibrary:HasInstance("Compost-2.0") and AceLibrary("Compost-2.0")
 
@@ -87,88 +94,92 @@ function AceModuleCore:NewModule(name, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, 
 	if self.modules[name] then
 		AceModuleCore:error("The module %q has already been registered", name)
 	end
-
+	
 	if not tmp then
 		tmp = {}
 	end
 	if a1 then table.insert(tmp, a1)
-	if a2 then table.insert(tmp, a2)
-	if a3 then table.insert(tmp, a3)
-	if a4 then table.insert(tmp, a4)
-	if a5 then table.insert(tmp, a5)
-	if a6 then table.insert(tmp, a6)
-	if a7 then table.insert(tmp, a7)
-	if a8 then table.insert(tmp, a8)
-	if a9 then table.insert(tmp, a9)
-	if a10 then table.insert(tmp, a10)
-	if a11 then table.insert(tmp, a11)
-	if a12 then table.insert(tmp, a12)
-	if a13 then table.insert(tmp, a13)
-	if a14 then table.insert(tmp, a14)
-	if a15 then table.insert(tmp, a15)
-	if a16 then table.insert(tmp, a16)
-	if a17 then table.insert(tmp, a17)
-	if a18 then table.insert(tmp, a18)
-	if a19 then table.insert(tmp, a19)
-	if a20 then table.insert(tmp, a20)
-	end end end end end end end end end end end end end end end end end end end end
-	for k,v in ipairs(tmp) do
-		tmp[k] = getlibrary(v)
-	end
-
-	if self.moduleMixins then
-		for _,mixin in ipairs(self.moduleMixins) do
-			local exists = false
-			for _,v in ipairs(tmp) do
-				if mixin == v then
-					exists = true
-					break
-				end
-			end
-			if not exists then
-				table.insert(tmp, mixin)
-			end
-		end
-	end
-
-	local module = AceOO.Classpool(self.moduleClass, unpack(tmp)):new(name)
-	self.modules[name] = module
-	module.name = name
-	module.title = name
-
-	AceModuleCore.totalModules[module] = self
-
-	for k in pairs(tmp) do
-		tmp[k] = nil
-	end
-	table_setn(tmp, 0)
-	return module
+		if a2 then table.insert(tmp, a2)
+			if a3 then table.insert(tmp, a3)
+				if a4 then table.insert(tmp, a4)
+					if a5 then table.insert(tmp, a5)
+						if a6 then table.insert(tmp, a6)
+							if a7 then table.insert(tmp, a7)
+								if a8 then table.insert(tmp, a8)
+									if a9 then table.insert(tmp, a9)
+										if a10 then table.insert(tmp, a10)
+											if a11 then table.insert(tmp, a11)
+												if a12 then table.insert(tmp, a12)
+													if a13 then table.insert(tmp, a13)
+														if a14 then table.insert(tmp, a14)
+															if a15 then table.insert(tmp, a15)
+																if a16 then table.insert(tmp, a16)
+																	if a17 then table.insert(tmp, a17)
+																		if a18 then table.insert(tmp, a18)
+																			if a19 then table.insert(tmp, a19)
+																				if a20 then table.insert(tmp, a20)
+																				end end end end end end end end end end end end end end end end end end end end
+																				for k,v in ipairs(tmp) do
+																					tmp[k] = getlibrary(v)
+																				end
+																				
+																				if self.moduleMixins then
+																					for _,mixin in ipairs(self.moduleMixins) do
+																						local exists = false
+																						for _,v in ipairs(tmp) do
+																							if mixin == v then
+																								exists = true
+																								break
+																							end
+																						end
+																						if not exists then
+																							table.insert(tmp, mixin)
+																						end
+																					end
+																				end
+																				
+																				local module = AceOO.Classpool(self.moduleClass, unpack(tmp)):new(name)
+																				self.modules[name] = module
+																				module.name = name
+																				module.title = name
+																				
+																				AceModuleCore.totalModules[module] = self
+																				
+																				if AceEvent then
+																					AceEvent:TriggerEvent("Ace2_ModuleCreated", module)
+																				end
+																				
+																				for k in pairs(tmp) do
+																					tmp[k] = nil
+																				end
+																				table_setn(tmp, 0)
+																				return module
 end
 
 function AceModuleCore:HasModule(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20)
 	if a1 then if not self.modules[a1] then return false end
-	if a2 then if not self.modules[a2] then return false end
-	if a3 then if not self.modules[a3] then return false end
-	if a4 then if not self.modules[a4] then return false end
-	if a5 then if not self.modules[a5] then return false end
-	if a6 then if not self.modules[a6] then return false end
-	if a7 then if not self.modules[a7] then return false end
-	if a8 then if not self.modules[a8] then return false end
-	if a9 then if not self.modules[a9] then return false end
-	if a10 then if not self.modules[a10] then return false end
-	if a11 then if not self.modules[a11] then return false end
-	if a12 then if not self.modules[a12] then return false end
-	if a13 then if not self.modules[a13] then return false end
-	if a14 then if not self.modules[a14] then return false end
-	if a15 then if not self.modules[a15] then return false end
-	if a16 then if not self.modules[a16] then return false end
-	if a17 then if not self.modules[a17] then return false end
-	if a18 then if not self.modules[a18] then return false end
-	if a19 then if not self.modules[a19] then return false end
-	if a20 then if not self.modules[a20] then return false end
-	end end end end end end end end end end end end end end end end end end end end
-
-	return true
+		if a2 then if not self.modules[a2] then return false end
+			if a3 then if not self.modules[a3] then return false end
+				if a4 then if not self.modules[a4] then return false end
+					if a5 then if not self.modules[a5] then return false end
+						if a6 then if not self.modules[a6] then return false end
+							if a7 then if not self.modules[a7] then return false end
+								if a8 then if not self.modules[a8] then return false end
+									if a9 then if not self.modules[a9] then return false end
+										if a10 then if not self.modules[a10] then return false end
+											if a11 then if not self.modules[a11] then return false end
+												if a12 then if not self.modules[a12] then return false end
+													if a13 then if not self.modules[a13] then return false end
+														if a14 then if not self.modules[a14] then return false end
+															if a15 then if not self.modules[a15] then return false end
+																if a16 then if not self.modules[a16] then return false end
+																	if a17 then if not self.modules[a17] then return false end
+																		if a18 then if not self.modules[a18] then return false end
+																			if a19 then if not self.modules[a19] then return false end
+																				if a20 then if not self.modules[a20] then return false end
+																				end end end end end end end end end end end end end end end end end end end end
+																				
+																				return true
 end
 
 function AceModuleCore:GetModule(name)
@@ -221,7 +232,7 @@ function AceModuleCore:SetModuleMixins(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, 
 	elseif next(self.modules) then
 		AceModuleCore:error('Cannot call "SetModuleMixins" after "NewModule" has been called.')
 	end
-
+	
 	self.moduleMixins = Compost and Compost:Acquire(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20) or {a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20}
 	for k,v in ipairs(self.moduleMixins) do
 		self.moduleMixins[k] = getlibrary(v)
@@ -245,7 +256,7 @@ end
 function AceModuleCore:ToggleModuleActive(module, state)
 	AceModuleCore:argCheck(module, 2, "table", "string")
 	AceModuleCore:argCheck(state, 3, "nil", "boolean")
-
+	
 	if type(module) == "string" then
 		if not self:HasModule(module) then
 			AceModuleCore:error("Cannot find module %q", module)
@@ -256,7 +267,7 @@ function AceModuleCore:ToggleModuleActive(module, state)
 			AceModuleCore:error("%q is not a module", module)
 		end
 	end
-
+	
 	local disable
 	if state == nil then
 		disable = self:IsModuleActive(module)
@@ -266,7 +277,7 @@ function AceModuleCore:ToggleModuleActive(module, state)
 			return
 		end
 	end
-
+	
 	if type(module.ToggleActive) == "function" then
 		return module:ToggleActive(not disable)
 	elseif AceOO.inherits(self, "AceDB-2.0") then
@@ -310,8 +321,25 @@ function AceModuleCore:ToggleModuleActive(module, state)
 		end
 	end
 	if not disable then
+		local current = module.class
+		while true do
+			if current == AceOO.Class then
+				break
+			end
+			if current.mixins then
+				for mixin in pairs(current.mixins) do
+					if type(mixin.OnEmbedEnable) == "function" then
+						safecall(mixin.OnEmbedEnable, mixin, module)
+					end
+				end
+			end
+			current = current.super
+		end
 		if type(module.OnEnable) == "function" then
-			module:OnEnable()
+			safecall(module.OnEnable, module)
+		end
+		if AceEvent then
+			AceEvent:TriggerEvent("Ace2_AddonEnabled", module)
 		end
 	else
 		local current = module.class
@@ -322,14 +350,17 @@ function AceModuleCore:ToggleModuleActive(module, state)
 			if current.mixins then
 				for mixin in pairs(current.mixins) do
 					if type(mixin.OnEmbedDisable) == "function" then
-						mixin:OnEmbedDisable(module)
+						safecall(mixin.OnEmbedDisable, mixin, module)
 					end
 				end
 			end
 			current = current.super
 		end
 		if type(module.OnDisable) == "function" then
-			module:OnDisable()
+			safecall(module.OnDisable, module)
+		end
+		if AceEvent then
+			AceEvent:TriggerEvent("Ace2_AddonDisabled", module)
 		end
 	end
 	return not disable
@@ -358,7 +389,7 @@ function AceModuleCore:IsModuleActive(module)
 			AceModuleCore:error("%q is not a module", module)
 		end
 	end
-
+	
 	if type(module.IsActive) == "function" then
 		return module:IsActive()
 	elseif AceOO.inherits(self, "AceDB-2.0") then
@@ -374,31 +405,58 @@ function AceModuleCore:OnInstanceInit(target)
 		AceModuleCore:error("OnInstanceInit cannot be called twice")
 	end
 	target.modules = Compost and Compost:Acquire() or {}
-
+	
 	target.moduleClass = AceOO.Class("AceAddon-2.0")
 	target.modulePrototype = target.moduleClass.prototype
 end
 
 AceModuleCore.OnManualEmbed = AceModuleCore.OnInstanceInit
 
+function AceModuleCore.OnEmbedProfileDisable(AceModuleCore, self, newProfile)
+	if not AceOO.inherits(self, "AceDB-2.0") then
+		return
+	end
+	local _,currentProfile = self:GetProfile()
+	for k, module in pairs(self.modules) do
+		if type(module.IsActive) == "function" or type(module.ToggleActive) == "function" then
+			-- continue
+		else
+			local currentActive =  not self.db or not self.db.raw or not self.db.raw.disabledModules or not self.db.raw.disabledModules[currentProfile] or not self.db.raw.disabledModules[currentProfile][module.name]
+			local newActive =  not self.db or not self.db.raw or not self.db.raw.disabledModules or not self.db.raw.disabledModules[newProfile] or not self.db.raw.disabledModules[newProfile][module.name]
+			if currentActive ~= newActive then
+				self:ToggleModuleActive(module)
+				if not self.db.raw.disabledModules then
+					self.db.raw.disabledModules = {}
+				end
+				if not self.db.raw.disabledModules[currentProfile] then
+					self.db.raw.disabledModules[currentProfile] = {}
+				end
+				self.db.raw.disabledModules[currentProfile][module.name] = not currentActive or nil
+			end
+		end
+	end
+end
+
 local function activate(self, oldLib, oldDeactivate)
 	AceModuleCore = self
-
-	self.super.activate(self, oldLib, oldDeactivate)
-
+	
 	if oldLib then
 		self.totalModules = oldLib.totalModules
 	end
 	if not self.totalModules then
 		self.totalModules = {}
 	end
+	
+	self.super.activate(self, oldLib, oldDeactivate)
 end
 
 local function external(self, major, instance)
 	if major == "Compost-2.0" then
 		Compost = instance
+	elseif major == "AceEvent-2.0" then
+		AceEvent = instance
 	end
 end
 
-AceLibrary:Register(AceModuleCore, MAJOR_VERSION, MINOR_VERSION, activate)
+AceLibrary:Register(AceModuleCore, MAJOR_VERSION, MINOR_VERSION, activate, nil, external)
 AceModuleCore = AceLibrary(MAJOR_VERSION)

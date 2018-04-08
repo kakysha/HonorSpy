@@ -1,43 +1,44 @@
 --[[
-Name: AceEvent-2.0
-Revision: $Rev: 14125 $
-Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
-Inspired By: Ace 1.x by Turan (turan@gryphon.com)
-Website: http://www.wowace.com/
-Documentation: http://www.wowace.com/index.php/AceEvent-2.0
-SVN: http://svn.wowace.com/root/trunk/Ace2/AceEvent-2.0
-Description: Mixin to allow for event handling, scheduling, and inter-addon
-             communication.
-Dependencies: AceLibrary, AceOO-2.0
+	Name: AceEvent-2.0
+	Revision: $Rev: 17803 $
+	Developed by: The Ace Development Team (http://www.wowace.com/index.php/The_Ace_Development_Team)
+	Inspired By: Ace 1.x by Turan (turan@gryphon.com)
+	Website: http://www.wowace.com/
+	Documentation: http://www.wowace.com/index.php/AceEvent-2.0
+	SVN: http://svn.wowace.com/root/trunk/Ace2/AceEvent-2.0
+	Description: Mixin to allow for event handling, scheduling, and inter-addon
+	communication.
+	Dependencies: AceLibrary, AceOO-2.0
 ]]
 
 local MAJOR_VERSION = "AceEvent-2.0"
-local MINOR_VERSION = "$Revision: 14125 $"
+local MINOR_VERSION = "$Revision: 17803 $"
 
 if not AceLibrary then error(MAJOR_VERSION .. " requires AceLibrary") end
 if not AceLibrary:IsNewVersion(MAJOR_VERSION, MINOR_VERSION) then return end
 
+if loadstring("return function(...) return ... end") and AceLibrary:HasInstance(MAJOR_VERSION) then return end -- lua51 check
 if not AceLibrary:HasInstance("AceOO-2.0") then error(MAJOR_VERSION .. " requires AceOO-2.0") end
 
 local AceOO = AceLibrary:GetInstance("AceOO-2.0")
 local Mixin = AceOO.Mixin
 local AceEvent = Mixin {
-						"RegisterEvent",
-						"RegisterAllEvents",
-						"UnregisterEvent",
-						"UnregisterAllEvents",
-						"TriggerEvent",
-						"ScheduleEvent",
-						"ScheduleRepeatingEvent",
-						"CancelScheduledEvent",
-						"CancelAllScheduledEvents",
-						"IsEventRegistered",
-						"IsEventScheduled",
-						"RegisterBucketEvent",
-						"UnregisterBucketEvent",
-						"UnregisterAllBucketEvents",
-						"IsBucketEventRegistered",
-					   }
+	"RegisterEvent",
+	"RegisterAllEvents",
+	"UnregisterEvent",
+	"UnregisterAllEvents",
+	"TriggerEvent",
+	"ScheduleEvent",
+	"ScheduleRepeatingEvent",
+	"CancelScheduledEvent",
+	"CancelAllScheduledEvents",
+	"IsEventRegistered",
+	"IsEventScheduled",
+	"RegisterBucketEvent",
+	"UnregisterBucketEvent",
+	"UnregisterAllBucketEvents",
+	"IsBucketEventRegistered",
+}
 
 local table_setn
 do
@@ -208,6 +209,8 @@ function AceEvent:TriggerEvent(event, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a
 	end
 	local _G_event = _G.event
 	_G.event = event
+	local lastEvent = AceEvent.currentEvent
+	AceEvent.currentEvent = event
 
 	local AceEvent_onceRegistry = AceEvent.onceRegistry
 	local AceEvent_debugTable = AceEvent.debugTable
@@ -386,6 +389,7 @@ function AceEvent:TriggerEvent(event, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a
 		del(tmp)
 	end
 	_G.event = _G_event
+	AceEvent.currentEvent = lastEvent
 end
 
 -- local accessors
@@ -399,47 +403,51 @@ local pairs = pairs
 local unpack = unpack
 
 local delayRegistry
+local tmp = {}
 local function OnUpdate()
 	local t = GetTime()
-	local k,v = next(delayRegistry)
-	local last = nil
-	while k do
-		local v_time = v.time
-		if not v_time then
-			delayRegistry[k] = del(v)
-		elseif v_time <= t then
-			local v_repeatDelay = v.repeatDelay
-			if v_repeatDelay then
-				-- use the event time, not the current time, else timing inaccuracies add up over time
-				v.time = v_time + v_repeatDelay
-			end
-			local event = v.event
-			local mem, time
-			if AceEvent_debugTable then
-				mem, time = gcinfo(), GetTime()
-			end
-			if type(event) == "function" then
-				event(unpack(v))
-			else
-				AceEvent:TriggerEvent(event, unpack(v))
-			end
-			if AceEvent_debugTable then
-				mem, time = gcinfo() - mem, GetTime() - time
-				v.mem = v.mem + mem
-				v.timeSpent = v.timeSpent + time
-				v.count = v.count + 1
-			end
-			if not v_repeatDelay then
-				local x = delayRegistry[k]
-				if x and x.time == v_time then -- check if it was manually reset
-					delayRegistry[k] = del(v)
+	for k,v in pairs(delayRegistry) do
+		tmp[k] = true
+	end
+	for k in pairs(tmp) do
+		local v = delayRegistry[k]
+		if v then
+			local v_time = v.time
+			if not v_time then
+				delayRegistry[k] = del(v)
+			elseif v_time <= t then
+				local v_repeatDelay = v.repeatDelay
+				if v_repeatDelay then
+					-- use the event time, not the current time, else timing inaccuracies add up over time
+					v.time = v_time + v_repeatDelay
+				end
+				local event = v.event
+				local mem, time
+				if AceEvent_debugTable then
+					mem, time = gcinfo(), GetTime()
+				end
+				if type(event) == "function" then
+					event(unpack(v))
+				else
+					AceEvent:TriggerEvent(event, unpack(v))
+				end
+				if AceEvent_debugTable then
+					mem, time = gcinfo() - mem, GetTime() - time
+					v.mem = v.mem + mem
+					v.timeSpent = v.timeSpent + time
+					v.count = v.count + 1
+				end
+				if not v_repeatDelay then
+					local x = delayRegistry[k]
+					if x and x.time == v_time then -- check if it was manually reset
+						delayRegistry[k] = del(v)
+					end
 				end
 			end
 		end
-		if delayRegistry[k] then
-			last = k
-		end
-		k,v = next(delayRegistry, last)
+	end
+	for k in pairs(tmp) do
+		tmp[k] = nil
 	end
 	if not next(delayRegistry) then
 		AceEvent.frame:Hide()
@@ -945,10 +953,13 @@ function AceEvent:activate(oldLib, oldDeactivate)
 		end)
 		self:RegisterEvent("LANGUAGE_LIST_CHANGED", function()
 			if self.registry["MEETINGSTONE_CHANGED"] and self.registry["MEETINGSTONE_CHANGED"][self] then
+				registeringFromAceEvent = true
 				self:UnregisterEvent("MEETINGSTONE_CHANGED")
 				self:RegisterEvent("MINIMAP_ZONE_CHANGED", f, true)
+				registeringFromAceEvent = nil
 			end
 		end)
+		self:ScheduleEvent("AceEvent_FullyInitialized", func, 10)
 		registeringFromAceEvent = nil
 	end
 
