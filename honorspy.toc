@@ -1,6 +1,8 @@
 ## Interface: 11200
 ## Title: HonorSpy
+## Title-ruRU: HonorSpy
 ## Notes: Records PvP standings of all players
+## Notes-ruRU: Записывает PvP позиции всех игроков
 ## Author: kakysha, contributors: Mistaboom and Moxie
 ## OptionalDeps: Ace2
 ## Version: 3
