@@ -66,9 +66,9 @@ L:RegisterTranslations("ruRU", function() return {
 	["m"] = "м",
 	["s"] = "с",
 	
-	["Weekly data was reset"] = "Weekly data was reset", --
-	["This will purge ALL addon data, you sure?"] = "This will purge ALL addon data, you sure?", --
-	["All data was purged"] = "All data was purged", --
+	["Weekly data was reset"] = "Еженедельные данные были сброшены", --
+	["This will purge ALL addon data, you sure?"] = "Это удалит ВСЕ данные аддона, вы уверены?", --
+	["All data was purged"] = "Все данные были удалены", --
 	["Show HonorSpy Standings"] = "Show HonorSpy Standings", --
 	["Report specific player standings"] = "Report specific player standings", --
 	["player_name"] = "player_name", --
