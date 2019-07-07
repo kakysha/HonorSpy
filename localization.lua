@@ -54,7 +54,7 @@ L:RegisterTranslations("enUS", function() return {
 } end)
 
 L:RegisterTranslations("ruRU", function() return {
-	["HonorSpy standings"] = "HonorSpy standings", -- 
+	["HonorSpy standings"] = "HonorSpy позиции", -- 
 	["Name"] = "Игрок",
 	["ThisWeekHonor"] = "ЧестьНаЭтойНеделе",
 	["LastWeekHonor"] = "ЧестьНаПрошлойНеделе",
@@ -69,7 +69,7 @@ L:RegisterTranslations("ruRU", function() return {
 	["Weekly data was reset"] = "Еженедельные данные были сброшены", --
 	["This will purge ALL addon data, you sure?"] = "Это удалит ВСЕ данные аддона, вы уверены?", --
 	["All data was purged"] = "Все данные были удалены", --
-	["Show HonorSpy Standings"] = "Show HonorSpy Standings", --
+	["Show HonorSpy Standings"] = "Показать HonorSpy позиции", --
 	["Report specific player standings"] = "Report specific player standings", --
 	["player_name"] = "player_name", --
 	["Player %s not found in table"] = "Игрок %s не найден в таблице",
