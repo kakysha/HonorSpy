@@ -1,6 +1,7 @@
 ## Interface: 80200
 ## Title: HonorSpy
 ## Notes: Records PvP standings of all players
+## Notes-ruRU: Записывает PvP позиции всех игроков
 ## Author: kakysha, contributors: Mistaboom and Moxie
 ## OptionalDeps: Ace2
 ## Version: 4
