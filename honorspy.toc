@@ -1,17 +1,16 @@
-## Interface: 80200
+## Interface: 11302
 ## Title: HonorSpy
 ## Notes: Records PvP standings of all players
 ## Notes-ruRU: Записывает PvP позиции всех игроков
 ## Author: kakysha, contributors: Mistaboom and Moxie
-## OptionalDeps: Ace2
-## Version: 4
+## OptionalDeps: Ace3
+## Version: 1
 ## X-Category: Battlegrounds/PvP
 ## SavedVariables: HonorSpyDB
 
 Libs\embeds.xml
-
-localization.lua
+Localizations\embeds.xml
 
 honorspy.lua
-standings.lua
-export.lua
+#standings.lua
+#export.lua
