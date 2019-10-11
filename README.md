@@ -1,3 +1,6 @@
+## Wow: Classic
+Work in progress currently, should be done before honor system release in P2
+
 ### Install
 Download zip of 'master' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-master' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
 
