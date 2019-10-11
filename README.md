@@ -6,7 +6,7 @@ Work in progress currently, should be done before honor system release in P2
 `vanilla` branch -> vanilla wow (1.12.1)
 
 ### Install
-Download zip of 'classic' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-master' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
+Download zip of 'classic' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-classic' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
 
 ### About
 Addon does all the magic in background.
