@@ -1,5 +1,5 @@
 ### Install
-Download zip of 'master' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-master' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
+Download zip of 'vanilla' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-vanilla' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
 
 ### About
 Addon does all the magic in background.
