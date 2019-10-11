@@ -2,6 +2,7 @@
 Work in progress currently, should be done before honor system release in P2
 
 `classic` branch -> wow: classic (1.13.2)
+
 `master` branch -> vanilla wow (1.12.1)
 
 ### Install
