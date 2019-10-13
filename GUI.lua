@@ -90,8 +90,9 @@ function GUI:Show()
 		end
 		
 		if (not rows[i]) then
-			rows[i] = AceGUI:Create("Label")
-			rows[i]:SetFullWidth(true)
+			rows[i] = AceGUI:Create("InteractiveLabel")
+			rows[i]:SetRelativeWidth(0.25)
+			rows[i].highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 			scroll:AddChild(rows[i])
 		end
 
