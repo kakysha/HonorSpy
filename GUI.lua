@@ -11,7 +11,7 @@ local colors = {
 	["ORANGE"] = "ff7f00"
 }
 
-local nameWidth, dataWidth = 0, 0
+local nameWidth, dataWidth, lstWkHonorWidth = 0, 0, 0
 
 function GUI:Show()
 	local mainFrameExisted = not not mainFrame
@@ -46,8 +46,13 @@ function GUI:Show()
 		mainFrame:AddChild(btn)
 
 		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["LastWeekHonor"], "ORANGE"))
+		btn.OnWidthSet = function(self, width)
+			if (width > 0) then
+				lstWkHonorWidth = width
+			end
+		end
+		btn:SetRelativeWidth(0.15)
+		btn:SetText(colorize(L["LstWkHonor"], "ORANGE"))
 		mainFrame:AddChild(btn)
 
 		btn = AceGUI:Create("InteractiveLabel")
@@ -66,7 +71,7 @@ function GUI:Show()
 		mainFrame:AddChild(btn)
 
 		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetRelativeWidth(0.12)
+		btn:SetRelativeWidth(0.1)
 		btn:SetText(colorize(L["LastSeen"], "ORANGE"))
 		mainFrame:AddChild(btn)
 
@@ -114,13 +119,13 @@ function GUI:Show()
 		text = text .. thisWeekHonor
 		text = padTextToWidth(text, nameWidth+dataWidth)
 		text = text .. lastWeekHonor
-		text = padTextToWidth(text, nameWidth+2*dataWidth)
+		text = padTextToWidth(text, nameWidth+dataWidth+lstWkHonorWidth)
 		text = text .. standing
-		text = padTextToWidth(text, nameWidth+3*dataWidth)
+		text = padTextToWidth(text, nameWidth+2*dataWidth+lstWkHonorWidth)
 		text = text .. RP
-		text = padTextToWidth(text, nameWidth+4*dataWidth)
+		text = padTextToWidth(text, nameWidth+3*dataWidth+lstWkHonorWidth)
 		text = text .. rank
-		text = padTextToWidth(text, nameWidth+5*dataWidth)
+		text = padTextToWidth(text, nameWidth+4*dataWidth+lstWkHonorWidth)
 		text = text .. last_seen_human
 		
 		rows[i]:SetText(colorize(text, class))
