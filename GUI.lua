@@ -23,6 +23,11 @@ function GUI:Show()
 
 		-- TABLE HEADER
 		local btn = AceGUI:Create("InteractiveLabel")
+		btn.OnWidthSet = function(self, width)
+			if (width > 0) then
+				firstColWidth = width
+			end
+		end
 		btn:SetRelativeWidth(0.25)
 		btn:SetText(colorize(L["Name"], "ORANGE"))
 		mainFrame:AddChild(btn)
@@ -64,7 +69,7 @@ function GUI:Show()
 		mainFrame:AddChild(scrollcontainer)
 
 		scroll = AceGUI:Create("ScrollFrame")
-		scroll:SetLayout("Flow")
+		scroll:SetLayout("List")
 		scroll:SetUserData("table", {
 			  columns = {0.25, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12},
 			  space = 2
@@ -89,13 +94,53 @@ function GUI:Show()
 			last_seen_human = ""..last_seen..L["s"]
 		end
 		
-		if (not rows[i]) then
-			rows[i] = AceGUI:Create("Label")
-			rows[i]:SetFullWidth(true)
-			scroll:AddChild(rows[i])
+		local row = rows[i];
+		if (not row) then
+			row = AceGUI:Create("SimpleGroup")
+			row:SetLayout("Flow")
+			row:SetFullWidth(true)
+
+			row.name = AceGUI:Create("Label")
+			row.name:SetWidth(firstColWidth)
+			row:AddChild(row.name)
+
+			row.thisweekhonor = AceGUI:Create("Label")
+			row.thisweekhonor:SetWidth(50)
+			row:AddChild(row.thisweekhonor)
+
+			row.lastweekhonor = AceGUI:Create("Label")
+			row.lastweekhonor:SetWidth(50)
+			row:AddChild(row.lastweekhonor)
+
+			row.standing = AceGUI:Create("Label")
+			row.standing:SetWidth(50)
+			row:AddChild(row.standing)
+
+			row.rp = AceGUI:Create("Label")
+			row.rp:SetWidth(50)
+			row:AddChild(row.rp)
+
+			row.rank = AceGUI:Create("Label")
+			row.rank:SetWidth(50)
+			row:AddChild(row.rank)
+
+			row.lastseen = AceGUI:Create("Label")
+			row.lastseen:SetWidth(50)
+			row:AddChild(row.lastseen)
 		end
 
-		rows[i]:SetText(colorize(string.format('%d) %s  %d %d %d %d %d %s', i, name, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_seen_human), class))
+		row.name:SetText(colorize(i .. ') ' .. name, class))
+		row.thisweekhonor:SetText(colorize(thisWeekHonor, class))
+		row.lastweekhonor:SetText(colorize(lastWeekHonor, class))
+		row.standing:SetText(colorize(standing, class))
+		row.rp:SetText(colorize(RP, class))
+		row.rank:SetText(colorize(rank, class))
+		row.lastseen:SetText(colorize(last_seen_human, class))
+
+		if (not rows[i]) then
+			rows[i] = row
+			scroll:AddChild(row)
+		end
 	end
 
 	if (not mainFrameExisted) then
