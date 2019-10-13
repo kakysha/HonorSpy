@@ -12,5 +12,5 @@ Libs\embeds.xml
 Localizations\embeds.xml
 
 honorspy.lua
-#standings.lua
+GUI.lua
 #export.lua

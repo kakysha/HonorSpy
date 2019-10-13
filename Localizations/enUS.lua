@@ -9,6 +9,7 @@ L["LastWeekHonor"] = true
 L["Standing"] = true
 L["RP"] = true
 L["Rank"] = true
+L["LastSeen"] = true
 L["d"] = true
 L["h"] = true
 L["m"] = true

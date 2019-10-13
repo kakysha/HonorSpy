@@ -19,8 +19,6 @@ function HonorSpy:OnInitialize()
 			minimapButton = {hide = false}
     	}
 	}, true)
-
-	DrawMinimapIcon();
 end
 
 function HonorSpy:OnEnable()
@@ -34,6 +32,8 @@ function HonorSpy:OnEnable()
 	self:RegisterComm(commPrefix, "OnCommReceive")
 
 	self:RegisterEvent("PLAYER_DEAD");
+
+	DrawMinimapIcon();
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -219,10 +219,10 @@ function DrawMinimapIcon()
 		type = "data source",
 		text = addonName,
 		icon = "Interface\\Icons\\Inv_Misc_Bomb_04",
-		OnClick = function() HonorSpy:Print("test") end,
+		OnClick = function() HonorSpyGUI:Toggle() end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(string.format("%s", addonName));
-			tooltip:AddLine(string.format("|cff777777by Kakysha|r", GetAddOnMetadata("HonorSpy", "Version")));
+			tooltip:AddLine("|cff777777by Kakysha|r");
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
 end
