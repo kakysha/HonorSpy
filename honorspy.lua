@@ -8,6 +8,7 @@ local commPrefix = addonName;
 local VERSION = 1;
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
+local callback = nil
 
 function HonorSpy:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -106,6 +107,10 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
+	if callback then
+		callback()
+		callback = nil
+	end
 end
 
 -- INSPECT HOOKS pausing to not mess with native inspect calls
@@ -127,6 +132,15 @@ function HonorSpy:UPDATE_MOUSEOVER_UNIT()
 end
 function HonorSpy:PLAYER_TARGET_CHANGED()
 	if (not paused) then StartInspecting("target") end
+end
+
+function HonorSpy:UpdatePlayerData(cb)
+	callback = cb
+	if (paused) then 
+		return
+	end
+	callback = cb
+	StartInspecting("player")
 end
 
 -- CHAT COMMANDS

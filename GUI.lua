@@ -18,7 +18,14 @@ local nameWidth, dataWidth, lstWkHonorWidth = 0, 0, 0
 
 local playerName = UnitName("player")
 
-function GUI:Show()
+function GUI:Show(skipUpdate)
+	if (not skipUpdate) then
+		HonorSpy:UpdatePlayerData(function()
+			if (mainFrame and mainFrame:IsShown()) then
+				GUI:Show(true)
+			end
+		end)
+	end
 	local mainFrameExisted = not not mainFrame
 	if (not mainFrameExisted) then
 		mainFrame = AceGUI:Create("Window")
