@@ -211,13 +211,16 @@ function HonorSpy:Estimate(playerOfInterest)
 end
 
 function HonorSpy:Report(playerOfInterest)
+	if (not playerOfInterest) then
+		playerOfInterest = playerName
+	end
 	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
 	
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
 		return
 	end
-	if (playerOfInterest and playerOfInterest ~= playerName) then
+	if (playerOfInterest ~= playerName) then
 		SendChatMessage(format("- HonorSpy: %s %s", L["Report for player"], playerOfInterest),"emote")
 	end
 	SendChatMessage(format("- HonorSpy: %s = %d, %s = %d, %s = %d, %s = %s, %s = %d", L["Pool Size"], pool_size, L["Standing"], standing, L["Bracket"], bracket, L["Current RP"], RP, L["Next Week RP"], EstRP), "emote")
