@@ -308,10 +308,18 @@ function DrawMinimapIcon()
 		type = "data source",
 		text = addonName,
 		icon = "Interface\\Icons\\Inv_Misc_Bomb_04",
-		OnClick = function() HonorSpyGUI:Toggle() end,
+		OnClick = function(self, button) 
+			if (button == "RightButton") then
+				HonorSpy:Report(UnitName("target"))
+			else
+				HonorSpyGUI:Toggle()
+			end
+		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(string.format("%s", addonName));
 			tooltip:AddLine("|cff777777by Kakysha|r");
+			tooltip:AddLine("|cFFCFCFCFLeft Click: |r" .. L['Show HonorSpy Standings']);
+			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Target / Me']);
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
 end
