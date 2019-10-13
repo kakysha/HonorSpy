@@ -2,7 +2,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("HonorSpy", "enUS", true)
 
 if L then
 
-L["HonorSpy standings"] = true
+L["HonorSpy Standings"] = true
 L["Name"] = true
 L["Honor"] = true
 L["ThisWeekHonor"] = true
@@ -11,6 +11,7 @@ L["Standing"] = true
 L["RP"] = true
 L["Rank"] = true
 L["LastSeen"] = true
+L["Progress of"] = true
 L["d"] = true
 L["h"] = true
 L["m"] = true
@@ -24,11 +25,12 @@ L["Report specific player standings"] = true
 L["player_name"] = true
 L["Player %s not found in table"] = true
 
+L["Report"] = true
 L["Report for player"] = true
 L["Pool Size"] = true
 L["Standing"] = true
 L["Bracket"] = true
-L["current RP"] = true
+L["Current RP"] = true
 L["Next Week RP"] = true
 L["Current Rank"] = true
 L["Next Week Rank"] = true

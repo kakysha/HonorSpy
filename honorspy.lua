@@ -14,7 +14,7 @@ function HonorSpy:OnInitialize()
     	factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
-			sort = L["ThisWeekHonor"],
+			sort = L["Honor"],
 			limit = 750,
 			minimapButton = {hide = false}
     	}
@@ -151,6 +151,76 @@ local options = {
 	}
 }
 LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", "hs"})
+
+-- REPORT
+function HonorSpy:Estimate(playerOfInterest)
+	if (not playerOfInterest) then
+		playerOfInterest = playerName
+	end
+	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
+
+	local pool_size = 0;
+	local standing = -1;
+	local t = HonorSpyGUI:BuildStandingsTable()
+	local avg_lastchecked = 0;
+	pool_size = table.getn(t);
+	for i = 1, table.getn(t) do
+		if (playerOfInterest == t[i][1]) then
+			standing = i
+		end
+	end
+	if (standing == -1) then
+		self:Print(string.format(L["Player %s not found in table"], playerOfInterest));
+		return
+	end;
+			  -- 1   2     3      4		 5		 6		7		8		9	10		11		12		13	14
+	local brk = {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
+	local RP  = {0, 400} -- RP for each bracket
+	local Ranks = {0, 2000} -- RP for each rank
+
+	local bracket = 1;
+	local inside_br_progress = 0;
+	for i = 2,14 do
+		brk[i] = math.floor(brk[i]*pool_size+.5);
+		if (standing > brk[i]) then
+			inside_br_progress = (brk[i-1] - standing)/(brk[i-1] - brk[i])
+			break
+		end;
+		bracket = i;
+	end
+	if (bracket == 14 and standing == 1) then inside_br_progress = 1 end;
+	for i = 3,14 do
+		RP[i] = (i-2) * 1000;
+		Ranks[i] = (i-2) * 5000;
+	end
+	local award = RP[bracket] + 1000 * inside_br_progress;
+	local RP = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].RP;
+	local EstRP = math.floor(RP*0.8+award+.5);
+	local Rank = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rank;
+	local EstRank = 14;
+	local Progress = math.floor(HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rankProgress*100);
+	local EstProgress = math.floor((EstRP - math.floor(EstRP/5000)*5000) / 5000*100);
+	for i = 3,14 do
+		if (EstRP < Ranks[i]) then
+			EstRank = i-1;
+			break;
+		end
+	end
+
+	return pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress
+end
+
+function HonorSpy:Report(playerOfInterest)
+	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
+	if (not standing) then
+		return
+	end
+	if (playerOfInterest and playerOfInterest ~= playerName) then
+		SendChatMessage(format("- HonorSpy: %s %s", L["Report for player"], playerOfInterest),"emote")
+	end
+	SendChatMessage(format("- HonorSpy: %s = %d, %s = %d, %s = %d, %s = %s, %s = %d", L["Pool Size"], pool_size, L["Standing"], standing, L["Bracket"], bracket, L["Current RP"], RP, L["Next Week RP"], EstRP), "emote")
+	SendChatMessage(format("- HonorSpy: %s = %d (%d%%), %s = %d (%d%%)", L["Current Rank"], Rank, Progress, L["Next Week Rank"], EstRank, EstProgress), "emote")
+end
 
 -- SYNCING --
 function table.copy(t)

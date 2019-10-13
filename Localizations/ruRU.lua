@@ -2,7 +2,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("HonorSpy", "ruRU")
 
 if L then
 
-L["HonorSpy standings"] = "таблица HonorSpy"
+L["HonorSpy Standings"] = "Таблица HonorSpy"
 L["Name"] = "Игрок"
 L["Honor"] = "Честь"
 L["ThisWeekHonor"] = "ЧестьНаЭтойНеделе"
@@ -11,6 +11,7 @@ L["Standing"] = "Позиция"
 L["RP"] = "ОР"
 L["Rank"] = "Ранг"
 L["LastSeen"] = "Актуальность"
+L["Progress of"] = "Прогресс"
 L["d"] = "д"
 L["h"] = "ч"
 L["m"] = "м"
@@ -24,11 +25,12 @@ L["Report specific player standings"] = "Отчёт по другому игро
 L["player_name"] = "player_name"
 L["Player %s not found in table"] = "Игрок %s не найден в таблице"
 
-L["Report for player"] = "Report for player"
+L["Report"] = "Отчёт"
+L["Report for player"] = "Отчёт по др. игроку"
 L["Pool Size"] = "Размер пула"
 L["Standing"] = "Позиция"
 L["Bracket"] = "Группа"
-L["current RP"] = "текущие ОР"
+L["Current RP"] = "Текущие ОР"
 L["Next Week RP"] = "ОР на след. неделе"
 L["Current Rank"] = "Текущий ранг"
 L["Next Week Rank"] = "Будущий ранг"
