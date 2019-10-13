@@ -4,6 +4,7 @@ if L then
 
 L["HonorSpy standings"] = "таблица HonorSpy"
 L["Name"] = "Игрок"
+L["Honor"] = "Честь"
 L["ThisWeekHonor"] = "ЧестьНаЭтойНеделе"
 L["LastWeekHonor"] = "ЧестьНаПрошлойНеделе"
 L["Standing"] = "Позиция"

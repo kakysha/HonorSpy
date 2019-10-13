@@ -4,6 +4,7 @@ if L then
 
 L["HonorSpy standings"] = true
 L["Name"] = true
+L["Honor"] = true
 L["ThisWeekHonor"] = true
 L["LastWeekHonor"] = true
 L["Standing"] = true

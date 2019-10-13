@@ -11,6 +11,8 @@ local colors = {
 	["ORANGE"] = "ff7f00"
 }
 
+local nameWidth, dataWidth = 0, 0
+
 function GUI:Show()
 	local mainFrameExisted = not not mainFrame
 	if (not mainFrameExisted) then
@@ -19,17 +21,28 @@ function GUI:Show()
 		tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
 		-- mainFrame:SetCallback("OnClose", function(widget) widget:Release(); mainFrame = nil; _G["HonorSpyGUI_MainFrame"] = nil end)
 		mainFrame:SetTitle(L["HonorSpy standings"])
+		mainFrame:SetWidth(500)
 		mainFrame:SetLayout("Flow")
 
 		-- TABLE HEADER
 		local btn = AceGUI:Create("InteractiveLabel")
+		btn.OnWidthSet = function(self, width)
+			if (width > 0) then
+				nameWidth = width
+			end
+		end
 		btn:SetRelativeWidth(0.25)
 		btn:SetText(colorize(L["Name"], "ORANGE"))
 		mainFrame:AddChild(btn)
 
 		btn = AceGUI:Create("InteractiveLabel")
+		btn.OnWidthSet = function(self, width)
+			if (width > 0) then
+				dataWidth = width
+			end
+		end
 		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["ThisWeekHonor"], "ORANGE"))
+		btn:SetText(colorize(L["Honor"], "ORANGE"))
 		mainFrame:AddChild(btn)
 
 		btn = AceGUI:Create("InteractiveLabel")
@@ -96,7 +109,21 @@ function GUI:Show()
 			scroll:AddChild(rows[i])
 		end
 
-		rows[i]:SetText(colorize(string.format('%d) %s  %d %d %d %d %d %s', i, name, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_seen_human), class))
+		local text = string.format('%d) %s', i, name)
+		text = padTextToWidth(text, nameWidth)
+		text = text .. thisWeekHonor
+		text = padTextToWidth(text, nameWidth+dataWidth)
+		text = text .. lastWeekHonor
+		text = padTextToWidth(text, nameWidth+2*dataWidth)
+		text = text .. standing
+		text = padTextToWidth(text, nameWidth+3*dataWidth)
+		text = text .. RP
+		text = padTextToWidth(text, nameWidth+4*dataWidth)
+		text = text .. rank
+		text = padTextToWidth(text, nameWidth+5*dataWidth)
+		text = text .. last_seen_human
+		
+		rows[i]:SetText(colorize(text, class))
 	end
 
 	if (not mainFrameExisted) then
@@ -137,4 +164,13 @@ function colorize(str, colorOrClass)
 	end
 
 	return string.format("|cff%s%s|r", colors[colorOrClass], str)
+end
+
+local label = AceGUI:Create("Label")
+function padTextToWidth(str, width)
+	repeat
+		str = str .. ' '
+		label:SetText(str)
+	until label.label:GetStringWidth() >= width
+	return str
 end
