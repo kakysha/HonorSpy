@@ -138,7 +138,7 @@ local options = {
 			type = 'execute',
 			name = L['Show HonorSpy Standings'],
 			desc = L['Show HonorSpy Standings'],
-			func = function() HonorSpy:Print(HonorSpy.db.factionrealm.last_reset) end
+			func = function() HonorSpyGUI:Toggle() end
 		},
 		search = {
 			type = 'input',
@@ -146,7 +146,7 @@ local options = {
 			desc = L['Report specific player standings'],
 			usage = L['player_name'],
 			get = false,
-			set = function(playerName) HonorSpy.db.factionrealm.last_reset=HonorSpy.db.factionrealm.last_reset+1 end
+			set = function(info, playerName) HonorSpy:Report(playerName) end
 		},
 	}
 }
@@ -211,6 +211,8 @@ function HonorSpy:Estimate(playerOfInterest)
 end
 
 function HonorSpy:Report(playerOfInterest)
+	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
+	
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
 		return
