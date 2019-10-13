@@ -64,7 +64,7 @@ function GUI:Show()
 		mainFrame:AddChild(scrollcontainer)
 
 		scroll = AceGUI:Create("ScrollFrame")
-		scroll:SetLayout("Flow")
+		scroll:SetLayout("List")
 		scroll:SetUserData("table", {
 			  columns = {0.25, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12},
 			  space = 2
@@ -91,7 +91,7 @@ function GUI:Show()
 		
 		if (not rows[i]) then
 			rows[i] = AceGUI:Create("InteractiveLabel")
-			rows[i]:SetRelativeWidth(0.25)
+			rows[i]:SetFullWidth(true)
 			rows[i].highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 			scroll:AddChild(rows[i])
 		end
