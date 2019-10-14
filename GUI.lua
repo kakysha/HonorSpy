@@ -31,7 +31,6 @@ function GUI:Show(skipUpdate)
 		mainFrame = AceGUI:Create("Window")
 		_G["HonorSpyGUI_MainFrame"] = mainFrame
 		tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
-		-- mainFrame:SetCallback("OnClose", function(widget) widget:Release(); mainFrame = nil; _G["HonorSpyGUI_MainFrame"] = nil end)
 		mainFrame:SetTitle(L["HonorSpy Standings"])
 		mainFrame:SetWidth(500)
 		mainFrame:SetLayout("List")
@@ -63,7 +62,7 @@ function GUI:Show(skipUpdate)
 
 		local btn = AceGUI:Create("InteractiveLabel")
 		btn.OnWidthSet = function(self, width)
-			if (width > 0) then
+			if (btn:IsShown() and width > 0) then
 				nameWidth = width
 			end
 		end
@@ -73,7 +72,7 @@ function GUI:Show(skipUpdate)
 
 		btn = AceGUI:Create("InteractiveLabel")
 		btn.OnWidthSet = function(self, width)
-			if (width > 0) then
+			if (btn:IsShown() and width > 0) then
 				dataWidth = width
 			end
 		end
@@ -88,7 +87,7 @@ function GUI:Show(skipUpdate)
 
 		btn = AceGUI:Create("InteractiveLabel")
 		btn.OnWidthSet = function(self, width)
-			if (width > 0) then
+			if (btn:IsShown() and width > 0) then
 				lstWkHonorWidth = width
 			end
 		end
@@ -127,6 +126,7 @@ function GUI:Show(skipUpdate)
 		mainFrame:AddChild(scrollcontainer)
 
 		scroll = AceGUI:Create("ScrollFrame")
+		scrollcontainer:SetFullWidth(true)
 		scroll:SetLayout("List")
 
 		statusLine = AceGUI:Create("Label")
@@ -139,7 +139,7 @@ function GUI:Show(skipUpdate)
 	local limit = tonumber(HonorSpy.db.factionrealm.limit)
 
 	local t = self:BuildStandingsTable()
-	for i = 1, table.getn(t) do
+	for i = 1, #t do
 		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
 
 		local last_seen, last_seen_human = (time() - last_checked), ""
@@ -160,7 +160,7 @@ function GUI:Show(skipUpdate)
 			scroll:AddChild(rows[i])
 		end
 
-		local text = (name == playerName and '\n' or '') .. string.format('%d) %s', i, name)
+		local text = (name == playerName and '\n' or '') .. format('%d) %s', i, name)
 		text = padTextToWidth(text, nameWidth)
 		text = text .. thisWeekHonor
 		text = padTextToWidth(text, nameWidth+dataWidth)
@@ -201,7 +201,7 @@ function GUI:Show(skipUpdate)
 
 		scroll:SetScroll(math.floor(standing / pool_size * 1000))
 	else
-		playerStandings:SetText(format('%s %s: %s', L['Progress of'], playerName, L['not enough HKs, min = 15']))
+		playerStandings:SetText(format('%s %s\n%s\n', L['Progress of'], playerName, L['not enough HKs, min = 15']))
 	end
 
 	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
@@ -222,7 +222,8 @@ function GUI:Toggle()
 end
 
 function GUI:Reset()
-	if (scroll) then
+	if (rows[1]) then
+		rows = {}
 		scroll:ReleaseChildren()
 	end
 end
@@ -242,10 +243,10 @@ end
 
 function colorize(str, colorOrClass)
 	if (not colors[colorOrClass] and RAID_CLASS_COLORS and RAID_CLASS_COLORS[colorOrClass]) then
-		colors[colorOrClass] = string.format("%02x%02x%02x", RAID_CLASS_COLORS[colorOrClass].r * 255, RAID_CLASS_COLORS[colorOrClass].g * 255, RAID_CLASS_COLORS[colorOrClass].b * 255)
+		colors[colorOrClass] = format("%02x%02x%02x", RAID_CLASS_COLORS[colorOrClass].r * 255, RAID_CLASS_COLORS[colorOrClass].g * 255, RAID_CLASS_COLORS[colorOrClass].b * 255)
 	end
 
-	return string.format("|cff%s%s|r", colors[colorOrClass], str)
+	return format("|cff%s%s|r", colors[colorOrClass], str)
 end
 
 local label = AceGUI:Create("Label")

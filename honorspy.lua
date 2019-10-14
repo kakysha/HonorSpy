@@ -233,7 +233,7 @@ function HonorSpy:Report(playerOfInterest, skipUpdate)
 	
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
-		self:Print(string.format(L["Player %s not found in table"], playerOfInterest));
+		self:Print(format(L["Player %s not found in table"], playerOfInterest));
 		return
 	end
 	if (playerOfInterest ~= playerName) then
@@ -340,7 +340,7 @@ function DrawMinimapIcon()
 			end
 		end,
 		OnTooltipShow = function(tooltip)
-			tooltip:AddLine(string.format("%s", addonName));
+			tooltip:AddLine(format("%s", addonName));
 			tooltip:AddLine("|cff777777by Kakysha|r");
 			tooltip:AddLine("|cFFCFCFCFLeft Click: |r" .. L['Show HonorSpy Standings']);
 			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Target / Me']);
