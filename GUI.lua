@@ -136,6 +136,8 @@ function GUI:Show(skipUpdate)
 		mainFrame:Show()
 	end
 
+	local limit = tonumber(HonorSpy.db.factionrealm.limit)
+	
 	local t = self:BuildStandingsTable()
 	for i = 1, table.getn(t) do
 		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
@@ -173,6 +175,10 @@ function GUI:Show(skipUpdate)
 		text = text .. last_seen_human .. (name == playerName and '\n' or '')
 		
 		rows[i]:SetText(colorize(text, class))
+
+		if (i == limit) then
+			break
+		end
 	end
 
 	if (not mainFrameExisted) then
