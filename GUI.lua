@@ -130,7 +130,7 @@ function GUI:Show(skipUpdate)
 		scroll:SetLayout("List")
 
 		statusLine = AceGUI:Create("Label")
-		statusLine:SetWidth(100)
+		statusLine:SetFullWidth(true)
 		mainFrame:AddChild(statusLine)
 	else
 		mainFrame:Show()
@@ -182,7 +182,7 @@ function GUI:Show(skipUpdate)
 		statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
 	end
 
-	statusLine:SetText(format(L['Pool Size'] .. ': %d', #t))
+	statusLine:SetText(format('|cff777777/hs show|r                                                    ' .. L['Pool Size'] .. ': %d                              |cff777777/hs search nickname|r', #t))
 
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
 	local playerText = colorize(L['Progress of'], "GREY") .. ' ' .. colorize(playerName, HonorSpy.db.factionrealm.currentStandings[playerName].class)
