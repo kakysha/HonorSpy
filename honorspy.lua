@@ -254,7 +254,7 @@ function store_player(playerName, player)
 	if (player == nil) then return end
 	
 	if (player.last_checked < HonorSpy.db.factionrealm.last_reset
-		or player.last_checked-60*5 > time()
+		or player.last_checked-60 > time()
 		-- or player.thisWeekHonor == 0
 		) then
 		return
