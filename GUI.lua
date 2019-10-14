@@ -158,7 +158,7 @@ function GUI:Show(skipUpdate)
 			scroll:AddChild(rows[i])
 		end
 
-		local text = string.format('%d) %s', i, name)
+		local text = (name == playerName and '\n' or '') .. string.format('%d) %s', i, name)
 		text = padTextToWidth(text, nameWidth)
 		text = text .. thisWeekHonor
 		text = padTextToWidth(text, nameWidth+dataWidth)
@@ -170,7 +170,7 @@ function GUI:Show(skipUpdate)
 		text = padTextToWidth(text, nameWidth+3*dataWidth+lstWkHonorWidth)
 		text = text .. rank
 		text = padTextToWidth(text, nameWidth+4*dataWidth+lstWkHonorWidth)
-		text = text .. last_seen_human
+		text = text .. last_seen_human .. (name == playerName and '\n' or '')
 		
 		rows[i]:SetText(colorize(text, class))
 	end
@@ -192,6 +192,8 @@ function GUI:Show(skipUpdate)
 	playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
 	playerStandings:SetText(playerText .. '\n')
 	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
+
+	scroll:SetScroll(math.floor(standing / pool_size * 1000))
 end
 
 function GUI:Hide()
