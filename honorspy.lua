@@ -135,7 +135,6 @@ function HonorSpy:PLAYER_TARGET_CHANGED()
 end
 
 function HonorSpy:UpdatePlayerData(cb)
-	callback = cb
 	if (paused) then 
 		return
 	end
@@ -224,9 +223,12 @@ function HonorSpy:Estimate(playerOfInterest)
 	return pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress
 end
 
-function HonorSpy:Report(playerOfInterest)
+function HonorSpy:Report(playerOfInterest, skipUpdate)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
+	end
+	if (playerOfInterest == playerName) then
+		HonorSpy:UpdatePlayerData() -- will update for next time, this report gonna be for old data
 	end
 	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
 	
