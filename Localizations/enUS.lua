@@ -57,5 +57,6 @@ L["Limit Rows"] = true
 L["Limits number of rows shown in table"] = true
 L["<EP>"] = true
 L["Limit"] = true
+L['not enough HKs, min = 15'] = true
 
 end

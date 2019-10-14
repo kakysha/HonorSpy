@@ -4,7 +4,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 local GUI = {}
 _G["HonorSpyGUI"] = GUI
 
-local mainFrame, statusLine, playerStandings, reportBtn = nil, nil, nil, nil
+local mainFrame, statusLine, playerStandings, reportBtn, scroll = nil, nil, nil, nil
 local rows = {}
 
 local colors = {
@@ -137,7 +137,7 @@ function GUI:Show(skipUpdate)
 	end
 
 	local limit = tonumber(HonorSpy.db.factionrealm.limit)
-	
+
 	local t = self:BuildStandingsTable()
 	for i = 1, table.getn(t) do
 		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
@@ -188,18 +188,23 @@ function GUI:Show(skipUpdate)
 		statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
 	end
 
-	statusLine:SetText(format('|cff777777/hs show|r                                                    ' .. L['Pool Size'] .. ': %d                              |cff777777/hs search nickname|r', #t))
+	statusLine:SetText(format('|cff777777/hs show|r                                                    ' .. L['Pool Size'] .. ': %d                                      |cff777777/hs search nickname|r', #t))
 
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
-	local playerText = colorize(L['Progress of'], "GREY") .. ' ' .. colorize(playerName, HonorSpy.db.factionrealm.currentStandings[playerName].class)
-	playerText = playerText .. '\n' .. colorize(L['Standing'] .. ':', "GREY") .. colorize(standing, "ORANGE")
-	playerText = playerText .. ' ' .. colorize(L['Bracket'] .. ':', "GREY") .. colorize(bracket, "ORANGE")
-	playerText = playerText .. ' ' .. colorize(L['Current Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', Rank, Progress), "ORANGE")
-	playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
-	playerStandings:SetText(playerText .. '\n')
-	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
+	if (standing) then
+		local playerText = colorize(L['Progress of'], "GREY") .. ' ' .. colorize(playerName, HonorSpy.db.factionrealm.currentStandings[playerName].class)
+		playerText = playerText .. '\n' .. colorize(L['Standing'] .. ':', "GREY") .. colorize(standing, "ORANGE")
+		playerText = playerText .. ' ' .. colorize(L['Bracket'] .. ':', "GREY") .. colorize(bracket, "ORANGE")
+		playerText = playerText .. ' ' .. colorize(L['Current Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', Rank, Progress), "ORANGE")
+		playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
+		playerStandings:SetText(playerText .. '\n')
 
-	scroll:SetScroll(math.floor(standing / pool_size * 1000))
+		scroll:SetScroll(math.floor(standing / pool_size * 1000))
+	else
+		playerStandings:SetText(format('%s %s: %s', L['Progress of'], playerName, L['not enough HKs, min = 15']))
+	end
+
+	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
 end
 
 function GUI:Hide()
@@ -213,6 +218,12 @@ function GUI:Toggle()
 		GUI:Hide()
 	else
 		GUI:Show()
+	end
+end
+
+function GUI:Reset()
+	if (scroll) then
+		scroll:ReleaseChildren()
 	end
 end
 

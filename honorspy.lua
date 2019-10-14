@@ -15,14 +15,13 @@ function HonorSpy:OnInitialize()
     	factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
+			reset_day = 3,
 			sort = L["Honor"],
 			limit = 750,
 			minimapButton = {hide = false}
     	}
 	}, true)
-end
 
-function HonorSpy:OnEnable()
 	self:SecureHook("InspectUnit");
 
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
@@ -35,6 +34,7 @@ function HonorSpy:OnEnable()
 	self:RegisterEvent("PLAYER_DEAD");
 
 	DrawMinimapIcon();
+	-- checkNeedReset();
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -183,7 +183,6 @@ function HonorSpy:Estimate(playerOfInterest)
 		end
 	end
 	if (standing == -1) then
-		self:Print(string.format(L["Player %s not found in table"], playerOfInterest));
 		return
 	end;
 			  -- 1   2     3      4		 5		 6		7		8		9	10		11		12		13	14
@@ -234,6 +233,7 @@ function HonorSpy:Report(playerOfInterest, skipUpdate)
 	
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
+		self:Print(string.format(L["Player %s not found in table"], playerOfInterest));
 		return
 	end
 	if (playerOfInterest ~= playerName) then
@@ -303,6 +303,27 @@ function HonorSpy:PLAYER_DEAD()
 	end
 end
 
+-- RESET WEEK
+function resetWeek(must_reset_on)
+	HonorSpy.db.factionrealm.last_reset = must_reset_on;
+	inspectedPlayers = {};
+	HonorSpy.db.factionrealm.currentStandings={};
+	HonorSpyGUI:Reset();
+	HonorSpy:Print(L["Weekly data was reset"]);
+end
+function checkNeedReset()
+	local day = date("!%w");
+	local h = date("!%H");
+	local m = date("!%M");
+	local s = date("!%S");
+	local days_diff = (7 + (day - HonorSpy.db.factionrealm.reset_day)) - math.floor((7 + (day - HonorSpy.db.factionrealm.reset_day))/7) * 7;
+	local diff_in_seconds = s + m*60 + h*60*60 + days_diff*24*60*60 - 10*60*60 - 1; -- 10 AM UTC - fixed hour of PvP maintenance
+	if (diff_in_seconds > 0) then -- it is negative on reset_day untill 10AM
+		local must_reset_on = time()-diff_in_seconds;
+		if (must_reset_on > HonorSpy.db.factionrealm.last_reset) then resetWeek(must_reset_on) end
+	end
+end
+
 -- Minimap icon
 function DrawMinimapIcon()
 	LibStub("LibDBIcon-1.0"):Register("HonorSpy", LibStub("LibDataBroker-1.1"):NewDataObject("HonorSpy",
@@ -314,6 +335,7 @@ function DrawMinimapIcon()
 			if (button == "RightButton") then
 				HonorSpy:Report(UnitName("target"))
 			else
+				checkNeedReset()
 				HonorSpyGUI:Toggle()
 			end
 		end,
