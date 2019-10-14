@@ -35,7 +35,7 @@ L["Current RP"] = true
 L["Next Week RP"] = true
 L["Current Rank"] = true
 L["Next Week Rank"] = true
-L["HonorSpy options"] = true
+L["HonorSpy Options"] = true
 L["Sunday"] = true
 L["Monday"] = true
 L["Tuesday"] = true
@@ -54,9 +54,10 @@ L["Reports your current standing as emote"] = true
 L["_ purge all data"] = true
 L["Delete all collected data"] = true
 L["Limit Rows"] = true
-L["Limits number of rows shown in table"] = true
+L["Limits number of rows shown in table, from 1 to 9999"] = true
 L["<EP>"] = true
 L["Limit"] = true
 L['not enough HKs, min = 15'] = true
-
+L["Hide Minimap Button"] = true
+L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = true
 end

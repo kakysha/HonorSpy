@@ -34,7 +34,7 @@ function HonorSpy:OnInitialize()
 	self:RegisterEvent("PLAYER_DEAD");
 
 	DrawMinimapIcon();
-	-- checkNeedReset();
+	HonorSpy:CheckNeedReset();
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -304,14 +304,18 @@ function HonorSpy:PLAYER_DEAD()
 end
 
 -- RESET WEEK
-function resetWeek(must_reset_on)
-	HonorSpy.db.factionrealm.last_reset = must_reset_on;
+function HonorSpy:Purge()
 	inspectedPlayers = {};
 	HonorSpy.db.factionrealm.currentStandings={};
 	HonorSpyGUI:Reset();
+	HonorSpy:Print(L["All data was purged"]);
+end
+function resetWeek(must_reset_on)
+	HonorSpy.db.factionrealm.last_reset = must_reset_on;
+	HonorSpy:Purge()
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
-function checkNeedReset()
+function HonorSpy:CheckNeedReset()
 	local day = date("!%w");
 	local h = date("!%H");
 	local m = date("!%M");
@@ -335,7 +339,7 @@ function DrawMinimapIcon()
 			if (button == "RightButton") then
 				HonorSpy:Report(UnitName("target"))
 			else
-				checkNeedReset()
+				HonorSpy:CheckNeedReset()
 				HonorSpyGUI:Toggle()
 			end
 		end,

@@ -12,6 +12,7 @@
 	<Include file="Ace3\AceConsole-3.0\AceConsole-3.0.xml"/>
 	<Include file="Ace3\AceGUI-3.0\AceGUI-3.0.xml"/>
 	<Include file="Ace3\AceConfig-3.0\AceConfig-3.0.xml"/>
+	<Include file="Ace3\AceConfig-3.0\AceConfigDialog-3.0\AceConfigDialog-3.0.xml"/>
 	<Include file="Ace3\AceComm-3.0\AceComm-3.0.xml"/>
 	<Include file="Ace3\AceTab-3.0\AceTab-3.0.xml"/>
 	<Include file="Ace3\AceSerializer-3.0\AceSerializer-3.0.xml"/>

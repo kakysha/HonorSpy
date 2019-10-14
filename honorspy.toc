@@ -13,4 +13,5 @@ Localizations\embeds.xml
 
 honorspy.lua
 GUI.lua
-#export.lua
+settings.lua
+export.lua
