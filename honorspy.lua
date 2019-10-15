@@ -63,7 +63,7 @@ local function StartInspecting(unitID)
 		inspectedPlayers[name] = {last_checked = 0};
 		player = inspectedPlayers[name];
 	end
-	if (time() - player.last_checked < 30) then -- 30 seconds until new inspection request
+	if (GetServerTime() - player.last_checked < 30) then -- 30 seconds until new inspection request
 		return
 	end
 	-- we gonna inspect new player, clear old one
@@ -94,7 +94,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	NotifyInspect("target"); -- change real target back to player's target, broken by prev NotifyInspect call
 	ClearInspectPlayer();
 	
-	player.last_checked = time();
+	player.last_checked = GetServerTime();
 	player.RP = 0;
 
 	if (thisweekHK >= 0) then
@@ -256,7 +256,7 @@ function store_player(playerName, player)
 	if (player == nil) then return end
 	
 	if (player.last_checked < HonorSpy.db.factionrealm.last_reset
-		or player.last_checked-60 > time()
+		or player.last_checked > GetServerTime()
 		-- or player.thisWeekHonor == 0
 		) then
 		return
@@ -287,8 +287,8 @@ end
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
 	local filtered_players, count = {}, 0;
-	if (time() - last_send_time < 5*60) then return	end;
-	last_send_time = time();
+	if (GetServerTime() - last_send_time < 5*60) then return	end;
+	last_send_time = GetServerTime();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
 		player.is_outdated = false;
@@ -326,7 +326,7 @@ function HonorSpy:CheckNeedReset()
 	local days_diff = (7 + (day - HonorSpy.db.factionrealm.reset_day)) - math.floor((7 + (day - HonorSpy.db.factionrealm.reset_day))/7) * 7;
 	local diff_in_seconds = s + m*60 + h*60*60 + days_diff*24*60*60 - 10*60*60 - 1; -- 10 AM UTC - fixed hour of PvP maintenance
 	if (diff_in_seconds > 0) then -- it is negative on reset_day untill 10AM
-		local must_reset_on = time()-diff_in_seconds;
+		local must_reset_on = GetServerTime()-diff_in_seconds;
 		if (must_reset_on > HonorSpy.db.factionrealm.last_reset) then resetWeek(must_reset_on) end
 	end
 end

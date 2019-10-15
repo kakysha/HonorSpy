@@ -35,7 +35,7 @@ function GUI:Show(skipUpdate)
 	for i = 1, #t do
 		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
 
-		local last_seen, last_seen_human = (time() - last_checked), ""
+		local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
 		if (last_seen/60/60/24 > 1) then
 			last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
 		elseif (last_seen/60/60 > 1) then
