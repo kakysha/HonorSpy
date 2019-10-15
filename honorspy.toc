@@ -1,6 +1,6 @@
 ## Interface: 11302
 ## Title: HonorSpy
-## TitlezhCN: HonorSpy 荣誉监视榜
+## Title-zhCN: HonorSpy 荣誉监视榜
 ## Notes: Records PvP standings of all players
 ## Notes-ruRU: Записывает PvP позиции всех игроков
 ## Notes-zhCN: PvP 荣誉监视榜,用于收集并监视服务器荣誉角色并排行
