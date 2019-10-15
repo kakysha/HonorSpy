@@ -340,7 +340,7 @@ function DrawMinimapIcon()
 		icon = "Interface\\Icons\\Inv_Misc_Bomb_04",
 		OnClick = function(self, button) 
 			if (button == "RightButton") then
-				HonorSpy:Report(UnitName("target"))
+				HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
 			else
 				HonorSpy:CheckNeedReset()
 				HonorSpyGUI:Toggle()
