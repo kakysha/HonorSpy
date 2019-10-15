@@ -43,7 +43,10 @@ local inspectedPlayers = {}; -- stores last_checked time of all players met
 local inspectedPlayerName = nil; -- name of currently inspected player
 
 local function StartInspecting(unitID)
-	local name = UnitName(unitID);
+	local name, realm = UnitName(unitID);
+	if (realm) then
+		return
+	end
 
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
 		ClearInspectPlayer();
