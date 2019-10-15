@@ -21,120 +21,13 @@ local playerName = UnitName("player")
 function GUI:Show(skipUpdate)
 	if (not skipUpdate) then
 		HonorSpy:UpdatePlayerData(function()
-			if (mainFrame and mainFrame:IsShown()) then
+			if (mainFrame:IsShown()) then
 				GUI:Show(true)
 			end
 		end)
 	end
-	local mainFrameExisted = not not mainFrame
-	if (not mainFrameExisted) then
-		mainFrame = AceGUI:Create("Window")
-		_G["HonorSpyGUI_MainFrame"] = mainFrame
-		tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
-		mainFrame:SetTitle(L["HonorSpy Standings"])
-		mainFrame:SetWidth(500)
-		mainFrame:SetLayout("List")
-		mainFrame:EnableResize(false)
-
-		-- Player Standings
-		local playerStandingsGrp = AceGUI:Create("SimpleGroup")
-		playerStandingsGrp:SetFullWidth(true)
-		playerStandingsGrp:SetLayout("Flow")
-		mainFrame:AddChild(playerStandingsGrp)
-
-		playerStandings = AceGUI:Create("Label")
-		playerStandings:SetRelativeWidth(0.8)
-		playerStandingsGrp:AddChild(playerStandings)
-
-		reportBtn = AceGUI:Create("Button")
-		reportBtn:SetRelativeWidth(0.19)
-		reportBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 8)
-		reportBtn:SetCallback("OnClick", function()
-			HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
-		end)
-		playerStandingsGrp:AddChild(reportBtn)
-
-		-- TABLE HEADER
-		local tableHeader = AceGUI:Create("SimpleGroup")
-		tableHeader:SetFullWidth(true)
-		tableHeader:SetLayout("Flow")
-		mainFrame:AddChild(tableHeader)
-
-		local btn = AceGUI:Create("InteractiveLabel")
-		btn.OnWidthSet = function(self, width)
-			if (btn:IsShown() and width > 0) then
-				nameWidth = width
-			end
-		end
-		btn:SetRelativeWidth(0.25)
-		btn:SetText(colorize(L["Name"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn.OnWidthSet = function(self, width)
-			if (btn:IsShown() and width > 0) then
-				dataWidth = width
-			end
-		end
-		btn:SetCallback("OnClick", function()
-			HonorSpy.db.factionrealm.sort = L["Honor"]
-			GUI:Show()
-		end)
-		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["Honor"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn.OnWidthSet = function(self, width)
-			if (btn:IsShown() and width > 0) then
-				lstWkHonorWidth = width
-			end
-		end
-		btn:SetRelativeWidth(0.15)
-		btn:SetText(colorize(L["LstWkHonor"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["Standing"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["RP"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetCallback("OnClick", function()
-			HonorSpy.db.factionrealm.sort = L["Rank"]
-			GUI:Show()
-		end)
-		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-		btn:SetRelativeWidth(0.12)
-		btn:SetText(colorize(L["Rank"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		btn = AceGUI:Create("InteractiveLabel")
-		btn:SetRelativeWidth(0.1)
-		btn:SetText(colorize(L["LastSeen"], "ORANGE"))
-		tableHeader:AddChild(btn)
-
-		scrollcontainer = AceGUI:Create("SimpleGroup")
-		scrollcontainer:SetFullWidth(true)
-		scrollcontainer:SetLayout("Fill")
-		mainFrame:AddChild(scrollcontainer)
-
-		scroll = AceGUI:Create("ScrollFrame")
-		scrollcontainer:SetFullWidth(true)
-		scroll:SetLayout("List")
-
-		statusLine = AceGUI:Create("Label")
-		statusLine:SetFullWidth(true)
-		mainFrame:AddChild(statusLine)
-	else
-		mainFrame:Show()
-	end
+	
+	mainFrame:Show()
 
 	local limit = tonumber(HonorSpy.db.factionrealm.limit)
 
@@ -154,10 +47,7 @@ function GUI:Show(skipUpdate)
 		end
 		
 		if (not rows[i]) then
-			rows[i] = AceGUI:Create("InteractiveLabel")
-			rows[i]:SetFullWidth(true)
-			rows[i].highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-			scroll:AddChild(rows[i])
+			generateRow(i)
 		end
 
 		local text = (name == playerName and '\n' or '') .. format('%d) %s', i, name)
@@ -179,13 +69,6 @@ function GUI:Show(skipUpdate)
 		if (i == limit) then
 			break
 		end
-	end
-
-	if (not mainFrameExisted) then
-		scrollcontainer:AddChild(scroll)
-		scrollcontainer.frame:SetPoint("BOTTOM", 0, 25)
-		statusLine:ClearAllPoints()
-		statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
 	end
 
 	statusLine:SetText(format('|cff777777/hs show|r                                                    ' .. L['Pool Size'] .. ': %d                                      |cff777777/hs search nickname|r', #t))
@@ -225,6 +108,7 @@ function GUI:Reset()
 	if (rows[1]) then
 		rows = {}
 		scroll:ReleaseChildren()
+		GUI:PrepareGUI()
 	end
 end
 
@@ -239,6 +123,132 @@ function GUI:BuildStandingsTable()
 	return a[sort_column] > b[sort_column]
 	end)
 	return t
+end
+
+function GUI:PrepareGUI()
+	mainFrame = AceGUI:Create("Window")
+	mainFrame:Hide()
+	_G["HonorSpyGUI_MainFrame"] = mainFrame
+	tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
+	mainFrame:SetTitle(L["HonorSpy Standings"])
+	mainFrame:SetWidth(500)
+	mainFrame:SetLayout("List")
+	mainFrame:EnableResize(false)
+
+	-- Player Standings
+	local playerStandingsGrp = AceGUI:Create("SimpleGroup")
+	playerStandingsGrp:SetFullWidth(true)
+	playerStandingsGrp:SetLayout("Flow")
+	mainFrame:AddChild(playerStandingsGrp)
+
+	playerStandings = AceGUI:Create("Label")
+	playerStandings:SetRelativeWidth(0.8)
+	playerStandings:SetText('\n\n')
+	playerStandingsGrp:AddChild(playerStandings)
+
+	reportBtn = AceGUI:Create("Button")
+	reportBtn:SetRelativeWidth(0.19)
+	reportBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 8)
+	reportBtn:SetCallback("OnClick", function()
+		HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
+	end)
+	playerStandingsGrp:AddChild(reportBtn)
+
+	-- TABLE HEADER
+	local tableHeader = AceGUI:Create("SimpleGroup")
+	tableHeader:SetFullWidth(true)
+	tableHeader:SetLayout("Flow")
+	mainFrame:AddChild(tableHeader)
+
+	local btn = AceGUI:Create("InteractiveLabel")
+	btn.OnWidthSet = function(self, width)
+		if (btn:IsShown() and width > 0) then
+			nameWidth = width
+		end
+	end
+	btn:SetRelativeWidth(0.25)
+	btn:SetText(colorize(L["Name"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn.OnWidthSet = function(self, width)
+		if (btn:IsShown() and width > 0) then
+			dataWidth = width
+		end
+	end
+	btn:SetCallback("OnClick", function()
+		HonorSpy.db.factionrealm.sort = L["Honor"]
+		GUI:Show()
+	end)
+	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+	btn:SetRelativeWidth(0.12)
+	btn:SetText(colorize(L["Honor"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn.OnWidthSet = function(self, width)
+		if (btn:IsShown() and width > 0) then
+			lstWkHonorWidth = width
+		end
+	end
+	btn:SetRelativeWidth(0.15)
+	btn:SetText(colorize(L["LstWkHonor"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetRelativeWidth(0.12)
+	btn:SetText(colorize(L["Standing"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetRelativeWidth(0.12)
+	btn:SetText(colorize(L["RP"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetCallback("OnClick", function()
+		HonorSpy.db.factionrealm.sort = L["Rank"]
+		GUI:Show()
+	end)
+	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+	btn:SetRelativeWidth(0.12)
+	btn:SetText(colorize(L["Rank"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetRelativeWidth(0.1)
+	btn:SetText(colorize(L["LastSeen"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	scrollcontainer = AceGUI:Create("SimpleGroup")
+	scrollcontainer:SetFullWidth(true)
+	scrollcontainer:SetLayout("Fill")
+	mainFrame:AddChild(scrollcontainer)
+
+	scroll = AceGUI:Create("ScrollFrame")
+	scrollcontainer:SetFullWidth(true)
+	scroll:SetLayout("List")
+
+	statusLine = AceGUI:Create("Label")
+	statusLine:SetFullWidth(true)
+	mainFrame:AddChild(statusLine)
+
+	for i = 1, math.min(#self:BuildStandingsTable(), HonorSpy.db.factionrealm.limit) do
+		generateRow(i)
+		rows[i]:SetText(' ')
+	end
+
+	scrollcontainer:AddChild(scroll)
+	scrollcontainer.frame:SetPoint("BOTTOM", 0, 25)
+	statusLine:ClearAllPoints()
+	statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
+end
+
+function generateRow(i)
+	rows[i] = AceGUI:Create("InteractiveLabel")
+	rows[i]:SetFullWidth(true)
+	rows[i].highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+	scroll:AddChild(rows[i])
 end
 
 function colorize(str, colorOrClass)

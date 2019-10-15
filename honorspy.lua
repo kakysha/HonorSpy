@@ -35,6 +35,8 @@ function HonorSpy:OnInitialize()
 
 	DrawMinimapIcon();
 	HonorSpy:CheckNeedReset();
+
+	HonorSpyGUI:PrepareGUI()
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
