@@ -27,7 +27,8 @@ L["Player %s not found in table"] = true
 
 L["Report"] = true
 L["Report for player"] = true
-L["Report Target / Me"] = true
+L["Report Target"] = true
+L["Report Me"] = true
 L["Pool Size"] = true
 L["Standing"] = true
 L["Bracket"] = true

@@ -8,6 +8,7 @@ local commPrefix = addonName;
 local VERSION = 1;
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
+local playerIsInGuild = GetGuildInfo("player") ~= nil
 local callback = nil
 
 function HonorSpy:OnInitialize()
@@ -107,8 +108,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
 		end
 		self.db.factionrealm.currentStandings[inspectedPlayerName] = player;
-		self:SendCommMessage(commPrefix, self:Serialize(inspectedPlayerName, player), "GROUP");
-		self:SendCommMessage(commPrefix, self:Serialize(inspectedPlayerName, player), "GUILD");
+		broadcast(self:Serialize(inspectedPlayerName, player))
 	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
@@ -286,11 +286,18 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	store_player(playerName, player);
 end
 
--- SEND
+function broadcast(msg)
+	HonorSpy:SendCommMessage(commPrefix, msg, "GROUP");
+	if (playerIsInGuild) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
+	end
+end
+
+-- Broadcast on death
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
 	local filtered_players, count = {}, 0;
-	if (GetServerTime() - last_send_time < 5*60) then return	end;
+	if (GetServerTime() - last_send_time < 5*60) then return end;
 	last_send_time = GetServerTime();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
@@ -298,14 +305,12 @@ function HonorSpy:PLAYER_DEAD()
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
-			self:SendCommMessage(commPrefix, self:Serialize("filtered_players", filtered_players), "GROUP");
-			self:SendCommMessage(commPrefix, self:Serialize("filtered_players", filtered_players), "GUILD");
+			broadcast(self:Serialize("filtered_players", filtered_players))
 			filtered_players, count = {}, 0;
 		end
 	end
 	if (count > 0) then
-		self:SendCommMessage(commPrefix, self:Serialize("filtered_players", filtered_players), "GROUP");
-		self:SendCommMessage(commPrefix, self:Serialize("filtered_players", filtered_players), "GUILD");
+		broadcast(self:Serialize("filtered_players", filtered_players))
 	end
 end
 
@@ -343,8 +348,10 @@ function DrawMinimapIcon()
 		icon = "Interface\\Icons\\Inv_Misc_Bomb_04",
 		OnClick = function(self, button) 
 			if (button == "RightButton") then
+				HonorSpy:Report()
+			elseif (button == "MiddleButton") then
 				HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
-			else
+			else 
 				HonorSpy:CheckNeedReset()
 				HonorSpyGUI:Toggle()
 			end
@@ -353,7 +360,8 @@ function DrawMinimapIcon()
 			tooltip:AddLine(format("%s", addonName));
 			tooltip:AddLine("|cff777777by Kakysha|r");
 			tooltip:AddLine("|cFFCFCFCFLeft Click: |r" .. L['Show HonorSpy Standings']);
-			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Target / Me']);
+			tooltip:AddLine("|cFFCFCFCFMiddle Click: |r" .. L['Report Target']);
+			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Me']);
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
 end

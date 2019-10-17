@@ -27,7 +27,8 @@ L["Player %s not found in table"] = "Игрок %s не найден в табл
 
 L["Report"] = "Отчёт"
 L["Report for player"] = "Отчёт по др. игроку"
-L["Report Target / Me"] = "Отчёт по цели / себе"
+L["Report Target"] = "Отчёт по цели"
+L["Report Me"] = "Отчёт по себе"
 L["Pool Size"] = "Размер пула"
 L["Standing"] = "Позиция"
 L["Bracket"] = "Группа"
