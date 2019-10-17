@@ -12,7 +12,7 @@ Addon does all the magic in background.
 - data is synced across "PARTY" and "GUILD" channels, so when you play on BGs you transmit and receive data from your teammates. And all the time you exchange your data with your guildmates.
 
 **Right click on minimap icon to estimate your progress without opening the addon window.** Or
-**Limit number of table rows to reduce lag on standings open. Default limit is set to: 750. Go to *Esc → Interface Options → Addons → HonorSpy* to set the limit and other options.**
+**Limit number of table rows to reduce lag on standings open.** Default limit is set to: 750. Go to *Esc → Interface Options → Addons → HonorSpy* to set the limit and other options.
 
 Sadly, game client cant handle well huge numbers of UI widgets rendered on the screen, thats why there is a limit for number of rows shown in the table. There a bunch of tricks and hacks already to minimize rendering time, but no hacks can allow you to draw table with 10k rows.
 Active rankers can freely set the limit to 300 or even less, as you actually have no interest to scroll the whole server PvP pool, only the players higher/lower than you, and maybe some of the top standing players.
