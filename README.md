@@ -21,7 +21,7 @@ Active rankers can freely set the limit to 300 or even less, as you actually hav
 You have three options:
 - Use Twitch app to install this addon. Just search for 'honorspy' in Mods section of the app.
 - Download directly from Curseforge https://www.curseforge.com/wow/addons/honorspy
-- Download zip of 'classic' branch (just click Clone or Download -> Download ZIP), unzip the archive, remove '-classic' suffix from folder name and put it in Interface/Addons folder, relaunch WoW.
+- Download latest release from Github (https://github.com/kakysha/HonorSpy/releases/latest), unzip and put it in Interface/Addons folder, relaunch WoW.
 
 ### About
 
