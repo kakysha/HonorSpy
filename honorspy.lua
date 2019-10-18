@@ -101,7 +101,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	player.last_checked = GetServerTime();
 	player.RP = 0;
 
-	if (thisweekHK >= 0) then
+	if (thisweekHK >= 15) then
 		if (player.rank >= 3) then
 			player.RP = math.ceil((player.rank-2) * 5000 + player.rankProgress * 5000)
 		elseif (player.rank == 2) then
@@ -260,7 +260,7 @@ function store_player(playerName, player)
 	
 	if (player.last_checked < HonorSpy.db.factionrealm.last_reset
 		or player.last_checked > GetServerTime()
-		-- or player.thisWeekHonor == 0
+		or player.thisWeekHonor == 0
 		) then
 		return
 	end
