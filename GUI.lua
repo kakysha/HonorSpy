@@ -239,6 +239,8 @@ function GUI:PrepareGUI()
 	end
 
 	scrollcontainer:AddChild(scroll)
+	scrollcontainer:ClearAllPoints()
+	scrollcontainer.frame:SetPoint("TOP", tableHeader.frame, "BOTTOM", 0, -5)
 	scrollcontainer.frame:SetPoint("BOTTOM", 0, 25)
 	statusLine:ClearAllPoints()
 	statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
