@@ -1,6 +1,6 @@
 ## HonorSpy addon for WoW: Classic
 
-Addon helps players estimate their PvP next week rank and overall progress. Its a must-have for rankers.
+Addon helps players estimate their PvP next week rank and overall progress.
 
 It uses the exact formulaes as game server does, the only difference is that it operates on the database collected by players themselves. The final result is pretty close to what you get in reality, as the database is collected by all addon users and is synced instantly across other players.
 
