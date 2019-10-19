@@ -12,6 +12,7 @@ local colors = {
 	["GREY"] = "aaaaaa",
 	["RED"] = "C41F3B",
 	["GREEN"] = "00FF96",
+	["SHAMAN"] = "0070DE"
 }
 
 local nameWidth, dataWidth, lstWkHonorWidth = 0, 0, 0
@@ -227,6 +228,7 @@ function GUI:PrepareGUI()
 
 	scroll = AceGUI:Create("ScrollFrame")
 	scrollcontainer:SetFullWidth(true)
+	scrollcontainer:SetHeight(390)
 	scroll:SetLayout("List")
 
 	statusLine = AceGUI:Create("Label")
@@ -241,9 +243,9 @@ function GUI:PrepareGUI()
 	scrollcontainer:AddChild(scroll)
 	scrollcontainer:ClearAllPoints()
 	scrollcontainer.frame:SetPoint("TOP", tableHeader.frame, "BOTTOM", 0, -5)
-	scrollcontainer.frame:SetPoint("BOTTOM", 0, 25)
+	scrollcontainer.frame:SetPoint("BOTTOM", 0, 20)
 	statusLine:ClearAllPoints()
-	statusLine:SetPoint("TOP", scrollcontainer.frame, "BOTTOM", 0, -10)
+	statusLine:SetPoint("BOTTOM", mainFrame.frame, "BOTTOM", 0, 15)
 end
 
 function generateRow(i)
