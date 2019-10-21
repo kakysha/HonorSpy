@@ -25,8 +25,8 @@ options.args["limit"] = {
 	type = "input",
 	name = L["Limit Rows"],
 	desc = L["Limits number of rows shown in table, from 1 to 9999"],
-	get = function() return HonorSpy.db.factionrealm.limit end,
-	set = function(info, v) HonorSpy.db.factionrealm.limit = v; HonorSpyGUI:Reset(); HonorSpy:Print(L["Limit"].." = "..v) end,
+	get = function() return HonorSpy.db.factionrealm.limit .. "" end,
+	set = function(info, v) HonorSpy.db.factionrealm.limit = tonumber(v); HonorSpyGUI:Reset(); HonorSpy:Print(L["Limit"].." = "..v) end,
 	validate = function(info, v)
 		local n = math.ceil(tonumber(v) or 0)
 		return n and n > 0 and n < 10000

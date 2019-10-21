@@ -32,7 +32,7 @@ function GUI:Show(skipUpdate)
 	
 	mainFrame:Show()
 
-	local limit = tonumber(HonorSpy.db.factionrealm.limit)
+	local limit = HonorSpy.db.factionrealm.limit
 
 	local t = self:BuildStandingsTable()
 
