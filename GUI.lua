@@ -6,6 +6,8 @@ _G["HonorSpyGUI"] = GUI
 
 local mainFrame, statusLine, playerStandings, reportBtn, scroll = nil, nil, nil, nil
 local rows = {}
+local playersPerRow = 50
+local needsRelayout = true
 
 local colors = {
 	["ORANGE"] = "ff7f00",
@@ -33,6 +35,9 @@ function GUI:Show(skipUpdate)
 	local limit = tonumber(HonorSpy.db.factionrealm.limit)
 
 	local t = self:BuildStandingsTable()
+
+	local resultText = ""
+	local tableRowNumber = 0
 	for i = 1, #t do
 		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
 
@@ -45,10 +50,6 @@ function GUI:Show(skipUpdate)
 			last_seen_human = ""..math.floor(last_seen/60)..L["m"]
 		else
 			last_seen_human = ""..last_seen..L["s"]
-		end
-		
-		if (not rows[i]) then
-			generateRow(i)
 		end
 
 		local text = (name == playerName and '\n' or '') .. format('%d) %s', i, name)
@@ -65,14 +66,35 @@ function GUI:Show(skipUpdate)
 		text = padTextToWidth(text, nameWidth+4*dataWidth+lstWkHonorWidth)
 		text = text .. last_seen_human .. (name == playerName and '\n' or '')
 		
-		rows[i]:SetText(colorize(text, class))
+		resultText = resultText .. colorize(text, class)
+
+		if (math.fmod(i, playersPerRow) == 0 or i == limit or i == #t) then
+			tableRowNumber = tableRowNumber + 1
+			if (not rows[tableRowNumber]) then
+				generateRow(tableRowNumber)
+			end
+			rows[tableRowNumber]:SetText(resultText)
+			resultText = ""
+		else
+			resultText = resultText .. '\n'
+		end
 
 		if (i == limit) then
 			break
 		end
 	end
+	if (needsRelayout) then
+		scroll:DoLayout()
+		needsRelayout = false
+	end
 
-	statusLine:SetText(format('|cff777777/hs show|r                                                    ' .. L['Pool Size'] .. ': %d                                      |cff777777/hs search nickname|r', #t))
+	local poolSizeText = format(L['Pool Size'] .. ': %d ', #t)
+	if (#t > limit) then
+		poolSizeText = poolSizeText .. colorize(format('(limit: %d)', limit), "GREY")
+	else
+		poolSizeText = poolSizeText .. '                        '
+	end
+	statusLine:SetText('|cff777777/hs show|r                                                    ' .. poolSizeText .. '                  |cff777777/hs search nickname|r')
 
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
 	if (standing) then
@@ -83,7 +105,7 @@ function GUI:Show(skipUpdate)
 		playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
 		playerStandings:SetText(playerText .. '\n')
 
-		scroll:SetScroll(math.floor(standing / pool_size * 1000))
+		scroll:SetScroll(math.floor(standing / math.min(pool_size, limit) * 1000))
 	else
 		playerStandings:SetText(format('%s %s\n%s\n', L['Progress of'], playerName, L['not enough HKs, min = 15']))
 	end
@@ -223,21 +245,21 @@ function GUI:PrepareGUI()
 
 	scrollcontainer = AceGUI:Create("SimpleGroup")
 	scrollcontainer:SetFullWidth(true)
+	scrollcontainer:SetHeight(390)
 	scrollcontainer:SetLayout("Fill")
 	mainFrame:AddChild(scrollcontainer)
 
 	scroll = AceGUI:Create("ScrollFrame")
-	scrollcontainer:SetFullWidth(true)
-	scrollcontainer:SetHeight(390)
+	scroll:SetFullWidth(true)
 	scroll:SetLayout("List")
 
 	statusLine = AceGUI:Create("Label")
 	statusLine:SetFullWidth(true)
 	mainFrame:AddChild(statusLine)
 
-	for i = 1, math.min(#self:BuildStandingsTable(), HonorSpy.db.factionrealm.limit) do
+	local playersToShow = math.min(#self:BuildStandingsTable(), HonorSpy.db.factionrealm.limit)
+	for i = 1, math.floor(playersToShow / playersPerRow) + 1 do
 		generateRow(i)
-		rows[i]:SetText(' ')
 	end
 
 	scrollcontainer:AddChild(scroll)
@@ -249,10 +271,10 @@ function GUI:PrepareGUI()
 end
 
 function generateRow(i)
-	rows[i] = AceGUI:Create("InteractiveLabel")
+	rows[i] = AceGUI:Create("Label")
 	rows[i]:SetFullWidth(true)
-	rows[i].highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	scroll:AddChild(rows[i])
+	needsRelayout = true
 end
 
 function colorize(str, colorOrClass)

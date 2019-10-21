@@ -18,7 +18,7 @@ function HonorSpy:OnInitialize()
 			last_reset = 0,
 			reset_day = 3,
 			sort = L["Honor"],
-			limit = 750,
+			limit = 1000,
 			minimapButton = {hide = false}
     	}
 	}, true)
