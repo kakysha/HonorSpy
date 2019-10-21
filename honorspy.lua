@@ -24,6 +24,7 @@ function HonorSpy:OnInitialize()
 	}, true)
 
 	self:SecureHook("InspectUnit");
+	self:SecureHook("UnitPopup_ShowMenu");
 
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
@@ -45,7 +46,7 @@ local inspectedPlayerName = nil; -- name of currently inspected player
 
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
-	if (realm) then
+	if (paused or realm) then
 		return
 	end
 
@@ -119,24 +120,35 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 end
 
 -- INSPECT HOOKS pausing to not mess with native inspect calls
-local hooked = false;
-function HonorSpy:InspectUnit(unitID)
-	paused = true;
-	if (not hooked) then
-		self:SecureHookScript(InspectFrame, "OnHide");
-		hooked = true;
+-- pause when use opens target right click menu, as it breaks "inspect" button sometimes
+function HonorSpy:UnitPopup_ShowMenu(s, menu, frame, name, id)
+	if (menu == "PLAYER" and not self:IsHooked(_G["DropDownList1"], "OnHide")) then
+			self:SecureHookScript(_G["DropDownList1"], "OnHide", "CloseDropDownMenu")
+			paused = true
+		return
 	end
 end
-function HonorSpy:OnHide()
+function HonorSpy:CloseDropDownMenu()
+	self:Unhook(_G["DropDownList1"], "OnHide")
+	paused = false
+end
+-- pause when use opens inspect frame
+function HonorSpy:InspectUnit(unitID)
+	paused = true;
+	if (not self:IsHooked(InspectFrame, "OnHide")) then
+		self:SecureHookScript(InspectFrame, "OnHide", "InspectFrameClose");
+	end
+end
+function HonorSpy:InspectFrameClose()
 	paused = false;
 end
 
 -- INSPECTION TRIGGERS
 function HonorSpy:UPDATE_MOUSEOVER_UNIT()
-	if (not paused) then StartInspecting("mouseover") end
+	StartInspecting("mouseover")
 end
 function HonorSpy:PLAYER_TARGET_CHANGED()
-	if (not paused) then StartInspecting("target") end
+	StartInspecting("target")
 end
 
 function HonorSpy:UpdatePlayerData(cb)
