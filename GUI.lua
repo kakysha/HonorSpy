@@ -105,7 +105,9 @@ function GUI:Show(skipUpdate)
 		playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
 		playerStandings:SetText(playerText .. '\n')
 
-		scroll:SetScroll(math.floor(standing / math.min(pool_size, limit) * 1000))
+		if (standing <= limit) then
+			scroll:SetScroll(math.floor(standing / math.min(pool_size, limit) * 1000))
+		end
 	else
 		playerStandings:SetText(format('%s %s\n%s\n', L['Progress of'], playerName, L['not enough HKs, min = 15']))
 	end
