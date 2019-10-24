@@ -17,8 +17,6 @@ local colors = {
 	["SHAMAN"] = "0070DE"
 }
 
-local nameWidth, dataWidth, lstWkHonorWidth = 0, 0, 0
-
 local playerName = UnitName("player")
 
 function GUI:Show(skipUpdate)
@@ -30,71 +28,10 @@ function GUI:Show(skipUpdate)
 		end)
 	end
 	
-	mainFrame:Show()
+	rows = self:BuildStandingsTable()
 
-	local limit = HonorSpy.db.factionrealm.limit
-
-	local t = self:BuildStandingsTable()
-
-	local resultText = ""
-	local tableRowNumber = 0
-	for i = 1, #t do
-		local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(t[i])
-
-		local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
-		if (last_seen/60/60/24 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
-		elseif (last_seen/60/60 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60/60)..L["h"]
-		elseif (last_seen/60 > 1) then
-			last_seen_human = ""..math.floor(last_seen/60)..L["m"]
-		else
-			last_seen_human = ""..last_seen..L["s"]
-		end
-
-		local text = (name == playerName and '\n' or '') .. format('%d) %s', i, name)
-		text = padTextToWidth(text, nameWidth)
-		text = text .. thisWeekHonor
-		text = padTextToWidth(text, nameWidth+dataWidth)
-		text = text .. lastWeekHonor
-		text = padTextToWidth(text, nameWidth+dataWidth+lstWkHonorWidth)
-		text = text .. standing
-		text = padTextToWidth(text, nameWidth+2*dataWidth+lstWkHonorWidth)
-		text = text .. RP
-		text = padTextToWidth(text, nameWidth+3*dataWidth+lstWkHonorWidth)
-		text = text .. rank
-		text = padTextToWidth(text, nameWidth+4*dataWidth+lstWkHonorWidth)
-		text = text .. last_seen_human .. (name == playerName and '\n' or '')
-		
-		resultText = resultText .. colorize(text, class)
-
-		if (math.fmod(i, playersPerRow) == 0 or i == limit or i == #t) then
-			tableRowNumber = tableRowNumber + 1
-			if (not rows[tableRowNumber]) then
-				generateRow(tableRowNumber)
-			end
-			rows[tableRowNumber]:SetText(resultText)
-			resultText = ""
-		else
-			resultText = resultText .. '\n'
-		end
-
-		if (i == limit) then
-			break
-		end
-	end
-	if (needsRelayout) then
-		scroll:DoLayout()
-		needsRelayout = false
-	end
-
-	local poolSizeText = format(L['Pool Size'] .. ': %d ', #t)
-	if (#t > limit) then
-		poolSizeText = poolSizeText .. colorize(format('(limit: %d)', limit), "GREY")
-	else
-		poolSizeText = poolSizeText .. '                        '
-	end
-	statusLine:SetText('|cff777777/hs show|r                                                    ' .. poolSizeText .. '                  |cff777777/hs search nickname|r')
+	local poolSizeText = format(L['Pool Size'] .. ': %d ', #rows)
+	statusLine:SetText('|cff777777/hs show|r                                                                         ' .. poolSizeText .. '                                                       |cff777777/hs search nickname|r')
 
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
 	if (standing) then
@@ -105,14 +42,16 @@ function GUI:Show(skipUpdate)
 		playerText = playerText .. ' ' .. colorize(L['Next Week Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', EstRank, EstProgress), EstRP >= RP and "GREEN" or "RED")
 		playerStandings:SetText(playerText .. '\n')
 
-		if (standing <= limit) then
-			scroll:SetScroll(math.floor(standing / math.min(pool_size, limit) * 1000))
-		end
+		scroll.scrollBar:SetValue(standing * scroll.buttonHeight-200)
+		scroll.scrollBar.thumbTexture:Show()
 	else
 		playerStandings:SetText(format('%s %s\n%s\n', L['Progress of'], playerName, L['not enough HKs, min = 15']))
 	end
 
 	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
+
+	mainFrame:Show()
+	GUI:UpdateTableView()
 end
 
 function GUI:Hide()
@@ -132,7 +71,6 @@ end
 function GUI:Reset()
 	if (rows[1]) then
 		rows = {}
-		scroll:ReleaseChildren()
 		GUI:PrepareGUI()
 	end
 end
@@ -150,13 +88,61 @@ function GUI:BuildStandingsTable()
 	return t
 end
 
+function GUI:UpdateTableView()
+	local buttons = HybridScrollFrame_GetButtons(scroll);
+    local offset = HybridScrollFrame_GetOffset(scroll);
+
+    for buttonIndex = 1, #buttons do
+        local button = buttons[buttonIndex];
+        local itemIndex = buttonIndex + offset;
+
+        if itemIndex <= #rows then
+            local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
+            local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
+			if (last_seen/60/60/24 > 1) then
+				last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
+			elseif (last_seen/60/60 > 1) then
+				last_seen_human = ""..math.floor(last_seen/60/60)..L["h"]
+			elseif (last_seen/60 > 1) then
+				last_seen_human = ""..math.floor(last_seen/60)..L["m"]
+			else
+				last_seen_human = ""..last_seen..L["s"]
+			end
+            button:SetID(itemIndex);
+            button.Name:SetText(colorize(itemIndex .. ') ' .. name, class));
+            button.Honor:SetText(colorize(thisWeekHonor, class));
+            button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
+            button.Standing:SetText(colorize(standing, class));
+            button.RP:SetText(colorize(RP, class));
+            button.Rank:SetText(colorize(rank, class));
+            button.LastSeen:SetText(colorize(last_seen_human, class));
+
+            if (name == playerName) then
+            	button.Background:SetColorTexture(0.5, 0.5, 0.5, 0.2)
+            else
+            	button.Background:SetColorTexture(0, 0, 0, 0.2)
+            end
+
+            button:Show();
+        else
+            button:Hide();
+        end
+    end
+
+    local buttonHeight = scroll.buttonHeight;
+    local totalHeight = #rows * buttonHeight;
+    local shownHeight = #buttons * buttonHeight;
+
+	HybridScrollFrame_Update(scroll, totalHeight, shownHeight);
+end
+
 function GUI:PrepareGUI()
 	mainFrame = AceGUI:Create("Window")
 	mainFrame:Hide()
 	_G["HonorSpyGUI_MainFrame"] = mainFrame
 	tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
 	mainFrame:SetTitle(L["HonorSpy Standings"])
-	mainFrame:SetWidth(500)
+	mainFrame:SetWidth(600)
 	mainFrame:SetLayout("List")
 	mainFrame:EnableResize(false)
 
@@ -186,47 +172,32 @@ function GUI:PrepareGUI()
 	mainFrame:AddChild(tableHeader)
 
 	local btn = AceGUI:Create("InteractiveLabel")
-	btn.OnWidthSet = function(self, width)
-		if (btn:IsShown() and width > 0) then
-			nameWidth = width
-		end
-	end
-	btn:SetRelativeWidth(0.25)
+	btn:SetWidth(150)
 	btn:SetText(colorize(L["Name"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn.OnWidthSet = function(self, width)
-		if (btn:IsShown() and width > 0) then
-			dataWidth = width
-		end
-	end
 	btn:SetCallback("OnClick", function()
 		HonorSpy.db.factionrealm.sort = L["Honor"]
 		GUI:Show()
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-	btn:SetRelativeWidth(0.12)
+	btn:SetWidth(80)
 	btn:SetText(colorize(L["Honor"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn.OnWidthSet = function(self, width)
-		if (btn:IsShown() and width > 0) then
-			lstWkHonorWidth = width
-		end
-	end
-	btn:SetRelativeWidth(0.15)
+	btn:SetWidth(80)
 	btn:SetText(colorize(L["LstWkHonor"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn:SetRelativeWidth(0.12)
+	btn:SetWidth(70)
 	btn:SetText(colorize(L["Standing"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn:SetRelativeWidth(0.12)
+	btn:SetWidth(70)
 	btn:SetText(colorize(L["RP"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
@@ -236,12 +207,12 @@ function GUI:PrepareGUI()
 		GUI:Show()
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-	btn:SetRelativeWidth(0.12)
+	btn:SetWidth(50)
 	btn:SetText(colorize(L["Rank"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn:SetRelativeWidth(0.1)
+	btn:SetWidth(60)
 	btn:SetText(colorize(L["LastSeen"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
@@ -250,33 +221,20 @@ function GUI:PrepareGUI()
 	scrollcontainer:SetHeight(390)
 	scrollcontainer:SetLayout("Fill")
 	mainFrame:AddChild(scrollcontainer)
+	scrollcontainer:ClearAllPoints()
+	scrollcontainer.frame:SetPoint("TOP", tableHeader.frame, "BOTTOM", 0, -5)
+	scrollcontainer.frame:SetPoint("BOTTOM", 0, 20)
 
-	scroll = AceGUI:Create("ScrollFrame")
-	scroll:SetFullWidth(true)
-	scroll:SetLayout("List")
+	scroll = CreateFrame("ScrollFrame", nil, scrollcontainer.frame, "HybridScrollFrame")
+	HybridScrollFrame_CreateButtons(scroll, "HybridScrollListItemTemplate");
+	HybridScrollFrame_SetDoNotHideScrollBar(scroll, true)
+	scroll.update = function() GUI:UpdateTableView() end
 
 	statusLine = AceGUI:Create("Label")
 	statusLine:SetFullWidth(true)
 	mainFrame:AddChild(statusLine)
-
-	local playersToShow = math.min(#self:BuildStandingsTable(), HonorSpy.db.factionrealm.limit)
-	for i = 1, math.floor(playersToShow / playersPerRow) + 1 do
-		generateRow(i)
-	end
-
-	scrollcontainer:AddChild(scroll)
-	scrollcontainer:ClearAllPoints()
-	scrollcontainer.frame:SetPoint("TOP", tableHeader.frame, "BOTTOM", 0, -5)
-	scrollcontainer.frame:SetPoint("BOTTOM", 0, 20)
 	statusLine:ClearAllPoints()
 	statusLine:SetPoint("BOTTOM", mainFrame.frame, "BOTTOM", 0, 15)
-end
-
-function generateRow(i)
-	rows[i] = AceGUI:Create("Label")
-	rows[i]:SetFullWidth(true)
-	scroll:AddChild(rows[i])
-	needsRelayout = true
 end
 
 function colorize(str, colorOrClass)
@@ -285,13 +243,4 @@ function colorize(str, colorOrClass)
 	end
 
 	return format("|cff%s%s|r", colors[colorOrClass], str)
-end
-
-local label = AceGUI:Create("Label")
-function padTextToWidth(str, width)
-	repeat
-		str = str .. ' '
-		label:SetText(str)
-	until label.label:GetStringWidth() >= width
-	return str
 end

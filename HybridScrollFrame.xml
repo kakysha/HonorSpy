@@ -1,0 +1,78 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<Frame name="HybridScrollListItemTemplate" virtual="true">
+		<Size y="12" x="560"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" setAllPoints="true">
+					<Color r="0" g="0" b="0" a="0.2"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Name" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="150"/>
+				</FontString>
+				<FontString parentKey="Honor" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="80"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Name"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="LstWkHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="80"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Honor"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Standing" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="70"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.LstWkHonor"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="RP" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="70"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Standing"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Rank" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="50"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.RP"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="LastSeen" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="60"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Rank"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="HIGHLIGHT">
+				<Texture parentKey="Highlight" setAllPoints="true" alphaMode="ADD">
+					<Color r="1" g="0.75" b="0" a="0.2"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+
+		
+	<ScrollFrame name="HybridScrollFrame" inherits="HybridScrollFrameTemplate" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+			<Anchor point="BOTTOMRIGHT" x="-20"/>
+		</Anchors>
+		<Frames>
+			<Slider parentKey="scrollBar" inherits="HybridScrollBarTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="1" y="-16"/>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="1" y="12"/>
+				</Anchors>
+			</Slider>
+		</Frames>
+	</ScrollFrame>
+</Ui>

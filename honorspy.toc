@@ -21,3 +21,4 @@ honorspy.lua
 GUI.lua
 settings.lua
 export.lua
+HybridScrollFrame.xml

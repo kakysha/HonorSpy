@@ -18,7 +18,6 @@ function HonorSpy:OnInitialize()
 			last_reset = 0,
 			reset_day = 3,
 			sort = L["Honor"],
-			limit = 1000,
 			minimapButton = {hide = false}
     	}
 	}, true)
@@ -313,7 +312,6 @@ function HonorSpy:PLAYER_DEAD()
 	last_send_time = GetServerTime();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
-		player.is_outdated = false;
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
