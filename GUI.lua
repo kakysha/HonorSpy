@@ -78,13 +78,15 @@ end
 function GUI:BuildStandingsTable()
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-	table.insert(t, {playerName, player.class, player.thisWeekHonor, player.lastWeekHonor, player.standing, player.RP, player.rank, player.last_checked})
+		table.insert(t, {playerName, player.class, player.thisWeekHonor, player.lastWeekHonor, player.standing, player.RP, player.rank, player.last_checked})
 	end
+	
 	local sort_column = 3; -- ThisWeekHonor
 	if (HonorSpy.db.factionrealm.sort == L["Rank"]) then sort_column = 6; end
 	table.sort(t, function(a,b)
-	return a[sort_column] > b[sort_column]
+		return a[sort_column] > b[sort_column]
 	end)
+	
 	return t
 end
 
