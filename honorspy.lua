@@ -181,19 +181,48 @@ local options = {
 }
 LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", "hs"})
 
+function HonorSpy:BuildStandingsTable()
+	local t = { }
+	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
+		table.insert(t, {playerName, player.class, player.thisWeekHonor, player.lastWeekHonor, player.standing, player.RP, player.rank, player.last_checked})
+	end
+	
+	local sort_column = 3; -- ThisWeekHonor
+	if (HonorSpy.db.factionrealm.sort == L["Rank"]) then sort_column = 6; end
+	table.sort(t, function(a,b)
+		return a[sort_column] > b[sort_column]
+	end)
+
+	return t
+end
+
 -- REPORT
+function HonorSpy:GetBrackets(pool_size)
+	          -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
+	local brk =  {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
+	
+	if (not pool_size) then
+		return brk
+	end
+	for i = 1,14 do
+		brk[i] = math.floor(brk[i]*pool_size+.5)
+	end
+	return brk
+end
+
 function HonorSpy:Estimate(playerOfInterest)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
 	end
 	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
 
-	local pool_size = 0;
+	
 	local standing = -1;
-	local t = HonorSpyGUI:BuildStandingsTable()
+	local t = HonorSpy:BuildStandingsTable()
 	local avg_lastchecked = 0;
-	pool_size = table.getn(t);
-	for i = 1, table.getn(t) do
+	local pool_size = #t;
+
+	for i = 1, pool_size do
 		if (playerOfInterest == t[i][1]) then
 			standing = i
 		end
@@ -201,15 +230,15 @@ function HonorSpy:Estimate(playerOfInterest)
 	if (standing == -1) then
 		return
 	end;
-			  -- 1   2     3      4		 5		 6		7		8		9	10		11		12		13	14
-	local brk = {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
+
 	local RP  = {0, 400} -- RP for each bracket
 	local Ranks = {0, 2000} -- RP for each rank
 
 	local bracket = 1;
 	local inside_br_progress = 0;
+	local brk = self:GetBrackets(pool_size)
+
 	for i = 2,14 do
-		brk[i] = math.floor(brk[i]*pool_size+.5);
 		if (standing > brk[i]) then
 			inside_br_progress = (brk[i-1] - standing)/(brk[i-1] - brk[i])
 			break

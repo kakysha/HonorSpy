@@ -23,11 +23,12 @@ You have three options:
 
 1. It inspects every player in 'inspect range' which you target or mouseover
 2. It syncs your db with other party/raid/bg members and your guildmates on your death
-3. It can estimate your (or specific player) onward RP, Rank and Progress, taking into account your (player's) standing and pool size.
-3. It can export your internal DB in CSV format to copy-paste it into Google Spreadsheets for future calculations. [Spreadsheet done specially for HonorSpy](https://docs.google.com/spreadsheets/d/1OvZ7PRhrFjRn8IoH8HIPwHfRDEq50uO64YLCsSsjBQc/edit#gid=2113352865), it will estimate RP for all players.
-4. It supports automatic weekly pvp reset. Reset day can be configured.
+3. It can estimate your (or specific player) onward RP, Rank and Progress, taking into account your (player's) standing and pool size
+3. It can export your internal DB in CSV format to copy-paste it into Google Spreadsheets for future calculations. [Spreadsheet done specially for HonorSpy](https://docs.google.com/spreadsheets/d/1OvZ7PRhrFjRn8IoH8HIPwHfRDEq50uO64YLCsSsjBQc/edit#gid=2113352865), it will estimate RP for all players
+4. It supports automatic weekly pvp reset. Reset day can be configured
 6. Supports sorting by Rank and Honor
-7. *Esc → Interface Options → Addons → HonorSpy* for addon settings.
+7. Rows backround is colored according to estimated bracket
+8. *Esc → Interface Options → Addons → HonorSpy* for addon settings
 
 It only stores players with >15HKs.
 Reset day can be configured, default is Wednesday. Reset time is fixed at 10AM UTC.
@@ -41,4 +42,4 @@ P.S. Do not be afraid of losing all your data, very likely that other players wi
 
 ### Screenshot
 
-![HonorSpy Screenshot](https://habrastorage.org/webt/kj/fd/-v/kjfd-vhcyfupuisl5yshh0vzija.png)
+![HonorSpy Screenshot](https://habrastorage.org/webt/hn/ec/e7/hnece7zzgwob86ia9putwks6vay.png)

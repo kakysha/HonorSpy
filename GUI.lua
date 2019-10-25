@@ -5,7 +5,7 @@ local GUI = {}
 _G["HonorSpyGUI"] = GUI
 
 local mainFrame, statusLine, playerStandings, reportBtn, scroll = nil, nil, nil, nil
-local rows = {}
+local rows, brackets = {}, {}
 local playersPerRow = 50
 local needsRelayout = true
 
@@ -14,7 +14,21 @@ local colors = {
 	["GREY"] = "aaaaaa",
 	["RED"] = "C41F3B",
 	["GREEN"] = "00FF96",
-	["SHAMAN"] = "0070DE"
+	["SHAMAN"] = "0070DE",
+	["br14"] = {color="a911f5",r=0.663,g=0.067,b=0.961},
+	["br13"] = {color="672492",r=0.404,g=0.141,b=0.573},
+	["br12"] = {color="5645aa",r=0.337,g=0.271,b=0.667},
+	["br11"] = {color="1370ba",r=0.075,g=0.439,b=0.729},
+	["br10"] = {color="277ee5",r=0.153,g=0.494,b=0.898},
+	["br9"] = {color="2d83de",r=0.176,g=0.514,b=0.871},
+	["br8"] = {color="1acbeb",r=0.102,g=0.796,b=0.922},
+	["br7"] = {color="3f788a",r=0.247,g=0.471,b=0.541},
+	["br6"] = {color="c84d72",r=0.784,g=0.302,b=0.447},
+	["br5"] = {color="09dfa0",r=0.035,g=0.875,b=0.627},
+	["br4"] = {color="04bc25",r=0.016,g=0.737,b=0.145},
+	["br3"] = {color="e96258",r=0.914,g=0.384,b=0.345},
+	["br2"] = {color="90f3e1",r=0.565,g=0.953,b=0.882},
+	["br1"] = {color="d1cf88",r=0.82,g=0.812,b=0.533}
 }
 
 local playerName = UnitName("player")
@@ -28,7 +42,13 @@ function GUI:Show(skipUpdate)
 		end)
 	end
 	
-	rows = self:BuildStandingsTable()
+	rows = HonorSpy:BuildStandingsTable()
+	local brk = HonorSpy:GetBrackets(#rows)
+	for i = 1, #brk do
+		for j = brk[i], (brk[i+1] or 0)+1, -1 do
+			brackets[j] = i
+		end
+	end
 
 	local poolSizeText = format(L['Pool Size'] .. ': %d ', #rows)
 	statusLine:SetText('|cff777777/hs show|r                                                                         ' .. poolSizeText .. '                                                       |cff777777/hs search nickname|r')
@@ -75,21 +95,6 @@ function GUI:Reset()
 	end
 end
 
-function GUI:BuildStandingsTable()
-	local t = { }
-	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		table.insert(t, {playerName, player.class, player.thisWeekHonor, player.lastWeekHonor, player.standing, player.RP, player.rank, player.last_checked})
-	end
-	
-	local sort_column = 3; -- ThisWeekHonor
-	if (HonorSpy.db.factionrealm.sort == L["Rank"]) then sort_column = 6; end
-	table.sort(t, function(a,b)
-		return a[sort_column] > b[sort_column]
-	end)
-	
-	return t
-end
-
 function GUI:UpdateTableView()
 	local buttons = HybridScrollFrame_GetButtons(scroll);
     local offset = HybridScrollFrame_GetOffset(scroll);
@@ -122,7 +127,7 @@ function GUI:UpdateTableView()
             if (name == playerName) then
             	button.Background:SetColorTexture(0.5, 0.5, 0.5, 0.2)
             else
-            	button.Background:SetColorTexture(0, 0, 0, 0.2)
+            	button.Background:SetColorTexture(colors["br"..brackets[itemIndex]].r, colors["br"..brackets[itemIndex]].g, colors["br"..brackets[itemIndex]].b, 0.1)
             end
 
             button:Show();
