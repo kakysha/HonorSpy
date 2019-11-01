@@ -97,15 +97,29 @@ end
 
 function GUI:UpdateTableView()
 	local buttons = HybridScrollFrame_GetButtons(scroll);
-    local offset = HybridScrollFrame_GetOffset(scroll);
+	local offset = HybridScrollFrame_GetOffset(scroll);
+	local brk_delim_inserted = false
 
-    for buttonIndex = 1, #buttons do
-        local button = buttons[buttonIndex];
-        local itemIndex = buttonIndex + offset;
+	for buttonIndex = 1, #buttons do
+		local button = buttons[buttonIndex];
+		local itemIndex = buttonIndex + offset;
 
-        if itemIndex <= #rows then
-            local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
-            local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
+		if (itemIndex > 1 and brackets[itemIndex] and brackets[itemIndex-1] ~= brackets[itemIndex] and not brk_delim_inserted) then
+			offset = offset-1
+			brk_delim_inserted = true
+			button.Name:SetText(colorize(format(L["Bracket"] .. " %d", brackets[itemIndex]), "GREY"))
+			button.Honor:SetText();
+			button.LstWkHonor:SetText();
+			button.Standing:SetText();
+			button.RP:SetText();
+			button.Rank:SetText();
+			button.LastSeen:SetText();
+			button.Background:SetTexture("Interface/Glues/CharacterCreate/CharacterCreateMetalFrameHorizontal")
+			button:Show();
+		
+		elseif (itemIndex <= #rows) then
+			local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
+			local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
 			if (last_seen/60/60/24 > 1) then
 				last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
 			elseif (last_seen/60/60 > 1) then
@@ -115,30 +129,32 @@ function GUI:UpdateTableView()
 			else
 				last_seen_human = ""..last_seen..L["s"]
 			end
-            button:SetID(itemIndex);
-            button.Name:SetText(colorize(itemIndex .. ') ' .. name, class));
-            button.Honor:SetText(colorize(thisWeekHonor, class));
-            button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
-            button.Standing:SetText(colorize(standing, class));
-            button.RP:SetText(colorize(RP, class));
-            button.Rank:SetText(colorize(rank, class));
-            button.LastSeen:SetText(colorize(last_seen_human, class));
+			button:SetID(itemIndex);
+			button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
+			button.Honor:SetText(colorize(thisWeekHonor, class));
+			button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
+			button.Standing:SetText(colorize(standing, class));
+			button.RP:SetText(colorize(RP, class));
+			button.Rank:SetText(colorize(rank, class));
+			button.LastSeen:SetText(colorize(last_seen_human, class));
 
-            if (name == playerName) then
-            	button.Background:SetColorTexture(0.5, 0.5, 0.5, 0.2)
-            else
-            	button.Background:SetColorTexture(colors["br"..brackets[itemIndex]].r, colors["br"..brackets[itemIndex]].g, colors["br"..brackets[itemIndex]].b, 0.1)
-            end
+			if (name == playerName) then
+				button.Background:SetColorTexture(0.5, 0.5, 0.5, 0.2)
+			else
+				button.Background:SetColorTexture(colors["br"..brackets[itemIndex]].r, colors["br"..brackets[itemIndex]].g, colors["br"..brackets[itemIndex]].b, 0.05)
+				--button.Background:SetColorTexture(0, 0, 0, 0.2)
+			end
 
-            button:Show();
-        else
-            button:Hide();
-        end
-    end
+			brk_delim_inserted = false
+			button:Show();
+		else
+			button:Hide();
+		end
+	end
 
-    local buttonHeight = scroll.buttonHeight;
-    local totalHeight = #rows * buttonHeight;
-    local shownHeight = #buttons * buttonHeight;
+	local buttonHeight = scroll.buttonHeight;
+	local totalHeight = #rows * buttonHeight;
+	local shownHeight = #buttons * buttonHeight;
 
 	HybridScrollFrame_Update(scroll, totalHeight, shownHeight);
 end

@@ -38,6 +38,7 @@ function HonorSpy:OnInitialize()
 	HonorSpy:CheckNeedReset();
 
 	HonorSpyGUI:PrepareGUI()
+	PrintWelcomeMsg();
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -403,4 +404,13 @@ function DrawMinimapIcon()
 			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Me']);
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
+end
+
+function PrintWelcomeMsg()
+	local realm = GetRealmName()
+	local msg = format("|cffAAAAAAversion: %s, bugs & features: github.com/kakysha/honorspy|r\n|cff209f9b", GetAddOnMetadata("HonorSpy", "Version"))
+	if (realm == "Flamelash") then
+		msg = msg .. format("You are lucky enough to play with HonorSpy author on one |cffFFFFFF%s |cff209f9brealm! Feel free to mail me (|cff8787edKakysha|cff209f9b) a supportive gold tip or kind word!", realm)
+	end
+	HonorSpy:Print(msg .. "|r")
 end
