@@ -101,6 +101,7 @@ function GUI:UpdateTableView()
 			button.Rank:SetText();
 			button.LastSeen:SetText();
 			button.Background:SetTexture("Interface/Glues/CharacterCreate/CharacterCreateMetalFrameHorizontal")
+			button.Highlight:SetTexture()
 			button:Show();
 		
 		elseif (itemIndex <= #rows) then
@@ -129,6 +130,7 @@ function GUI:UpdateTableView()
 			else
 				button.Background:SetColorTexture(0, 0, 0, 0.2)
 			end
+			button.Highlight:SetColorTexture(1, 0.75, 0, 0.2)
 
 			brk_delim_inserted = false
 			button:Show();

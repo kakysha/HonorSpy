@@ -328,7 +328,11 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function broadcast(msg)
-	HonorSpy:SendCommMessage(commPrefix, msg, "GROUP");
+	if (UnitInBattleground("player") ~= nil) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "BATTLEGROUND");
+	else
+		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
+	end
 	if (playerIsInGuild) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
 	end
@@ -367,10 +371,10 @@ function resetWeek(must_reset_on)
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
 function HonorSpy:CheckNeedReset()
-	local day = date("!%w");
-	local h = date("!%H");
-	local m = date("!%M");
-	local s = date("!%S");
+	local day = date("!%w", GetServerTime());
+	local h = date("!%H", GetServerTime());
+	local m = date("!%M", GetServerTime());
+	local s = date("!%S", GetServerTime());
 	local days_diff = (7 + (day - HonorSpy.db.factionrealm.reset_day)) - math.floor((7 + (day - HonorSpy.db.factionrealm.reset_day))/7) * 7;
 	local diff_in_seconds = s + m*60 + h*60*60 + days_diff*24*60*60 - 10*60*60 - 1; -- 10 AM UTC - fixed hour of PvP maintenance
 	if (diff_in_seconds > 0) then -- it is negative on reset_day untill 10AM

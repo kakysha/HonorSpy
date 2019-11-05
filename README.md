@@ -42,4 +42,4 @@ P.S. Do not be afraid of losing all your data, very likely that other players wi
 
 ### Screenshot
 
-![HonorSpy Screenshot](https://habrastorage.org/webt/hn/ec/e7/hnece7zzgwob86ia9putwks6vay.png)
+![HonorSpy Screenshot](https://habrastorage.org/webt/gb/eb/kx/gbebkxvluh-eqagwgbnvantmc1c.png)
