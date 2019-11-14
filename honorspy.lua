@@ -419,3 +419,16 @@ function PrintWelcomeMsg()
 	end
 	HonorSpy:Print(msg .. "|r")
 end
+
+function HonorSpy:RandomizeValues()
+	local i = 0
+	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
+		i = i + 1
+		player.thisWeekHonor = random(1, 1400000)
+		player.lastWeekHonor = random(1, 400000)
+		player.standing = i
+		player.rankProgress = random()
+		player.RP = random(1, 50000)
+		player.rank = random(1, 14)
+	end
+end
