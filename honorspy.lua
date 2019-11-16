@@ -82,7 +82,7 @@ local function StartInspecting(unitID)
 end
 
 function HonorSpy:INSPECT_HONOR_UPDATE()
-	if (inspectedPlayerName == nil or paused or not(HasInspectHonorData())) then
+	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
 		return;
 	end
 
@@ -108,6 +108,10 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		elseif (player.rank == 2) then
 			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
 		end
+		if (lastPlayer and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
+			return
+		end
+		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
 		self.db.factionrealm.currentStandings[inspectedPlayerName] = player;
 		broadcast(self:Serialize(inspectedPlayerName, player))
 	end
