@@ -61,5 +61,6 @@ L["Limit"] = "Лимит строк"
 L['not enough HKs, min = 15'] = "Недостаточно убийств, мин = 15"
 L["Hide Minimap Button"] = "Скрыть иконку на миникарте"
 L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = "Введите \'/hs show' чтобы открыть окно HonorSpy, если скрыли. UI будет перезагружен."
+L["Estimated Honor"] = "Ожидаемый Хонор"
 
 end

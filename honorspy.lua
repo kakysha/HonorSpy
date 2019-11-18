@@ -18,6 +18,13 @@ function HonorSpy:OnInitialize()
 			reset_day = 3,
 			sort = L["Honor"],
 			minimapButton = {hide = false}
+    	},
+    	char = {
+    		today_kills = {
+    			['*'] = 0
+    		},
+    		estimated_honor = 0,
+    		original_honor = 0
     	}
 	}, true)
 
@@ -28,6 +35,7 @@ function HonorSpy:OnInitialize()
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
 
 	self:RegisterEvent("INSPECT_HONOR_UPDATE");
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER)
 
 	self:RegisterComm(commPrefix, "OnCommReceive")
 
@@ -38,6 +46,9 @@ function HonorSpy:OnInitialize()
 
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
+
+	HonorSpy:UpdatePlayerData()
+	checkDailyReset()
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -120,6 +131,46 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		callback()
 		callback = nil
 	end
+end
+
+local last_killed = {name = "", ts = 0}
+local handler_invocation_ts = 0
+function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, ...)
+	checkDailyReset()
+	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: %w+ %(Estimated Honor Points: (%d+)%)")
+	if (victim) then
+		if (victim == last_killed.name and (time()-last_killed.ts <= 1)) then
+			return nil, msg, ... -- ddue to the bug, this chat filter is called twice
+		end
+		if (not HonorSpy.db.char.today_kills[victim]) then
+			HonorSpy.db.char.today_kills[victim] = 0
+		end
+		est_honor = math.floor(est_honor * (1-0.1*HonorSpy.db.char.today_kills[victim]) + 0.5)
+		HonorSpy.db.char.today_kills[victim] = HonorSpy.db.char.today_kills[victim]+1
+		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+est_honor
+
+		last_killed = {name = victim, ts = time()}
+		return nil, msg .. format(" kills: %d, honor:|cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), ...
+	end
+	local awarded_honor = msg:match("You have been awarded %d+ honor.")
+	if (awarded_honor) then
+		if (time() - handler_invocation_ts <= 1) then
+			return nil, msg, ... -- ddue to the bug, this chat filter is called twice
+		end
+		handler_invocation_ts = time()
+		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+awarded_honor
+		return nil, msg, ...
+	end
+end
+
+function checkDailyReset()
+	if (not HonorSpy.db.factionrealm.currentStandings[playerName] or HonorSpy.db.char.original_honor == HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
+		return
+	end
+	HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
+	HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
+	HonorSpy.db.char.today_kills = {}
+
 end
 
 -- INSPECT HOOKS pausing to not mess with native inspect calls
@@ -218,7 +269,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
 	end
-	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
+	playerOfInterest = string.utf8upper(string.utf8sub(playerOfInterest, 1, 1))..string.utf8lower(string.utf8sub(playerOfInterest, 2))
 
 	
 	local standing = -1;
@@ -278,7 +329,7 @@ function HonorSpy:Report(playerOfInterest, skipUpdate)
 	if (playerOfInterest == playerName) then
 		HonorSpy:UpdatePlayerData() -- will update for next time, this report gonna be for old data
 	end
-	playerOfInterest = string.upper(string.sub(playerOfInterest, 1, 1))..string.lower(string.sub(playerOfInterest, 2))
+	playerOfInterest = string.utf8upper(string.utf8sub(playerOfInterest, 1, 1))..string.utf8lower(string.utf8sub(playerOfInterest, 2))
 	
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
@@ -317,6 +368,9 @@ function store_player(playerName, player)
 end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
+	if (distribution == "BATTLEGROUND" and UnitRealmRelationship(sender) ~= 1) then
+		return -- discard any message from players from different servers (on x-realm BGs)
+	end
 	local ok, playerName, player = self:Deserialize(message);
 	if (not ok) then
 		return;
