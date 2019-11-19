@@ -133,33 +133,30 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 end
 
-local last_killed = {name = "", ts = 0}
-local handler_invocation_ts = 0
-function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, ...)
+local last_msg_id = 0
+function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...)
+	if (id == last_msg_id) then
+		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...-- due to the bug, this chat filter is called twice
+	end
+	last_msg_id = id
 	checkDailyReset()
 	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: %w+ %(Estimated Honor Points: (%d+)%)")
 	if (victim) then
-		if (victim == last_killed.name and (time()-last_killed.ts <= 1)) then
-			return nil, msg, ... -- ddue to the bug, this chat filter is called twice
-		end
 		if (not HonorSpy.db.char.today_kills[victim]) then
 			HonorSpy.db.char.today_kills[victim] = 0
 		end
-		est_honor = math.floor(est_honor * (1-0.1*HonorSpy.db.char.today_kills[victim]) + 0.5)
+		est_honor = math.floor(est_honor * (1-0.25*HonorSpy.db.char.today_kills[victim]) + 0.5)
 		HonorSpy.db.char.today_kills[victim] = HonorSpy.db.char.today_kills[victim]+1
 		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+est_honor
 
 		last_killed = {name = victim, ts = time()}
-		return nil, msg .. format(" kills: %d, honor:|cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), ...
+		return nil, msg .. format(" kills: %d, honor:|cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
 	end
 	local awarded_honor = msg:match("You have been awarded %d+ honor.")
 	if (awarded_honor) then
-		if (time() - handler_invocation_ts <= 1) then
-			return nil, msg, ... -- ddue to the bug, this chat filter is called twice
-		end
 		handler_invocation_ts = time()
 		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+awarded_honor
-		return nil, msg, ...
+		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
 	end
 end
 
