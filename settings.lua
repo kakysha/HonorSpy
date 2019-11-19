@@ -21,14 +21,34 @@ options.args["minimapButtonDesc"] = {
 }
 
 options.args["sep1"] = {
+	order = 2,
+	type = "description",
+	name = "\n"
+}
+
+options.args["syncOverGuild"] = {
 	order = 3,
+	type = "toggle",
+	name = L["Sync over GUILD instead of separate 'HonorSpySync' channel"],
+	desc = L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."],
+	get = function() return HonorSpy.db.factionrealm.syncOverGuild end,
+	set = function(info, v) HonorSpy.db.factionrealm.syncOverGuild = v end,
+}
+options.args["syncOverGuildDesc"] = {
+	order = 4,
+	type = "description",
+	name = L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] .. '\n\n'
+}
+
+options.args["sep1"] = {
+	order = 5,
 	type = "description",
 	name = "\n"
 }
 
 local days = { L["Sunday"], L["Monday"], L["Tuesday"], L["Wednesday"], L["Thursday"], L["Friday"], L["Saturday"] };
 options.args["reset_day"] = {
-	order = 4,
+	order = 6,
 	type = "select",
 	name = L["PvP Week Reset On"],
 	desc = L["Day of week when new PvP week starts (10AM UTC)"],
@@ -40,19 +60,19 @@ options.args["reset_day"] = {
 	end
 }
 options.args["sep2"] = {
-	order = 5,
+	order = 7,
 	type = "header",
 	name = ""
 }
 options.args["export"] = {
-	order = 6,
+	order = 8,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 7,
+	order = 9,
 	type = "execute",
 	name = L["_ purge all data"],
 	desc = L["Delete all collected data"],

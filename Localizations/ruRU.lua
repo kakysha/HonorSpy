@@ -62,5 +62,7 @@ L['not enough HKs, min = 15'] = "Недостаточно убийств, мин
 L["Hide Minimap Button"] = "Скрыть иконку на миникарте"
 L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = "Введите \'/hs show' чтобы открыть окно HonorSpy, если скрыли. UI будет перезагружен."
 L["Estimated Honor"] = "Ожидаемый Хонор"
+L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "Синхронизировать с Гильдией, вместо отдельного канала HonorSpySync"
+L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "Вы больше не будете подключаться к каналу HonorSpySync, а будете синхронизировать данные только с согильдийцами. Требуется релог при изменении."
 
 end

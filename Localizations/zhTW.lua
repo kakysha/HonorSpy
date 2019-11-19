@@ -61,5 +61,8 @@ L["Limit"] = "限制"
 L['not enough HKs, min = 15'] = "沒有榮譽擊殺, 最低需要 = 15"
 L["Hide Minimap Button"] = "隱藏小地圖按鈕"
 L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = "輸入 \'/hs show' 顯示 HonorSpy 窗口, 更改時將重置UI"
+L["Estimated Honor"] = true
+L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = true
+L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = true
 
 end

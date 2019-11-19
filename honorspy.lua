@@ -7,25 +7,26 @@ local commPrefix = addonName .. "2";
 
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
-local playerIsInGuild = GetGuildInfo("player") ~= nil
 local callback = nil
+local syncChannelID = 0
 
 function HonorSpy:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
-    	factionrealm = {
+	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
+		factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
 			reset_day = 3,
 			sort = L["Honor"],
-			minimapButton = {hide = false}
-    	},
-    	char = {
-    		today_kills = {
-    			['*'] = 0
-    		},
-    		estimated_honor = 0,
-    		original_honor = 0
-    	}
+			minimapButton = {hide = false},
+			syncOverGuild = false
+		},
+		char = {
+			today_kills = {
+				['*'] = 0
+			},
+			estimated_honor = 0,
+			original_honor = 0
+		}
 	}, true)
 
 	self:SecureHook("InspectUnit");
@@ -49,6 +50,10 @@ function HonorSpy:OnInitialize()
 
 	HonorSpy:UpdatePlayerData()
 	checkDailyReset()
+
+	if (not HonorSpy.db.factionrealm.syncOverGuild) then
+		HS_wait(5, HS_joinSyncChannel)
+	end
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -250,7 +255,7 @@ end
 
 -- REPORT
 function HonorSpy:GetBrackets(pool_size)
-	          -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
+			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
 	local brk =  {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
 	
 	if (not pool_size) then
@@ -381,13 +386,27 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	store_player(playerName, player);
 end
 
+function HS_joinSyncChannel()
+	local channelName = "HonorSpySync"
+	if (GetChannelName(channelName) == 0) then
+		JoinTemporaryChannel("hstemp1")
+		JoinTemporaryChannel("hstemp2")
+		JoinTemporaryChannel(channelName)
+		HS_wait(1, LeaveChannelByName, "hstemp1")
+		HS_wait(1, LeaveChannelByName, "hstemp2")
+	end
+	syncChannelID = GetChannelName(channelName)
+end
+
 function broadcast(msg)
 	if (UnitInBattleground("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "BATTLEGROUND");
 	else
 		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
 	end
-	if (playerIsInGuild) then
+	if (syncChannelID > 0) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "CHANNEL", syncChannelID);
+	elseif (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
 	end
 end
@@ -425,6 +444,7 @@ function resetWeek(must_reset_on)
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
 function HonorSpy:CheckNeedReset()
+	checkDailyReset()
 	local day = date("!%w", GetServerTime());
 	local h = date("!%H", GetServerTime());
 	local m = date("!%M", GetServerTime());
@@ -472,4 +492,34 @@ function PrintWelcomeMsg()
 		msg = msg .. format("You are lucky enough to play with HonorSpy author on one |cffFFFFFF%s |cff209f9brealm! Feel free to mail me (|cff8787edKakysha|cff209f9b) a supportive gold tip or kind word!", realm)
 	end
 	HonorSpy:Print(msg .. "|r")
+end
+
+local waitTable = {};
+local waitFrame = nil;
+function HS_wait(delay, func, ...)
+  if(type(delay)~="number" or type(func)~="function") then
+	return false;
+  end
+  if(waitFrame == nil) then
+	waitFrame = CreateFrame("Frame","WaitFrame", UIParent);
+	waitFrame:SetScript("onUpdate",function (self,elapse)
+	  local count = #waitTable;
+	  local i = 1;
+	  while(i<=count) do
+		local waitRecord = tremove(waitTable,i);
+		local d = tremove(waitRecord,1);
+		local f = tremove(waitRecord,1);
+		local p = tremove(waitRecord,1);
+		if(d>elapse) then
+		  tinsert(waitTable,i,{d-elapse,f,p});
+		  i = i + 1;
+		else
+		  count = count - 1;
+		  f(unpack(p));
+		end
+	  end
+	end);
+  end
+  tinsert(waitTable,{delay,func,{...}});
+  return true;
 end
