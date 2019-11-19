@@ -151,7 +151,7 @@ function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, 
 		if (not HonorSpy.db.char.today_kills[victim]) then
 			HonorSpy.db.char.today_kills[victim] = 0
 		end
-		est_honor = math.floor(est_honor * (1-0.25*HonorSpy.db.char.today_kills[victim]) + 0.5)
+		est_honor = math.max(math.floor(est_honor * (1-0.25*HonorSpy.db.char.today_kills[victim]) + 0.5), 0)
 		HonorSpy.db.char.today_kills[victim] = HonorSpy.db.char.today_kills[victim]+1
 		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+est_honor
 
