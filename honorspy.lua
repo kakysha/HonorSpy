@@ -9,6 +9,7 @@ local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
 local callback = nil
 local syncChannelID = 0
+local channelName = "HonorSpySync"
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -387,7 +388,6 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function HS_joinSyncChannel()
-	local channelName = "HonorSpySync"
 	if (GetChannelName(channelName) == 0) then
 		JoinTemporaryChannel("hstemp1")
 		JoinTemporaryChannel("hstemp2")
@@ -434,6 +434,10 @@ function HonorSpy:PLAYER_DEAD()
 	end
 	if (count > 0) then
 		broadcast(self:Serialize("filtered_players", filtered_players))
+	end
+
+	if (syncChannelID > 0) then
+		SetChannelPassword(channelName, "") -- if some malicious player who is owning the channel changes its password, reset it
 	end
 end
 
