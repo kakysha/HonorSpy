@@ -395,6 +395,12 @@ function HS_joinSyncChannel()
 		HS_wait(1, LeaveChannelByName, "hstemp1")
 		HS_wait(1, LeaveChannelByName, "hstemp2")
 	end
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(_s, e, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, baseChannelName, ...)
+		if (baseChannelName == channelName) then
+			return true
+		end
+		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, baseChannelName, ...
+	end)
 	syncChannelID = GetChannelName(channelName)
 end
 
