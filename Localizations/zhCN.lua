@@ -31,7 +31,7 @@ L["Report Target"] = "报告目标"
 L["Report Me"] = "报告目我"
 L["Pool Size"] = "数据表的大小"
 L["Standing"] = "排名"
-L["Bracket"] = "等级段"
+L["Bracket"] = "Br等级段"
 L["Current RP"] = "当前经验"
 L["Next Week RP"] = "下周经验"
 L["Current Rank"] = "当前Rank"
@@ -61,8 +61,8 @@ L["Limit"] = "限制"
 L['not enough HKs, min = 15'] = "没有荣誉击杀, 最低需要 = 15"
 L["Hide Minimap Button"] = "隐藏小地图按钮"
 L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = "输入 \'/hs show' 显示 HonorSpy 窗口, 更改时将重置UI"
-L["Estimated Honor"] = true
-L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = true
-L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = true
+L["Estimated Honor"] = "荣誉预估"
+L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "通过公会同步而不是单独的“HonorSpySync”频道"
+L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "你将不再加入‘HonorSpySync’频道，并且只与你的公会成员同步数据。更改后请重载登陆"
 
 end
