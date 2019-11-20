@@ -140,7 +140,7 @@ function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, 
 	end
 	last_msg_id = id
 	HonorSpy:CheckNeedReset()
-	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: %w+ %(Estimated Honor Points: (%d+)%)")
+	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: [%s%w]+ %(Estimated Honor Points: (%d+)%)")
 	if (victim) then
 		if (not HonorSpy.db.char.today_kills[victim]) then
 			HonorSpy.db.char.today_kills[victim] = 0
@@ -150,7 +150,7 @@ function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, 
 		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+est_honor
 
 		last_killed = {name = victim, ts = time()}
-		return nil, msg .. format(" kills: %d, honor:|cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
+		return nil, msg .. format(" kills: %d, honor: |cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
 	end
 	local awarded_honor = msg:match("You have been awarded %d+ honor.")
 	if (awarded_honor) then
