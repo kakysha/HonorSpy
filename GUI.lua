@@ -42,7 +42,7 @@ function GUI:Show(skipUpdate)
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
 	if (standing) then
 		local playerText = colorize(L['Progress of'], "GREY") .. ' ' .. colorize(playerName, HonorSpy.db.factionrealm.currentStandings[playerName].class)
-		playerText = playerText .. ", " .. colorize(L['Estimated Honor'] .. ':', "GREY") .. colorize(HonorSpy.db.char.estimated_honor, "ORANGE")
+		playerText = playerText .. ", " .. colorize(L['Estimated Honor'] .. ': ', "GREY") .. colorize(HonorSpy.db.char.estimated_honor, "ORANGE")
 		playerText = playerText .. '\n' .. colorize(L['Standing'] .. ':', "GREY") .. colorize(standing, "ORANGE")
 		playerText = playerText .. ' ' .. colorize(L['Bracket'] .. ':', "GREY") .. colorize(bracket, "ORANGE")
 		playerText = playerText .. ' ' .. colorize(L['Current Rank'] .. ':', "GREY") .. colorize(format('%d (%d%%)', Rank, Progress), "ORANGE")
@@ -52,7 +52,7 @@ function GUI:Show(skipUpdate)
 		scroll.scrollBar:SetValue(standing * scroll.buttonHeight-200)
 		scroll.scrollBar.thumbTexture:Show()
 	else
-		playerStandings:SetText(format('%s %s\n%s\n', L['Progress of'], playerName, L['not enough HKs, min = 15']))
+		playerStandings:SetText(format('%s %s, %s: %s\n%s\n', L['Progress of'], playerName, colorize(L['Estimated Honor'], "GREY"), colorize(HonorSpy.db.char.estimated_honor, "ORANGE"), L['not enough HKs, min = 15']))
 	end
 
 	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))
