@@ -170,7 +170,7 @@ function GUI:PrepareGUI()
 
 	reportBtn = AceGUI:Create("Button")
 	reportBtn:SetRelativeWidth(0.19)
-	reportBtn.text:SetFont("Fonts\\ARIALN.TTF", 8)
+	reportBtn.text:SetFontObject("SystemFont_NamePlate")
 	reportBtn:SetCallback("OnClick", function()
 		HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
 	end)
