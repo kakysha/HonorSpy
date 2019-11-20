@@ -46,33 +46,15 @@ options.args["sep1"] = {
 	name = "\n"
 }
 
-local days = { L["Sunday"], L["Monday"], L["Tuesday"], L["Wednesday"], L["Thursday"], L["Friday"], L["Saturday"] };
-options.args["reset_day"] = {
-	order = 6,
-	type = "select",
-	name = L["PvP Week Reset On"],
-	desc = L["Day of week when new PvP week starts (10AM UTC)"],
-	values = days,
-	get = function() return HonorSpy.db.factionrealm.reset_day+1 end,
-	set = function(info, v)
-		HonorSpy.db.factionrealm.reset_day = v-1
-		HonorSpy:CheckNeedReset();
-	end
-}
-options.args["sep2"] = {
-	order = 7,
-	type = "header",
-	name = ""
-}
 options.args["export"] = {
-	order = 8,
+	order = 6,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 9,
+	order = 7,
 	type = "execute",
 	name = L["_ purge all data"],
 	desc = L["Delete all collected data"],

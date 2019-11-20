@@ -16,7 +16,6 @@ function HonorSpy:OnInitialize()
 		factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
-			reset_day = 3,
 			sort = L["Honor"],
 			minimapButton = {hide = false},
 			syncOverGuild = false
@@ -35,22 +34,15 @@ function HonorSpy:OnInitialize()
 
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
-
 	self:RegisterEvent("INSPECT_HONOR_UPDATE");
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER)
-
 	self:RegisterComm(commPrefix, "OnCommReceive")
-
 	self:RegisterEvent("PLAYER_DEAD");
 
 	DrawMinimapIcon();
 	HonorSpy:CheckNeedReset();
-
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
-
-	HonorSpy:UpdatePlayerData()
-	checkDailyReset()
 
 	if (not HonorSpy.db.factionrealm.syncOverGuild) then
 		HS_wait(5, HS_joinSyncChannel)
@@ -130,6 +122,8 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
 		self.db.factionrealm.currentStandings[inspectedPlayerName] = player;
 		broadcast(self:Serialize(inspectedPlayerName, player))
+	else
+		self.db.factionrealm.currentStandings[inspectedPlayerName] = nil
 	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
@@ -145,7 +139,7 @@ function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, 
 		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...-- due to the bug, this chat filter is called twice
 	end
 	last_msg_id = id
-	checkDailyReset()
+	HonorSpy:CheckNeedReset()
 	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: %w+ %(Estimated Honor Points: (%d+)%)")
 	if (victim) then
 		if (not HonorSpy.db.char.today_kills[victim]) then
@@ -164,16 +158,6 @@ function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, 
 		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+awarded_honor
 		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
 	end
-end
-
-function checkDailyReset()
-	if (not HonorSpy.db.factionrealm.currentStandings[playerName] or HonorSpy.db.char.original_honor == HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
-		return
-	end
-	HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
-	HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
-	HonorSpy.db.char.today_kills = {}
-
 end
 
 -- INSPECT HOOKS pausing to not mess with native inspect calls
@@ -454,17 +438,22 @@ function resetWeek(must_reset_on)
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
 function HonorSpy:CheckNeedReset()
-	checkDailyReset()
-	local day = date("!%w", GetServerTime());
-	local h = date("!%H", GetServerTime());
-	local m = date("!%M", GetServerTime());
-	local s = date("!%S", GetServerTime());
-	local days_diff = (7 + (day - HonorSpy.db.factionrealm.reset_day)) - math.floor((7 + (day - HonorSpy.db.factionrealm.reset_day))/7) * 7;
-	local diff_in_seconds = s + m*60 + h*60*60 + days_diff*24*60*60 - 10*60*60 - 1; -- 10 AM UTC - fixed hour of PvP maintenance
-	if (diff_in_seconds > 0) then -- it is negative on reset_day untill 10AM
-		local must_reset_on = GetServerTime()-diff_in_seconds;
-		if (must_reset_on > HonorSpy.db.factionrealm.last_reset) then resetWeek(must_reset_on) end
-	end
+	HonorSpy:UpdatePlayerData(function()
+		-- reset weekly standings
+		if (HonorSpy.db.factionrealm.currentStandings[playerName] == nil and HonorSpy.db.char.original_honor > 0) then
+			resetWeek(GetServerTime())
+			HonorSpy.db.char.original_honor = 0
+			HonorSpy.db.char.estimated_honor = 0
+			HonorSpy.db.char.today_kills = {}
+		end
+
+		-- reset daily honor
+		if (HonorSpy.db.factionrealm.currentStandings[playerName] and HonorSpy.db.char.original_honor ~= HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
+			HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
+			HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
+			HonorSpy.db.char.today_kills = {}
+		end
+	end)
 end
 
 -- Minimap icon

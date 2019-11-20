@@ -52,7 +52,7 @@ function GUI:Show(skipUpdate)
 		scroll.scrollBar:SetValue(standing * scroll.buttonHeight-200)
 		scroll.scrollBar.thumbTexture:Show()
 	else
-		playerStandings:SetText(format('%s %s, %s: %s\n%s\n', L['Progress of'], playerName, colorize(L['Estimated Honor'], "GREY"), colorize(HonorSpy.db.char.estimated_honor, "ORANGE"), L['not enough HKs, min = 15']))
+		playerStandings:SetText(format('%s %s, %s: %s\n%s\n', L['Progress of'], playerName, colorize(L['Estimated Honor'], "GREY"), colorize(HonorSpy.db.char.estimated_honor, "ORANGE"), L['You have 0 honor or not enough HKs, min = 15']))
 	end
 
 	reportBtn:SetText(L['Report'] .. ' ' .. (UnitIsPlayer("target") and UnitName("target") or ''))

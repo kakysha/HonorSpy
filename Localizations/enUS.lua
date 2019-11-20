@@ -58,7 +58,7 @@ L["Limit Rows"] = true
 L["Limits number of rows shown in table, from 1 to 9999"] = true
 L["<EP>"] = true
 L["Limit"] = true
-L['not enough HKs, min = 15'] = true
+L['You have 0 honor or not enough HKs, min = 15'] = true
 L["Hide Minimap Button"] = true
 L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on change."] = true
 L["Estimated Honor"] = true
