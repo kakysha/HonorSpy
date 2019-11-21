@@ -127,6 +127,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
+
 	if callback then
 		callback()
 		callback = nil
@@ -437,23 +438,25 @@ function resetWeek(must_reset_on)
 	HonorSpy:Purge()
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
-function HonorSpy:CheckNeedReset()
-	HonorSpy:UpdatePlayerData(function()
-		-- reset weekly standings
-		if (HonorSpy.db.factionrealm.currentStandings[playerName] == nil and HonorSpy.db.char.original_honor > 0) then
-			resetWeek(GetServerTime())
-			HonorSpy.db.char.original_honor = 0
-			HonorSpy.db.char.estimated_honor = 0
-			HonorSpy.db.char.today_kills = {}
-		end
 
-		-- reset daily honor
-		if (HonorSpy.db.factionrealm.currentStandings[playerName] and HonorSpy.db.char.original_honor ~= HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
-			HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
-			HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
-			HonorSpy.db.char.today_kills = {}
-		end
-	end)
+function HonorSpy:CheckNeedReset(skipUpdate)
+	if (not skipUpdate) then
+		HonorSpy:UpdatePlayerData(function() HonorSpy:CheckNeedReset(true) end)
+	end
+	-- reset weekly standings
+	if (HonorSpy.db.factionrealm.currentStandings[playerName] == nil and HonorSpy.db.char.original_honor > 0) then
+		resetWeek(GetServerTime())
+		HonorSpy.db.char.original_honor = 0
+		HonorSpy.db.char.estimated_honor = 0
+		HonorSpy.db.char.today_kills = {}
+	end
+
+	-- reset daily honor
+	if (HonorSpy.db.factionrealm.currentStandings[playerName] and HonorSpy.db.char.original_honor ~= HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
+		HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
+		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
+		HonorSpy.db.char.today_kills = {}
+	end
 end
 
 -- Minimap icon
