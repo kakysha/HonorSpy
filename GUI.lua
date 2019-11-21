@@ -19,16 +19,16 @@ local colors = {
 
 local playerName = UnitName("player")
 
-function GUI:Show(skipUpdate)
+function GUI:Show(skipUpdate, sort_column)
 	if (not skipUpdate) then
 		HonorSpy:UpdatePlayerData(function()
 			if (mainFrame:IsShown()) then
-				GUI:Show(true)
+				GUI:Show(true, sort_column)
 			end
 		end)
 	end
 	
-	rows = HonorSpy:BuildStandingsTable()
+	rows = HonorSpy:BuildStandingsTable(sort_column)
 	local brk = HonorSpy:GetBrackets(#rows)
 	for i = 1, #brk do
 		for j = brk[i], (brk[i+1] or 0)+1, -1 do
@@ -189,8 +189,7 @@ function GUI:PrepareGUI()
 
 	btn = AceGUI:Create("InteractiveLabel")
 	btn:SetCallback("OnClick", function()
-		HonorSpy.db.factionrealm.sort = L["Honor"]
-		GUI:Show()
+		GUI:Show(false, L["Honor"])
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(80)
@@ -203,6 +202,10 @@ function GUI:PrepareGUI()
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetCallback("OnClick", function()
+		GUI:Show(false, L["Standing"])
+	end)
+	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(70)
 	btn:SetText(colorize(L["Standing"], "ORANGE"))
 	tableHeader:AddChild(btn)
@@ -214,8 +217,7 @@ function GUI:PrepareGUI()
 
 	btn = AceGUI:Create("InteractiveLabel")
 	btn:SetCallback("OnClick", function()
-		HonorSpy.db.factionrealm.sort = L["Rank"]
-		GUI:Show()
+		GUI:Show(false, L["Rank"])
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(50)

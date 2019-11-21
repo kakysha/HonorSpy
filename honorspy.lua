@@ -16,7 +16,6 @@ function HonorSpy:OnInitialize()
 		factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
-			sort = L["Honor"],
 			minimapButton = {hide = false},
 			syncOverGuild = false
 		},
@@ -224,17 +223,23 @@ local options = {
 }
 LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", "hs"})
 
-function HonorSpy:BuildStandingsTable()
+function HonorSpy:BuildStandingsTable(sort_by)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
 		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
 	end
 	
 	local sort_column = 3; -- ThisWeekHonor
-	if (HonorSpy.db.factionrealm.sort == L["Rank"]) then sort_column = 6; end
-	table.sort(t, function(a,b)
-		return a[sort_column] > b[sort_column]
-	end)
+	if (sort_by == L["Standing"]) then sort_column = 5; end
+	if (sort_by == L["Rank"]) then sort_column = 6; end
+	local sort_func = function(a,b)
+		if (sort_column == 5) then
+			return a[sort_column] < b[sort_column]
+		else
+			return a[sort_column] > b[sort_column]
+		end
+	end
+	table.sort(t, sort_func)
 
 	return t
 end
@@ -477,7 +482,7 @@ function DrawMinimapIcon()
 			end
 		end,
 		OnTooltipShow = function(tooltip)
-			tooltip:AddLine(format("%s", addonName));
+			tooltip:AddDoubleLine(format("%s", addonName), format("|cff777777v%s", GetAddOnMetadata(addonName, "Version")));
 			tooltip:AddLine("|cff777777by Kakysha|r");
 			tooltip:AddLine("|cFFCFCFCFLeft Click: |r" .. L['Show HonorSpy Standings']);
 			tooltip:AddLine("|cFFCFCFCFMiddle Click: |r" .. L['Report Target']);
@@ -489,7 +494,7 @@ end
 function PrintWelcomeMsg()
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
-	local msg = format("|cffAAAAAAversion: %s, bugs & features: github.com/kakysha/honorspy|r\n|cff209f9b", GetAddOnMetadata("HonorSpy", "Version"))
+	local msg = format("|cffAAAAAAversion: %s, bugs & features: github.com/kakysha/honorspy|r\n|cff209f9b", GetAddOnMetadata(addonName, "Version"))
 	if (realm == "Flamelash" and faction == "Horde") then
 		msg = msg .. format("You are lucky enough to play with HonorSpy author on one |cffFFFFFF%s |cff209f9brealm! Feel free to mail me (|cff8787edKakysha|cff209f9b) a supportive gold tip or kind word!", realm)
 	end
