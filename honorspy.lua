@@ -45,7 +45,7 @@ function HonorSpy:OnInitialize()
 	PrintWelcomeMsg();
 
 	if (not HonorSpy.db.factionrealm.syncOverGuild) then
-		HS_wait(5, HS_joinSyncChannel)
+		HS_wait(8, HS_joinSyncChannel)
 	end
 end
 
@@ -357,7 +357,7 @@ end
 function store_player(playerName, player)
 	if (player == nil) then return end
 	
-	if (player.last_checked < HonorSpy.db.factionrealm.last_reset
+	if (not player.last_checked or player.last_checked < HonorSpy.db.factionrealm.last_reset
 		or player.last_checked > GetServerTime()
 		or player.thisWeekHonor == 0
 		) then
