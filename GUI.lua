@@ -37,7 +37,7 @@ function GUI:Show(skipUpdate, sort_column)
 	end
 
 	local poolSizeText = format(L['Pool Size'] .. ': %d ', #rows)
-	statusLine:SetText('|cff777777/hs show|r                                                            ' .. poolSizeText .. '                                                 |cff777777/hs search nickname|r')
+	statusLine:SetText('|cff777777/hs show|r                                                       ' .. poolSizeText .. '                                             |cff777777/hs search nickname|r')
 
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
 	if (standing) then

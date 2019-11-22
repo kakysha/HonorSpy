@@ -34,7 +34,8 @@ function HonorSpy:OnInitialize()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
 	self:RegisterEvent("INSPECT_HONOR_UPDATE");
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER)
+	self:RegisterEvent("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_EVENT);
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_FILTER)
 	self:RegisterComm(commPrefix, "OnCommReceive")
 	self:RegisterEvent("PLAYER_DEAD");
 
@@ -133,31 +134,41 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 end
 
-local last_msg_id = 0
-function CHAT_MSG_COMBAT_HONOR_GAIN_HANDLER(_s, e, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...)
-	if (id == last_msg_id) then
-		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...-- due to the bug, this chat filter is called twice
-	end
-	last_msg_id = id
-	HonorSpy:CheckNeedReset()
-	local victim, est_honor = msg:match("([^%s]+) dies, honorable kill Rank: [%s%w]+ %(Estimated Honor Points: (%d+)%)")
-	if (victim) then
-		if (not HonorSpy.db.char.today_kills[victim]) then
-			HonorSpy.db.char.today_kills[victim] = 0
-		end
-		est_honor = math.max(math.floor(est_honor * (1-0.25*HonorSpy.db.char.today_kills[victim]) + 0.5), 0)
-		HonorSpy.db.char.today_kills[victim] = HonorSpy.db.char.today_kills[victim]+1
-		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+est_honor
+-- parse message
+-- COMBATLOG_HONORGAIN = "%s dies, honorable kill Rank: %s (Estimated Honor Points: %d)";
+-- COMBATLOG_HONORAWARD = "You have been awarded %d honor points.";
+local function parseHonorMessage(msg)
+	local honor_gain_pattern = string.gsub(COMBATLOG_HONORGAIN, "%(", "%%(")
+	honor_gain_pattern = string.gsub(honor_gain_pattern, "%)", "%%)")
+	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%s)", "(.+)")
+	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
+    local victim, rank, est_honor = msg:match(honor_gain_pattern)
+    if (victim) then
+    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*(HonorSpy.db.char.today_kills[victim]-1 or 0)) + 0.5))
+    end
 
-		last_killed = {name = victim, ts = time()}
-		return nil, msg .. format(" kills: %d, honor: |cff00FF96%d", HonorSpy.db.char.today_kills[victim], est_honor), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
+    local honor_award_pattern = string.gsub(COMBATLOG_HONORAWARD, "(%%d)", "(%%d+)")
+    local awarded_honor = msg:match(honor_award_pattern)
+    return victim, est_honor, awarded_honor
+end
+
+function CHAT_MSG_COMBAT_HONOR_GAIN_EVENT(e, msg)
+	local victim, est_honor, awarded_honor = parseHonorMessage(msg)
+    if victim then
+        HonorSpy.db.char.today_kills[victim] = (HonorSpy.db.char.today_kills[victim] or 0) + 1
+        HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor + est_honor
+    elseif awarded_honor then
+        HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor + awarded_honor
+    end
+end
+
+function CHAT_MSG_COMBAT_HONOR_GAIN_FILTER(_s, e, msg, ...)
+	HonorSpy:CheckNeedReset()
+	local victim, est_honor, awarded_honor = parseHonorMessage(msg)
+	if (not victim) then
+		return
 	end
-	local awarded_honor = msg:match("You have been awarded %d+ honor.")
-	if (awarded_honor) then
-		handler_invocation_ts = time()
-		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor+awarded_honor
-		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, id, ...
-	end
+	return false, format("%s kills: %d, honor: |cff00FF96%d", msg, HonorSpy.db.char.today_kills[victim] or 0, est_honor), ...
 end
 
 -- INSPECT HOOKS pausing to not mess with native inspect calls
