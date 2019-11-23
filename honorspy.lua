@@ -144,7 +144,7 @@ local function parseHonorMessage(msg)
 	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
     local victim, rank, est_honor = msg:match(honor_gain_pattern)
     if (victim) then
-    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*(HonorSpy.db.char.today_kills[victim]-1 or 0)) + 0.5))
+    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
     end
 
     local honor_award_pattern = string.gsub(COMBATLOG_HONORAWARD, "(%%d)", "(%%d+)")
