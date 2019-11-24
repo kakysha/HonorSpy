@@ -258,7 +258,7 @@ end
 -- REPORT
 function HonorSpy:GetBrackets(pool_size)
 			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
-	local brk =  {1, 0.858, 0.715, 0.587, 0.477, 0.377, 0.287, 0.207, 0.137, 0.077, 0.037, 0.017, 0.007, 0.002} -- brackets percentage
+	local brk =  {1, 0.845, 0.697, 0.566, 0.436, 0.327, 0.228, 0.159, 0.100, 0.060, 0.035, 0.020, 0.008, 0.003} -- brackets percentage
 	
 	if (not pool_size) then
 		return brk
