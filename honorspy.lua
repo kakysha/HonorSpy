@@ -241,14 +241,10 @@ function HonorSpy:BuildStandingsTable(sort_by)
 	end
 	
 	local sort_column = 3; -- ThisWeekHonor
-	if (sort_by == L["Standing"]) then sort_column = 5; end
+	if (sort_by == L["Standing"]) then sort_column = 4; end
 	if (sort_by == L["Rank"]) then sort_column = 6; end
 	local sort_func = function(a,b)
-		if (sort_column == 5) then
-			return a[sort_column] < b[sort_column]
-		else
-			return a[sort_column] > b[sort_column]
-		end
+		return a[sort_column] > b[sort_column]
 	end
 	table.sort(t, sort_func)
 
