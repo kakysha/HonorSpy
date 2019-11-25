@@ -14,7 +14,8 @@ local colors = {
 	["GREY"] = "aaaaaa",
 	["RED"] = "C41F3B",
 	["GREEN"] = "00FF96",
-	["SHAMAN"] = "0070DE"
+	["SHAMAN"] = "0070DE",
+	["nil"] = "FFFFFF"
 }
 
 local playerName = UnitName("player")
