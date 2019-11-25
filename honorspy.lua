@@ -349,7 +349,7 @@ function table.copy(t)
 end
 
 function store_player(playerName, player)
-	if (player == nil) then return end
+	if (player == nil or playerName:find("[%d%p%s%c%z]")) then return end
 	
 	if (not player.last_checked or player.last_checked < HonorSpy.db.factionrealm.last_reset
 		or player.last_checked > GetServerTime()

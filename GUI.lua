@@ -1,8 +1,10 @@
+local GUI = {}
+_G["HonorSpyGUI"] = GUI
+
 local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 
-local GUI = {}
-_G["HonorSpyGUI"] = GUI
+LibStub("AceHook-3.0"):Embed(GUI)
 
 local mainFrame, statusLine, playerStandings, reportBtn, scroll = nil, nil, nil, nil
 local rows, brackets = {}, {}
@@ -15,7 +17,8 @@ local colors = {
 	["RED"] = "C41F3B",
 	["GREEN"] = "00FF96",
 	["SHAMAN"] = "0070DE",
-	["nil"] = "FFFFFF"
+	["nil"] = "FFFFFF",
+	["NORMAL"] = "f2ca45"
 }
 
 local playerName = UnitName("player")
@@ -249,6 +252,21 @@ function GUI:PrepareGUI()
 	mainFrame:AddChild(statusLine)
 	statusLine:ClearAllPoints()
 	statusLine:SetPoint("BOTTOM", mainFrame.frame, "BOTTOM", 0, 15)
+
+	HonorSpyGUI:SecureHookScript(HonorFrame, "OnUpdate", "UpdateHonorFrameText")
+end
+
+function HonorSpyGUI:UpdateHonorFrameText(setRankProgress)
+	-- rank progress percentage
+	if (HonorSpy.db.factionrealm.currentStandings[playerName]) then
+		local _, rankNumber = GetPVPRankInfo(UnitPVPRank("player"))
+		HonorFrameCurrentPVPRank:SetText(format("(%s %d) %d%%", RANK, rankNumber, HonorSpy.db.factionrealm.currentStandings[playerName].rankProgress*100))
+	end
+	-- today's honor
+	HonorFrameCurrentHKValue:SetText(format("%d "..colorize("(Honor: %d)", "NORMAL"), GetPVPSessionStats(), HonorSpy.db.char.estimated_honor - HonorSpy.db.char.original_honor))
+	-- this week honor
+	local _, this_week_honor = GetPVPThisWeekStats();
+	HonorFrameThisWeekContributionValue:SetText(format("%d (%d)", this_week_honor, HonorSpy.db.char.estimated_honor))
 end
 
 function colorize(str, colorOrClass)
