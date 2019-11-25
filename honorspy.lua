@@ -20,9 +20,7 @@ function HonorSpy:OnInitialize()
 			syncOverGuild = false
 		},
 		char = {
-			today_kills = {
-				['*'] = 0
-			},
+			today_kills = {},
 			estimated_honor = 0,
 			original_honor = 0
 		}
