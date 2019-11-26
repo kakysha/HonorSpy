@@ -253,7 +253,9 @@ function GUI:PrepareGUI()
 	statusLine:ClearAllPoints()
 	statusLine:SetPoint("BOTTOM", mainFrame.frame, "BOTTOM", 0, 15)
 
-	HonorSpyGUI:SecureHookScript(HonorFrame, "OnUpdate", "UpdateHonorFrameText")
+	if (not HonorSpyGUI:IsHooked(HonorFrame, "OnUpdate")) then
+		HonorSpyGUI:SecureHookScript(HonorFrame, "OnUpdate", "UpdateHonorFrameText")
+	end
 end
 
 function HonorSpyGUI:UpdateHonorFrameText(setRankProgress)

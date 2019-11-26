@@ -440,6 +440,7 @@ end
 function HonorSpy:Purge()
 	inspectedPlayers = {};
 	HonorSpy.db.factionrealm.currentStandings={};
+	HonorSpy.db.char.original_honor = 0;
 	HonorSpyGUI:Reset();
 	HonorSpy:Print(L["All data was purged"]);
 end
