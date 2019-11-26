@@ -272,6 +272,10 @@ function HonorSpyGUI:UpdateHonorFrameText(setRankProgress)
 end
 
 function colorize(str, colorOrClass)
+	if (not colorOrClass) then -- some guys have nil class for an unknown reason
+		colorOrClass = "nil"
+	end
+	
 	if (not colors[colorOrClass] and RAID_CLASS_COLORS and RAID_CLASS_COLORS[colorOrClass]) then
 		colors[colorOrClass] = format("%02x%02x%02x", RAID_CLASS_COLORS[colorOrClass].r * 255, RAID_CLASS_COLORS[colorOrClass].g * 255, RAID_CLASS_COLORS[colorOrClass].b * 255)
 	end
