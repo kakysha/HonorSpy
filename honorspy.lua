@@ -38,7 +38,7 @@ function HonorSpy:OnInitialize()
 	self:RegisterEvent("PLAYER_DEAD");
 
 	DrawMinimapIcon();
-	HonorSpy:CheckNeedReset();
+	HS_wait(5, function() HonorSpy:CheckNeedReset() end)
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
 
@@ -55,7 +55,6 @@ local function StartInspecting(unitID)
 	if (paused or realm) then
 		return
 	end
-
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
 		ClearInspectPlayer();
 		inspectedPlayerName = nil;
@@ -68,7 +67,6 @@ local function StartInspecting(unitID)
 		or not CanInspect(unitID)) then
 		return
 	end
-
 	local player = HonorSpy.db.factionrealm.currentStandings[name] or inspectedPlayers[name];
 	if (player == nil) then
 		inspectedPlayers[name] = {last_checked = 0};
@@ -91,7 +89,6 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
 		return;
 	end
-
 	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
 	if (player.class == nil) then player.class = "nil" end
 
@@ -125,7 +122,6 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
-
 	if callback then
 		callback()
 		callback = nil
