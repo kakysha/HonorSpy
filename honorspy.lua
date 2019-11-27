@@ -146,16 +146,19 @@ local function parseHonorMessage(msg)
     return victim, est_honor, awarded_honor
 end
 
+-- this is called before filter
 function CHAT_MSG_COMBAT_HONOR_GAIN_EVENT(e, msg)
-	local victim, est_honor, awarded_honor = parseHonorMessage(msg)
+	local victim, _, awarded_honor = parseHonorMessage(msg)
     if victim then
         HonorSpy.db.char.today_kills[victim] = (HonorSpy.db.char.today_kills[victim] or 0) + 1
+        local _, est_honor = parseHonorMessage(msg)
         HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor + est_honor
     elseif awarded_honor then
         HonorSpy.db.char.estimated_honor = HonorSpy.db.char.estimated_honor + awarded_honor
     end
 end
 
+-- this is called after eventg	ww
 function CHAT_MSG_COMBAT_HONOR_GAIN_FILTER(_s, e, msg, ...)
 	HonorSpy:CheckNeedReset()
 	local victim, est_honor, awarded_honor = parseHonorMessage(msg)
