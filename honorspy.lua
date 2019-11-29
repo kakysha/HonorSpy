@@ -356,6 +356,7 @@ function class_exist(className)
 	className == "MAGE" or
 	className == "ROGUE" or
 	className == "HUNTER" or
+	className == "PALADIN" or
 	className == "DRUID" then
 		return true
 	end
@@ -443,7 +444,8 @@ end
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
 	local filtered_players, count = {}, 0;
-	if (GetServerTime() - last_send_time < 5*60) then return end;
+	if (syncChannelID > 0 and (GetServerTime() - last_send_time < 60*60)) then return end;
+	if (syncChannelID == 0 and (GetServerTime() - last_send_time < 10*60)) then return end;
 	last_send_time = GetServerTime();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
