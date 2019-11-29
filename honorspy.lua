@@ -41,6 +41,7 @@ function HonorSpy:OnInitialize()
 	HS_wait(5, function() HonorSpy:CheckNeedReset() end)
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
+	DBHealthCheck()
 
 	if (not HonorSpy.db.factionrealm.syncOverGuild) then
 		HS_wait(8, HS_joinSyncChannel)
@@ -347,13 +348,40 @@ function table.copy(t)
   return setmetatable(u, getmetatable(t))
 end
 
+function class_exist(className)
+	if className == "WARRIOR" or 
+	className == "PRIEST" or
+	className == "SHAMAN" or
+	className == "WARLOCK" or
+	className == "MAGE" or
+	className == "ROGUE" or
+	className == "HUNTER" or
+	className == "DRUID" then
+		return true
+	end
+	return false
+end
+
+function playerIsValid(player)
+	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.factionrealm.last_reset
+		or player.last_checked > GetServerTime()
+		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor == 0
+		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
+		or not player.standing or type(player.standing) ~= "number"
+		or not player.RP or type(player.RP) ~= "number"
+		or not player.rankProgress or type(player.rankProgress) ~= "number"
+		or not player.rank or type(player.rank) ~= "number"
+		or not player.class or not class_exist(player.class)
+		) then
+		return false
+	end
+	return true
+end
+
 function store_player(playerName, player)
 	if (player == nil or playerName:find("[%d%p%s%c%z]")) then return end
 	
-	if (not player.last_checked or player.last_checked < HonorSpy.db.factionrealm.last_reset
-		or player.last_checked > GetServerTime()
-		or player.thisWeekHonor == 0
-		) then
+	if (not playerIsValid(player)) then
 		return
 	end
 	
@@ -504,6 +532,15 @@ function PrintWelcomeMsg()
 		msg = msg .. format("You are lucky enough to play with HonorSpy author on one |cffFFFFFF%s |cff209f9brealm! Feel free to mail me (|cff8787edKakysha|cff209f9b) a supportive gold tip or kind word!", realm)
 	end
 	HonorSpy:Print(msg .. "|r")
+end
+
+function DBHealthCheck()
+	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
+		if (not playerIsValid(player)) then
+			HonorSpy.db.factionrealm.currentStandings[playerName] = nil
+			HonorSpy:Print("removed bad table row", playerName)
+		end
+	end
 end
 
 local waitTable = {};
