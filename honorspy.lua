@@ -43,9 +43,7 @@ function HonorSpy:OnInitialize()
 	PrintWelcomeMsg();
 	DBHealthCheck()
 
-	if (not HonorSpy.db.factionrealm.syncOverGuild) then
-		HS_wait(8, HS_joinSyncChannel)
-	end
+	HS_wait(8, HS_joinSyncChannel)
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -411,6 +409,9 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function HS_joinSyncChannel()
+	if (HonorSpy.db.factionrealm.syncOverGuild and GetGuildInfo("player") ~= nil) then
+		return
+	end
 	if (GetChannelName(channelName) == 0) then
 		JoinTemporaryChannel("hstemp1")
 		JoinTemporaryChannel("hstemp2")
