@@ -17,7 +17,7 @@ function HonorSpy:OnInitialize()
 			currentStandings = {},
 			last_reset = 0,
 			minimapButton = {hide = false},
-			syncOverGuild = false
+			syncOverGuild = true
 		},
 		char = {
 			today_kills = {},
