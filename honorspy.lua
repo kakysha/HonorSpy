@@ -17,7 +17,7 @@ function HonorSpy:OnInitialize()
 			currentStandings = {},
 			last_reset = 0,
 			minimapButton = {hide = false},
-			syncOverGuild = true
+			syncOverGuild = false
 		},
 		char = {
 			today_kills = {},
@@ -43,7 +43,9 @@ function HonorSpy:OnInitialize()
 	PrintWelcomeMsg();
 	DBHealthCheck()
 
-	HS_wait(8, HS_joinSyncChannel)
+	if (not HonorSpy.db.factionrealm.syncOverGuild) then
+		HS_wait(8, HS_joinSyncChannel)
+	end
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -409,9 +411,6 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function HS_joinSyncChannel()
-	if (HonorSpy.db.factionrealm.syncOverGuild and GetGuildInfo("player") ~= nil) then
-		return
-	end
 	if (GetChannelName(channelName) == 0) then
 		JoinTemporaryChannel("hstemp1")
 		JoinTemporaryChannel("hstemp2")
@@ -428,13 +427,13 @@ function HS_joinSyncChannel()
 	syncChannelID = GetChannelName(channelName)
 end
 
-function broadcast(msg)
+function broadcast(msg, skipChannel)
 	if (UnitInBattleground("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "BATTLEGROUND");
 	else
 		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
 	end
-	if (syncChannelID > 0) then
+	if (syncChannelID > 0 and not skipChannel) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "CHANNEL", syncChannelID);
 	elseif (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
@@ -453,12 +452,12 @@ function HonorSpy:PLAYER_DEAD()
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
-			broadcast(self:Serialize("filtered_players", filtered_players))
+			broadcast(self:Serialize("filtered_players", filtered_players), true)
 			filtered_players, count = {}, 0;
 		end
 	end
 	if (count > 0) then
-		broadcast(self:Serialize("filtered_players", filtered_players))
+		broadcast(self:Serialize("filtered_players", filtered_players), true)
 	end
 
 	if (syncChannelID > 0) then
