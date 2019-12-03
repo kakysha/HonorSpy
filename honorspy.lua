@@ -402,7 +402,7 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 		return;
 	end
 	if (distribution == "CHANNEL" and playerName == "filtered_players") then
-		ChannelKick(channelName, sender)
+		ChannelKick(channelName, sender) -- kick users with old addon version who causing chat lags
 	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
