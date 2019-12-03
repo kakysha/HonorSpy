@@ -401,6 +401,9 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (not ok) then
 		return;
 	end
+	if (distribution == "CHANNEL" and playerName == "filtered_players") then
+		ChannelKick(channelName, sender)
+	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
@@ -444,9 +447,9 @@ end
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
 	local filtered_players, count = {}, 0;
-	if (syncChannelID > 0 and (GetServerTime() - last_send_time < 60*60)) then return end;
-	if (syncChannelID == 0 and (GetServerTime() - last_send_time < 10*60)) then return end;
-	last_send_time = GetServerTime();
+	if (syncChannelID > 0 and (time() - last_send_time < 60*60)) then return end;
+	if (syncChannelID == 0 and (time() - last_send_time < 10*60)) then return end;
+	last_send_time = time();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
 		filtered_players[playerName] = player;
