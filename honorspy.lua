@@ -364,7 +364,7 @@ function class_exist(className)
 end
 
 function playerIsValid(player)
-	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.factionrealm.last_reset
+	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.factionrealm.last_reset + 24*60*60
 		or player.last_checked > GetServerTime()
 		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor == 0
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
@@ -476,7 +476,39 @@ function HonorSpy:Purge()
 	HonorSpyGUI:Reset();
 	HonorSpy:Print(L["All data was purged"]);
 end
-function resetWeek(must_reset_on)
+
+function resetWeek()
+	local currentUnixTime = GetServerTime()
+	local regionId = GetCurrentRegion()
+	local resetDay = 3 -- wed
+	local resetHour = 7 -- 7 AM UTC
+
+	if (regionId == 1) then -- US + BR + Oceania: 3 PM UTC Tue (7 AM PST Tue)
+		resetDay = 2
+		resetHour = 15
+	elseif (regionId == 2 or regionId == 4 or regionId == 5) then -- Korea, Taiwan, China: 10 PM UTC Wed (7 AM KST Thu)
+		resetDay = 3
+		resetHour = 22
+	elseif (regionId == 3) then -- EU + RU: 7 AM UTC Wed (7 AM UTC Wed)
+	end
+
+	local day = date("!%w", currentUnixTime);
+	local h = date("!%H", currentUnixTime);
+	local m = date("!%M", currentUnixTime);
+	local s = date("!%S", currentUnixTime);
+
+	local reset_seconds = resetDay*24*60*60 + resetHour*60*60 -- reset time in seconds from week start
+	local now_seconds = s + m*60 + h*60*60 + day*24*60*60 -- seconds passed from week start
+	
+	local week_start = currentUnixTime - now_seconds
+	local must_reset_on = 0
+
+	if (now_seconds - reset_seconds > 0) then -- we passed this week reset time
+		must_reset_on = week_start + reset_seconds
+	else -- we not yet passed the reset moment in this week, still on prev week reset time
+		must_reset_on = week_start - 7*24*60*60 + reset_seconds
+	end
+
 	HonorSpy.db.factionrealm.last_reset = must_reset_on;
 	HonorSpy:Purge()
 	HonorSpy:Print(L["Weekly data was reset"]);
@@ -486,9 +518,10 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 	if (not skipUpdate) then
 		HonorSpy:UpdatePlayerData(function() HonorSpy:CheckNeedReset(true) end)
 	end
+
 	-- reset weekly standings
 	if (HonorSpy.db.factionrealm.currentStandings[playerName] == nil and HonorSpy.db.char.original_honor > 0) then
-		resetWeek(GetServerTime())
+		resetWeek()
 		HonorSpy.db.char.original_honor = 0
 		HonorSpy.db.char.estimated_honor = 0
 		HonorSpy.db.char.today_kills = {}
