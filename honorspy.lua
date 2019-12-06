@@ -44,7 +44,7 @@ function HonorSpy:OnInitialize()
 	DBHealthCheck()
 
 	if (not HonorSpy.db.factionrealm.syncOverGuild) then
-		HS_wait(8, HS_joinSyncChannel)
+		HS_wait(10, HS_joinSyncChannel)
 	end
 end
 
@@ -566,7 +566,7 @@ function PrintWelcomeMsg()
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
 	local msg = format("|cffAAAAAAversion: %s, bugs & features: github.com/kakysha/honorspy|r\n|cff209f9b", GetAddOnMetadata(addonName, "Version"))
-	if (realm == "Flamelash" and faction == "Horde") then
+	if (realm == "Earthshaker" and faction == "Horde") then
 		msg = msg .. format("You are lucky enough to play with HonorSpy author on one |cffFFFFFF%s |cff209f9brealm! Feel free to mail me (|cff8787edKakysha|cff209f9b) a supportive gold tip or kind word!", realm)
 	end
 	HonorSpy:Print(msg .. "|r")
