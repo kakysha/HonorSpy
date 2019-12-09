@@ -380,11 +380,7 @@ function playerIsValid(player)
 end
 
 function store_player(playerName, player)
-	if (player == nil or playerName:find("[%d%p%s%c%z]")) then return end
-	
-	if (not playerIsValid(player)) then
-		return
-	end
+	if (player == nil or playerName == nil or playerName:find("[%d%p%s%c%z]") or not playerIsValid(player)) then return end
 	
 	local player = table.copy(player);
 	local localPlayer = HonorSpy.db.factionrealm.currentStandings[playerName];
@@ -403,6 +399,7 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	end
 	if (distribution == "CHANNEL" and playerName == "filtered_players") then
 		ChannelKick(channelName, sender) -- kick users with old addon version who causing chat lags
+		return
 	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
