@@ -8,16 +8,13 @@ local commPrefix = addonName .. "2";
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
 local callback = nil
-local syncChannelID = 0
-local channelName = "HonorSpySync"
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
 		factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
-			minimapButton = {hide = false},
-			syncOverGuild = false
+			minimapButton = {hide = false}
 		},
 		char = {
 			today_kills = {},
@@ -42,10 +39,6 @@ function HonorSpy:OnInitialize()
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
 	DBHealthCheck()
-
-	if (not HonorSpy.db.factionrealm.syncOverGuild) then
-		HS_wait(10, HS_joinSyncChannel)
-	end
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
@@ -397,10 +390,6 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (not ok) then
 		return;
 	end
-	if (distribution == "CHANNEL" and playerName == "filtered_players") then
-		ChannelKick(channelName, sender) -- kick users with old addon version who causing chat lags
-		return
-	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
@@ -410,33 +399,17 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	store_player(playerName, player);
 end
 
-function HS_joinSyncChannel()
-	if (GetChannelName(channelName) == 0) then
-		JoinTemporaryChannel("hstemp1")
-		JoinTemporaryChannel("hstemp2")
-		JoinTemporaryChannel(channelName)
-		HS_wait(1, LeaveChannelByName, "hstemp1")
-		HS_wait(1, LeaveChannelByName, "hstemp2")
-	end
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(_s, e, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, baseChannelName, ...)
-		if (baseChannelName == channelName) then
-			return true
-		end
-		return nil, msg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, baseChannelName, ...
-	end)
-	syncChannelID = GetChannelName(channelName)
-end
-
-function broadcast(msg, skipChannel)
+function broadcast(msg, skip_yell)
 	if (UnitInBattleground("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "BATTLEGROUND");
 	else
 		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
 	end
-	if (syncChannelID > 0 and not skipChannel) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "CHANNEL", syncChannelID);
-	elseif (GetGuildInfo("player") ~= nil) then
+	if (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
+	end
+	if (not skip_yell) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "YELL");
 	end
 end
 
@@ -444,8 +417,7 @@ end
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
 	local filtered_players, count = {}, 0;
-	if (syncChannelID > 0 and (time() - last_send_time < 60*60)) then return end;
-	if (syncChannelID == 0 and (time() - last_send_time < 10*60)) then return end;
+	if (time() - last_send_time < 10*60) then return end;
 	last_send_time = time();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
@@ -458,10 +430,6 @@ function HonorSpy:PLAYER_DEAD()
 	end
 	if (count > 0) then
 		broadcast(self:Serialize("filtered_players", filtered_players), true)
-	end
-
-	if (syncChannelID > 0) then
-		SetChannelPassword(channelName, "") -- if some malicious player who is owning the channel changes its password, reset it
 	end
 end
 

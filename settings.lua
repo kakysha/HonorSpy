@@ -26,35 +26,21 @@ options.args["sep1"] = {
 	name = "\n"
 }
 
-options.args["syncOverGuild"] = {
-	order = 3,
-	type = "toggle",
-	name = L["Sync over GUILD instead of separate 'HonorSpySync' channel"],
-	desc = L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."],
-	get = function() return HonorSpy.db.factionrealm.syncOverGuild end,
-	set = function(info, v) HonorSpy.db.factionrealm.syncOverGuild = v end,
-}
-options.args["syncOverGuildDesc"] = {
-	order = 4,
-	type = "description",
-	name = L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] .. '\n\n'
-}
-
 options.args["sep1"] = {
-	order = 5,
+	order = 3,
 	type = "description",
 	name = "\n"
 }
 
 options.args["export"] = {
-	order = 6,
+	order = 4,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 7,
+	order = 5,
 	type = "execute",
 	name = L["_ purge all data"],
 	desc = L["Delete all collected data"],
