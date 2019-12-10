@@ -327,11 +327,12 @@ function HonorSpy:Report(playerOfInterest, skipUpdate)
 		self:Print(format(L["Player %s not found in table"], playerOfInterest));
 		return
 	end
+	local text = "- HonorSpy: "
 	if (playerOfInterest ~= playerName) then
-		SendChatMessage(format("- HonorSpy: %s %s", L["Report for player"], playerOfInterest),"emote")
+		text = text .. format("%s <%s>: ", L['Progress of'], playerOfInterest)
 	end
-	SendChatMessage(format("- HonorSpy: %s = %d, %s = %d, %s = %d, %s = %s, %s = %d", L["Pool Size"], pool_size, L["Standing"], standing, L["Bracket"], bracket, L["Current RP"], RP, L["Next Week RP"], EstRP), "emote")
-	SendChatMessage(format("- HonorSpy: %s = %d (%d%%), %s = %d (%d%%)", L["Current Rank"], Rank, Progress, L["Next Week Rank"], EstRank, EstProgress), "emote")
+	text = text .. format("%s = %d, %s = %d, %s = %d, %s = %d (%d%%), %s = %d (%d%%)", L["Standing"], standing, L["Bracket"], bracket, L["Next Week RP"], EstRP, L["Rank"], Rank, Progress, L["Next Week Rank"], EstRank, EstProgress)
+	SendChatMessage(text, "emote")
 end
 
 -- SYNCING --
