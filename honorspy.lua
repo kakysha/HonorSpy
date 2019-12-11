@@ -3,7 +3,7 @@ HonorSpy = LibStub("AceAddon-3.0"):NewAddon("HonorSpy", "AceConsole-3.0", "AceHo
 local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 
 local addonName = GetAddOnMetadata("HonorSpy", "Title");
-local commPrefix = addonName .. "2";
+local commPrefix = addonName .. "3";
 
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
@@ -14,7 +14,8 @@ function HonorSpy:OnInitialize()
 		factionrealm = {
 			currentStandings = {},
 			last_reset = 0,
-			minimapButton = {hide = false}
+			minimapButton = {hide = false},
+			actualCommPrefix = ""
 		},
 		char = {
 			today_kills = {},
@@ -545,6 +546,11 @@ function DBHealthCheck()
 			HonorSpy.db.factionrealm.currentStandings[playerName] = nil
 			HonorSpy:Print("removed bad table row", playerName)
 		end
+	end
+
+	if (HonorSpy.db.factionrealm.actualCommPrefix ~= commPrefix) then
+		HonorSpy:Purge()
+		HonorSpy.db.factionrealm.actualCommPrefix = commPrefix
 	end
 end
 
