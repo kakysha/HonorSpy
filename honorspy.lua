@@ -46,7 +46,7 @@ local inspectedPlayerName = nil; -- name of currently inspected player
 
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
-	if (paused or realm or UnitRealmRelationship(name) ~= 1) then
+	if (paused or realm or UnitRealmRelationship(unitID) ~= 1) then
 		return
 	end
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
