@@ -109,7 +109,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 			return
 		end
 		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
-		self.db.factionrealm.currentStandings[inspectedPlayerName] = player;
+		store_player(inspectedPlayerName, player)
 		broadcast(self:Serialize(inspectedPlayerName, player))
 	else
 		self.db.factionrealm.currentStandings[inspectedPlayerName] = nil
