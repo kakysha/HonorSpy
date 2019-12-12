@@ -3,7 +3,7 @@ HonorSpy = LibStub("AceAddon-3.0"):NewAddon("HonorSpy", "AceConsole-3.0", "AceHo
 local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 
 local addonName = GetAddOnMetadata("HonorSpy", "Title");
-local commPrefix = addonName .. "3";
+local commPrefix = addonName .. "4";
 
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
@@ -47,8 +47,7 @@ local inspectedPlayerName = nil; -- name of currently inspected player
 
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
-	local fullName = GetUnitName(unitID, true);
-	if (paused or realm or (fullName and fullName:find("[%-%*]") ~= nil) or UnitRealmRelationship(unitID) ~= 1) then
+	if (paused or (realm and realm ~= "")) then
 		return
 	end
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
@@ -386,7 +385,7 @@ function store_player(playerName, player)
 end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
-	if (distribution == "BATTLEGROUND" and UnitRealmRelationship(sender) ~= 1) then
+	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
 		return -- discard any message from players from different servers (on x-realm BGs)
 	end
 	local ok, playerName, player = self:Deserialize(message);
