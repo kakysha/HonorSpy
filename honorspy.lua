@@ -402,7 +402,11 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function broadcast(msg, skip_yell)
-	HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
+	if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "INSTANCE_CHAT");
+	elseif (IsInRaid()) then
+		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
+	end
 	if (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
 	end
