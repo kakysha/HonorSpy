@@ -402,11 +402,7 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 end
 
 function broadcast(msg, skip_yell)
-	if (UnitInBattleground("player") ~= nil) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "BATTLEGROUND");
-	else
-		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
-	end
+	HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
 	if (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
 	end
