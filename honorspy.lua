@@ -455,7 +455,7 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 		HonorSpy.db.factionrealm.currentStandings[nameToTest] = nil
 		HonorSpy.db.factionrealm.fakePlayers[nameToTest] = true
 		HonorSpy.db.factionrealm.goodPlayers[nameToTest] = nil
-		HonorSpy:Print("removed fake table row", nameToTest)
+		HonorSpy:Print("removed non-existing player", nameToTest)
 		nameToTest = nil
 		return true
 	end
