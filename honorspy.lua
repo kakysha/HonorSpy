@@ -508,13 +508,12 @@ function HonorSpy:Purge()
 	inspectedPlayers = {};
 	HonorSpy.db.factionrealm.currentStandings={};
 	HonorSpy.db.factionrealm.fakePlayers={};
-	HonorSpy.db.factionrealm.goodPlayers={};
 	HonorSpy.db.char.original_honor = 0;
 	HonorSpyGUI:Reset();
 	HonorSpy:Print(L["All data was purged"]);
 end
 
-function resetWeek()
+function HonorSpy:ResetWeek()
 	local currentUnixTime = GetServerTime()
 	local regionId = GetCurrentRegion()
 	local resetDay = 3 -- wed
@@ -558,7 +557,7 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 
 	-- reset weekly standings
 	if (HonorSpy.db.factionrealm.currentStandings[playerName] == nil and HonorSpy.db.char.original_honor > 0) then
-		resetWeek()
+		HonorSpy:ResetWeek()
 		HonorSpy.db.char.original_honor = 0
 		HonorSpy.db.char.estimated_honor = 0
 		HonorSpy.db.char.today_kills = {}
