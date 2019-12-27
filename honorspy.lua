@@ -90,6 +90,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		return;
 	end
 	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
+	if (player == nil) then return end
 	if (player.class == nil) then player.class = "nil" end
 
 	local _, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
