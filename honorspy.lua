@@ -449,13 +449,15 @@ function HonorSpy:PLAYER_DEAD()
 end
 
 function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
-	if (not nameToTest) then return end
 	-- not found, fake
 	if (msg == ERR_FRIEND_NOT_FOUND) then
+		if (not nameToTest) then
+			return true
+		end
 		HonorSpy.db.factionrealm.currentStandings[nameToTest] = nil
 		HonorSpy.db.factionrealm.fakePlayers[nameToTest] = true
 		HonorSpy.db.factionrealm.goodPlayers[nameToTest] = nil
-		HonorSpy:Print("removed non-existing player", nameToTest)
+		-- HonorSpy:Print("removed non-existing player", nameToTest)
 		nameToTest = nil
 		return true
 	end
