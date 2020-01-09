@@ -405,6 +405,9 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (not ok) then
 		return;
 	end
+	if (playerName == UnitName("player")) then
+		return;
+	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
