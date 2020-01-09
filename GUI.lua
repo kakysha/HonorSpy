@@ -235,7 +235,7 @@ function GUI:PrepareGUI()
 
 	scrollcontainer = AceGUI:Create("SimpleGroup")
 	scrollcontainer:SetFullWidth(true)
-	scrollcontainer:SetHeight(390)
+	scrollcontainer:SetHeight(330)
 	scrollcontainer:SetLayout("Fill")
 	mainFrame:AddChild(scrollcontainer)
 	scrollcontainer:ClearAllPoints()
