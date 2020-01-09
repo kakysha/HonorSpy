@@ -261,7 +261,7 @@ end
 function HonorSpyGUI:UpdateHonorFrameText(setRankProgress)
 	-- rank progress percentage
 	local _, rankNumber = GetPVPRankInfo(UnitPVPRank("player"))
-	local rankProgress - GetPVPRankProgress(); -- This is a player only call
+	local rankProgress = GetPVPRankProgress(); -- This is a player only call
 	HonorFrameCurrentPVPRank:SetText(format("(%s %d) %d%%", RANK, rankNumber, rankProgress*100))
 	
 	-- today's honor
