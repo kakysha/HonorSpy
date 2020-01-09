@@ -260,10 +260,10 @@ end
 
 function HonorSpyGUI:UpdateHonorFrameText(setRankProgress)
 	-- rank progress percentage
-	if (HonorSpy.db.factionrealm.currentStandings[playerName]) then
-		local _, rankNumber = GetPVPRankInfo(UnitPVPRank("player"))
-		HonorFrameCurrentPVPRank:SetText(format("(%s %d) %d%%", RANK, rankNumber, HonorSpy.db.factionrealm.currentStandings[playerName].rankProgress*100))
-	end
+	local _, rankNumber = GetPVPRankInfo(UnitPVPRank("player"))
+	local rankProgress - GetPVPRankProgress(); -- This is a player only call
+	HonorFrameCurrentPVPRank:SetText(format("(%s %d) %d%%", RANK, rankNumber, rankProgress*100))
+	
 	-- today's honor
 	HonorFrameCurrentHKValue:SetText(format("%d "..colorize("(Honor: %d)", "NORMAL"), GetPVPSessionStats(), HonorSpy.db.char.estimated_honor - HonorSpy.db.char.original_honor))
 	-- this week honor
