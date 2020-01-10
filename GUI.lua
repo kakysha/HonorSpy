@@ -22,6 +22,7 @@ local colors = {
 }
 
 local playerName = UnitName("player")
+local regionId = GetCurrentRegion()
 
 function GUI:Show(skipUpdate, sort_column)
 	if (not skipUpdate) then
@@ -187,7 +188,7 @@ function GUI:PrepareGUI()
 	mainFrame:AddChild(tableHeader)
 
 	local btn = AceGUI:Create("InteractiveLabel")
-	btn:SetWidth(150)
+	btn:SetWidth(130)
 	btn:SetText(colorize(L["Name"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
@@ -229,13 +230,17 @@ function GUI:PrepareGUI()
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
-	btn:SetWidth(60)
+	btn:SetWidth(80)
 	btn:SetText(colorize(L["LastSeen"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
+	local scrollHeight = 390
+	if (regionId == 5) then
+		scrollHeight = 350		-- zhCN font size
+	end
 	scrollcontainer = AceGUI:Create("SimpleGroup")
 	scrollcontainer:SetFullWidth(true)
-	scrollcontainer:SetHeight(390)
+	scrollcontainer:SetHeight(scrollHeight)
 	scrollcontainer:SetLayout("Fill")
 	mainFrame:AddChild(scrollcontainer)
 	scrollcontainer:ClearAllPoints()

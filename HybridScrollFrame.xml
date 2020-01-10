@@ -12,7 +12,7 @@
 			</Layer>
 			<Layer level="ARTWORK">
 				<FontString parentKey="Name" inherits="GameFontHighlightSmall" justifyH="LEFT">
-					<Size x="150"/>
+					<Size x="130"/>
 				</FontString>
 				<FontString parentKey="Honor" inherits="GameFontHighlightSmall" justifyH="LEFT">
 					<Size x="80"/>
@@ -45,7 +45,7 @@
 					</Anchors>
 				</FontString>
 				<FontString parentKey="LastSeen" inherits="GameFontHighlightSmall" justifyH="LEFT">
-					<Size x="60"/>
+					<Size x="80"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Rank"/>
 					</Anchors>
