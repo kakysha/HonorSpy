@@ -406,6 +406,9 @@ function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (not ok) then
 		return;
 	end
+	if (sender == UnitName("player")) then
+		return;	-- Ignore broadcast messages from myself
+	end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
