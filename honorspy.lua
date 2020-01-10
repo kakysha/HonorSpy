@@ -238,13 +238,31 @@ function HonorSpy:BuildStandingsTable(sort_by)
 		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
 	end
 	
+	local sort_type = 'desc';
 	local sort_column = 3; -- ThisWeekHonor
-	if (sort_by == L["Standing"]) then sort_column = 4; end
-	if (sort_by == L["Rank"]) then sort_column = 6; end
-	local sort_func = function(a,b)
+
+	if (sort_by == L["Standing"]) then
+		sort_column = 5;
+		sort_type = 'asc';
+	end
+	if (sort_by == L["Rank"]) then
+		sort_column = 7;
+		sort_type = 'desc';
+	end
+
+	local sort_func_desc = function(a,b)
 		return a[sort_column] > b[sort_column]
 	end
-	table.sort(t, sort_func)
+
+	local sort_func_asc = function(a,b)
+		return a[sort_column] < b[sort_column]
+	end
+
+	if (sort_type == 'desc') then
+		table.sort(t, sort_func_desc)
+	else
+		table.sort(t, sort_func_asc)
+	end
 
 	return t
 end
