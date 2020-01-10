@@ -188,7 +188,7 @@ function GUI:PrepareGUI()
 	mainFrame:AddChild(tableHeader)
 
 	local btn = AceGUI:Create("InteractiveLabel")
-	btn:SetWidth(130)
+	btn:SetWidth(150)
 	btn:SetText(colorize(L["Name"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
@@ -211,7 +211,7 @@ function GUI:PrepareGUI()
 		GUI:Show(false, L["Standing"])
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-	btn:SetWidth(70)
+	btn:SetWidth(60)
 	btn:SetText(colorize(L["Standing"], "ORANGE"))
 	tableHeader:AddChild(btn)
 

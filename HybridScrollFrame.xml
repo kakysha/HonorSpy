@@ -12,7 +12,7 @@
 			</Layer>
 			<Layer level="ARTWORK">
 				<FontString parentKey="Name" inherits="GameFontHighlightSmall" justifyH="LEFT">
-					<Size x="130"/>
+					<Size x="150"/>
 				</FontString>
 				<FontString parentKey="Honor" inherits="GameFontHighlightSmall" justifyH="LEFT">
 					<Size x="80"/>
@@ -27,7 +27,7 @@
 					</Anchors>
 				</FontString>
 				<FontString parentKey="Standing" inherits="GameFontHighlightSmall" justifyH="LEFT">
-					<Size x="70"/>
+					<Size x="60"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.LstWkHonor"/>
 					</Anchors>
