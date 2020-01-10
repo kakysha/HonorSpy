@@ -44,7 +44,7 @@ function GUI:Show(skipUpdate, sort_column)
 	local poolSizeText = format(L['Pool Size'] .. ': %d ', #rows)
 	statusLine:SetText('|cff777777/hs show|r                                                       ' .. poolSizeText .. '                                             |cff777777/hs search nickname|r')
 
-	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate()
+	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(false, rows)
 	if (standing) then
 		local playerText = colorize(L['Progress of'], "GREY") .. ' ' .. colorize(playerName, HonorSpy.db.factionrealm.currentStandings[playerName].class)
 		playerText = playerText .. ", " .. colorize(L['Estimated Honor'] .. ': ', "GREY") .. colorize(HonorSpy.db.char.estimated_honor, "ORANGE")

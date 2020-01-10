@@ -271,7 +271,7 @@ end
 function HonorSpy:GetBrackets(pool_size)
 			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
 	local brk =  {1, 0.845, 0.697, 0.566, 0.436, 0.327, 0.228, 0.159, 0.100, 0.060, 0.035, 0.020, 0.008, 0.003} -- brackets percentage
-	
+
 	if (not pool_size) then
 		return brk
 	end
@@ -281,15 +281,18 @@ function HonorSpy:GetBrackets(pool_size)
 	return brk
 end
 
-function HonorSpy:Estimate(playerOfInterest)
+function HonorSpy:Estimate(playerOfInterest, buildStandingsTable)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
 	end
 	playerOfInterest = string.utf8upper(string.utf8sub(playerOfInterest, 1, 1))..string.utf8lower(string.utf8sub(playerOfInterest, 2))
 
-	
+	local t = buildStandingsTable
+	if (not t) then
+		t = HonorSpy:BuildStandingsTable()
+	end
+
 	local standing = -1;
-	local t = HonorSpy:BuildStandingsTable()
 	local avg_lastchecked = 0;
 	local pool_size = #t;
 
