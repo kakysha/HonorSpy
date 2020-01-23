@@ -6,7 +6,7 @@ It uses the exact formulaes as game server does, the only difference is that it 
 
 ### Known Problems
 - **Reset Day Is Wrong**: I'm playing on EU server, but HonorSpy resets on Tuesday instead of Wednesday: its because your client thinks you are in US. Check your *WoW Classic Folder > WTF > Config* file, it should have `SET portal "EU"`, not "US".
-- **My Table Is Empty, even though I Have > 15 Kills!!!**: its because its reset day, and you have 0 honor during this whole day. Everyone have 0 honor! Check your Honor tab, line "This week honor". Come back tomorrow, when honor is updated for everyone and the table will start populating with content.
+- **I'm Not In the Table -or- My Table Is Empty, even though I Have > 15 Kills!!!**: its because its reset day, and you have 0 honor during this whole day. Everyone have 0 honor! Check your Honor tab, line "This week honor". Come back tomorrow, when honor is updated for everyone and the table will start populating with content.
 
 ### How it works
 Addon does all the magic in background.
