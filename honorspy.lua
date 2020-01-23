@@ -525,8 +525,11 @@ function getResetTime()
 	if (regionId == 1) then -- US + BR + Oceania: 3 PM UTC Tue (7 AM PST Tue)
 		resetDay = 2
 		resetHour = 15
-	elseif (regionId == 2 or regionId == 4 or regionId == 5) then -- Korea, Taiwan, China: 10 PM UTC Mon (7 AM KST Tue)
+	elseif (regionId == 2 or regionId == 5) then -- Korea, China: 10 PM UTC Mon (7 AM KST Tue)
 		resetDay = 1
+		resetHour = 22
+	elseif (regionId == 4) then -- Taiwan: 10 PM UTC Wed (7 AM KST Thu)
+		resetDay = 3
 		resetHour = 22
 	elseif (regionId == 3) then -- EU + RU: 7 AM UTC Wed (7 AM UTC Wed)
 	end
