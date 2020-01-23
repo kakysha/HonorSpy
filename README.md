@@ -4,6 +4,10 @@ Addon helps players estimate their PvP next week rank and overall progress.
 
 It uses the exact formulaes as game server does, the only difference is that it operates on the database collected by players themselves. The final result is pretty close to what you get in reality, as the database is collected by all addon users and is synced instantly across other players.
 
+### Known Problems
+- **Reset Day Is Wrong**: I'm playing on EU server, but HonorSpy resets on Tuesday instead of Wednesday: its because your client thinks you are in US. Check your *WoW Classic Folder > WTF > Config* file, it should have `SET portal "EU"`, not "US".
+- **My Table Is Empty, even though I Have > 15 Kills!!!**: its because its reset day, and you have 0 honor during this whole day. Everyone have 0 honor! Check your Honor tab, line "This week honor". Come back tomorrow, when honor is updated for everyone and the table will start populating with content.
+
 ### How it works
 Addon does all the magic in background.
 
@@ -27,13 +31,12 @@ You have three options:
 3. It syncs your db with other party/raid/bg members and your guildmates on your death
 4. It can estimate your (or specific player) onward RP, Rank and Progress, taking into account your (player's) standing and pool size
 5. It can export your internal DB in CSV format to copy-paste it into Google Spreadsheets for future calculations. [Spreadsheet done specially for HonorSpy](https://docs.google.com/spreadsheets/d/1OvZ7PRhrFjRn8IoH8HIPwHfRDEq50uO64YLCsSsjBQc/edit#gid=2113352865), it will estimate RP for all players
-6. It supports automatic weekly pvp reset. Reset day can be configured
-7. Supports sorting by Rank and Honor
+6. It supports automatic weekly pvp reset.
+7. Supports sorting by Rank, Honor and last week Standing.
 8. Groups players in table by brackets
-9. *Esc → Interface Options → Addons → HonorSpy* for addon settings
+9. *Esc → Interface Options → Addons → HonorSpy* for addon settings.
 
 It only stores players with >15HKs.
-Reset day can be configured, default is Wednesday. Reset time is fixed at 10AM UTC.
 
 P.S. Do not be afraid of losing all your data, very likely that other players with HonorSpy will push you their database very soon. The more players use and collect data -> the more up-to-date data you will have. Magic of sync.
 
