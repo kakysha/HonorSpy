@@ -3,7 +3,7 @@ HonorSpy = LibStub("AceAddon-3.0"):NewAddon("HonorSpy", "AceConsole-3.0", "AceHo
 local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 
 local addonName = GetAddOnMetadata("HonorSpy", "Title");
-local commPrefix = addonName .. "4";
+local commPrefix = addonName .. "5";
 
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = UnitName("player");
@@ -139,7 +139,7 @@ local function parseHonorMessage(msg)
 	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
     local victim, rank, est_honor = msg:match(honor_gain_pattern)
     if (victim) then
-    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
+    	est_honor = math.max(0, math.floor(est_honor * (1-0.10*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
     end
 
     local honor_award_pattern = string.gsub(COMBATLOG_HONORAWARD, "(%%d)", "(%%d+)")
