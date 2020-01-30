@@ -139,7 +139,7 @@ local function parseHonorMessage(msg)
 	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
     local victim, rank, est_honor = msg:match(honor_gain_pattern)
     if (victim) then
-    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
+    	est_honor = math.max(0, math.floor(est_honor * (1-0.10*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
     end
 
     local honor_award_pattern = string.gsub(COMBATLOG_HONORAWARD, "(%%d)", "(%%d+)")
@@ -525,7 +525,10 @@ function getResetTime()
 	if (regionId == 1) then -- US + BR + Oceania: 3 PM UTC Tue (7 AM PST Tue)
 		resetDay = 2
 		resetHour = 15
-	elseif (regionId == 2 or regionId == 5) then -- Korea, China: 10 PM UTC Mon (7 AM KST Tue)
+	elseif (regionId == 2) then -- Korea: 1 AM UTC Thu (10 AM KST Thu)
+		resetDay = 4
+		resetHour = 1
+	elseif (regionId == 5) then -- China: 10 PM UTC Mon (7 AM KST Tue)
 		resetDay = 1
 		resetHour = 22
 	elseif (regionId == 4) then -- Taiwan: 10 PM UTC Wed (7 AM KST Thu)
