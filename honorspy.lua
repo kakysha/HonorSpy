@@ -129,6 +129,27 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 end
 
+-- round a decimal value to integer
+local function roundInt(val)
+	return math.floor(val + 0.5)
+end
+
+-- compute the diminishing return on honor based on number of times victim is killed
+-- requires victim and est_honor to be defined
+-- victim = string name of player that died and awarded honor
+-- est_honor = numeric value of honor awarded (as reported in the chat string)
+local function computeDiminishingHonor(victim, est_honor)
+	-- this is the percentage that each consecutive kill decreases honor reward (10% as of 2020-01-31)
+	-- https://us.forums.blizzard.com/en/wow/t/alterac-valley-adjustments-incoming/422125
+	local REDUCTION_FACTOR = 0.1
+
+	local recent_killcount = (HonorSpy.db.char.today_kills[victim] or 1)
+	local reduce_by = 1 - REDUCTION_FACTOR * (recent_killcount - 1) -- subtract one since first kill gets full honor
+
+	-- return honor earned adjusted by the diminishing factor and never negative
+	return math.max(0, roundPositiveInt(est_honor * reduce_by))
+end
+
 -- parse message
 -- COMBATLOG_HONORGAIN = "%s dies, honorable kill Rank: %s (Estimated Honor Points: %d)";
 -- COMBATLOG_HONORAWARD = "You have been awarded %d honor points.";
@@ -139,7 +160,7 @@ local function parseHonorMessage(msg)
 	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
     local victim, rank, est_honor = msg:match(honor_gain_pattern)
     if (victim) then
-    	est_honor = math.max(0, math.floor(est_honor * (1-0.25*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
+    	est_honor = computeDiminishingHonor(victim, est_honor)
     end
 
     local honor_award_pattern = string.gsub(COMBATLOG_HONORAWARD, "(%%d)", "(%%d+)")
