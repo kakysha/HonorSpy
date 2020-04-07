@@ -518,7 +518,9 @@ end
 
 function getResetTime()
 	local currentUnixTime = GetServerTime()
-	local regionId = GetCurrentRegion()
+	-- Hack: Always work for the CN servers
+	-- local regionId = GetCurrentRegion()
+	local regionId = 5
 	local resetDay = 3 -- wed
 	local resetHour = 7 -- 7 AM UTC
 
