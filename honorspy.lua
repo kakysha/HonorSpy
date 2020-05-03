@@ -97,6 +97,9 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	player.thisWeekHonor = thisWeekHonor;
 	player.lastWeekHonor = lastWeekHonor;
 	player.standing = standing;
+	if ( inspectedPlayerName == playerName ) then
+		player.estHonor = HonorSpy.db.char.estimated_honor
+	end
 
 	player.rankProgress = GetInspectPVPRankProgress();
 	ClearInspectPlayer();
@@ -235,12 +238,13 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", 
 function HonorSpy:BuildStandingsTable(sort_by)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
+		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.estHonor or 0, player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
 	end
 	
 	local sort_column = 3; -- ThisWeekHonor
-	if (sort_by == L["Standing"]) then sort_column = 4; end
-	if (sort_by == L["Rank"]) then sort_column = 6; end
+	if (sort_by == L["EstHonor"]) then sort_column = 4; end
+	if (sort_by == L["Standing"]) then sort_column = 5; end
+	if (sort_by == L["Rank"]) then sort_column = 7; end
 	local sort_func = function(a,b)
 		return a[sort_column] > b[sort_column]
 	end

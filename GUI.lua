@@ -100,6 +100,7 @@ function GUI:UpdateTableView()
 			brk_delim_inserted = true
 			button.Name:SetText(colorize(format(L["Bracket"] .. " %d", brackets[itemIndex]), "GREY"))
 			button.Honor:SetText();
+			button.EstHonor:SetText();
 			button.LstWkHonor:SetText();
 			button.Standing:SetText();
 			button.RP:SetText();
@@ -110,7 +111,7 @@ function GUI:UpdateTableView()
 			button:Show();
 		
 		elseif (itemIndex <= #rows) then
-			local name, class, thisWeekHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
+			local name, class, thisWeekHonor, estHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
 			local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
 			if (last_seen/60/60/24 > 1) then
 				last_seen_human = ""..math.floor(last_seen/60/60/24)..L["d"]
@@ -124,6 +125,7 @@ function GUI:UpdateTableView()
 			button:SetID(itemIndex);
 			button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
 			button.Honor:SetText(colorize(thisWeekHonor, class));
+			button.EstHonor:SetText(colorize(estHonor, class));
 			button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
 			button.Standing:SetText(colorize(standing, class));
 			button.RP:SetText(colorize(RP, class));
@@ -157,7 +159,7 @@ function GUI:PrepareGUI()
 	_G["HonorSpyGUI_MainFrame"] = mainFrame
 	tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
 	mainFrame:SetTitle(L["HonorSpy Standings"])
-	mainFrame:SetWidth(600)
+	mainFrame:SetWidth(680)
 	mainFrame:SetLayout("List")
 	mainFrame:EnableResize(false)
 
@@ -198,6 +200,15 @@ function GUI:PrepareGUI()
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(80)
 	btn:SetText(colorize(L["Honor"], "ORANGE"))
+	tableHeader:AddChild(btn)
+
+	btn = AceGUI:Create("InteractiveLabel")
+	btn:SetCallback("OnClick", function()
+		GUI:Show(false, L["EstHonor"])
+	end)
+	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+	btn:SetWidth(80)
+	btn:SetText(colorize(L["EstHonor"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")

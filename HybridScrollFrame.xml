@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 
 	<Frame name="HybridScrollListItemTemplate" virtual="true">
-		<Size y="12" x="560"/>
+		<Size y="12" x="640"/>
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture parentKey="Background" setAllPoints="true">
@@ -20,10 +20,16 @@
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Name"/>
 					</Anchors>
 				</FontString>
-				<FontString parentKey="LstWkHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<FontString parentKey="EstHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
 					<Size x="80"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Honor"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="LstWkHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size x="80"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.EstHonor"/>
 					</Anchors>
 				</FontString>
 				<FontString parentKey="Standing" inherits="GameFontHighlightSmall" justifyH="LEFT">

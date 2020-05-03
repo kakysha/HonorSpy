@@ -6,6 +6,7 @@ L["HonorSpy Standings"] = true
 L["Name"] = true
 L["Honor"] = true
 L["ThisWeekHonor"] = true
+L["EstHonor"] = true
 L["LstWkHonor"] = true
 L["Standing"] = true
 L["RP"] = true
