@@ -4,6 +4,7 @@
 ## Notes: Records PvP standings of all players
 ## Notes-ruRU: Записывает PvP позиции всех игроков
 ## Notes-zhCN: PvP 荣誉监视榜,用于收集并监视服务器荣誉角色并排行
+## Notes-koKR: 모든 플레이어의 PvP 명예 순위를 기록합니다
 
 ## Author: kakysha
 ## OptionalDeps: Ace3
