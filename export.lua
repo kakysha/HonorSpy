@@ -24,7 +24,7 @@ function HonorSpy:ExportCSV()
 		
 		local editBox = CreateFrame("EditBox", "ARLCopyEdit", frame)
 		editBox:SetMultiLine(true)
-		editBox:SetMaxLetters(999999)
+		editBox:SetMaxLetters(99999)
 		editBox:EnableMouse(true)
 		editBox:SetAutoFocus(false)
 		editBox:SetFontObject(ChatFontNormal)
