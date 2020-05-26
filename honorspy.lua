@@ -470,7 +470,7 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     if (friend) then
     	HonorSpy.db.factionrealm.goodPlayers[friend] = true
     	HonorSpy.db.factionrealm.fakePlayers[friend] = nil
-    	if (friend == nameToTest) then
+    	if (friend:lower() == nameToTest) then
     		HonorSpy:removeTestedFriends()
     		nameToTest = nil
     	end
@@ -495,7 +495,9 @@ function HonorSpy:TestNextFakePlayer()
 	if (nameToTest or not startRemovingFakes) then return end
 
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		if (not HonorSpy.db.factionrealm.fakePlayers[playerName] and not HonorSpy.db.factionrealm.goodPlayers[playerName] and playerName ~= UnitName("player")) then
+		lowerPlayerName = playerName:lower()
+		lowerSelfName = UnitName("player"):lower()
+		if (not HonorSpy.db.factionrealm.fakePlayers[lowerPlayerName] and not HonorSpy.db.factionrealm.goodPlayers[lowerPlayerName] and lowerPlayerName ~= lowerSelfName) then
 			nameToTest = playerName
 			break
 		end
