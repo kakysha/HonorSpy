@@ -49,11 +49,15 @@ options.args["sep1"] = {
 
 options.args["poolBoost"] = {
 	order = 6,
-	type = "input",
+	type = "range",
 	name = L["Pool Booster Count"],
 	desc = L["Number of characters to add to Pool"],
+	min = 0,
+	max = 10000,
+	step = 5,
+	bigStep = 100,
 	get = function() return HonorSpy.db.factionrealm.poolBoost end,
-	set = function(info, v) HonorSpy.db.factionrealm.poolBoost = v; end
+	set = function(info, v) HonorSpy.db.factionrealm.poolBoost = tonumber(v); end
 }
 
 options.args["sep1"] = {

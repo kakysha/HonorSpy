@@ -5,6 +5,7 @@ if L then
 L["HonorSpy Standings"] = "榮譽監視榜"
 L["Name"] = "名字"
 L["Honor"] = "榮譽"
+L["EstHonor"] = true
 L["ThisWeekHonor"] = "本周榮譽"
 L["LstWkHonor"] = "上周榮譽"
 L["Standing"] = "排名表"
@@ -25,11 +26,16 @@ L["Report specific player standings"] = "報告指定玩家排名"
 L["player_name"] = "玩家名字"
 L["Player %s not found in table"] = "玩家%s未在表單裏"
 
+L["Pool Booster Count"] = true
+L["Number of characters to add to Pool"] = true
+
 L["Report"] = "報告"
 L["Report for player"] = "報告玩家"
 L["Report Target"] = "報告目標"
 L["Report Me"] = "報告自己"
 L["Pool Size"] = "數據表的大小"
+L["Natural Pool Size"] = true
+L["Boosted Pool Size"] = true
 L["Standing"] = "排名"
 L["Bracket"] = "Br等級段"
 L["Current RP"] = "當前經驗"
@@ -64,5 +70,7 @@ L["Use \'/hs show\' to bring HonorSpy window, if hidden. Will Reload UI on chang
 L["Estimated Honor"] = "榮譽預估"
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "通過公會同步而不是單獨的“HonorSpySync”頻道"
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "妳將不再加入‘HonorSpySync’頻道，並且只與妳的公會成員同步數據。更改後請重載登陸"
+L["Show Estimated Honor"] = true
+L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."] = true
 
 end

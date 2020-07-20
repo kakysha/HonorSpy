@@ -42,7 +42,7 @@ function GUI:Show(skipUpdate, sort_column)
 
 	local poolSizeText
 	
-	if tonumber(HonorSpy.db.factionrealm.poolBoost) > 0 then
+	if HonorSpy.db.factionrealm.poolBoost > 0 then
 		poolSizeText = format(
 			L['Natural Pool Size'] .. ":" .. colorize(' %d', "RED") .. " - " .. 
 			L['Boosted Pool Size'] .. ":" .. colorize(' %d', "GREEN"), 
