@@ -26,21 +26,51 @@ options.args["sep1"] = {
 	name = "\n"
 }
 
-options.args["sep1"] = {
+options.args["estHonorCol"] = {
 	order = 3,
+	type = "toggle",
+	name = L["Show Estimated Honor"],
+	desc = L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."],
+	get = function() return HonorSpy.db.factionrealm.estHonorCol.show end,
+	set = function(info, v) HonorSpy.db.factionrealm.estHonorCol.show = v; HonorSpyGUI:PrepareGUI() end,
+}
+
+options.args["estHonorColDesc"] = {
+	order = 4,
+	type = "description",
+	name = L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."] .. '\n\n'
+}
+
+options.args["sep1"] = {
+	order = 5,
+	type = "description",
+	name = "\n"
+}
+
+options.args["poolBoost"] = {
+	order = 6,
+	type = "input",
+	name = L["Pool Booster Count"],
+	desc = L["Number of characters to add to Pool"],
+	get = function() return HonorSpy.db.factionrealm.poolBoost end,
+	set = function(info, v) HonorSpy.db.factionrealm.poolBoost = v; end
+}
+
+options.args["sep1"] = {
+	order = 7,
 	type = "description",
 	name = "\n"
 }
 
 options.args["export"] = {
-	order = 4,
+	order = 8,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 5,
+	order = 9,
 	type = "execute",
 	name = L["_ purge all data"],
 	desc = L["Delete all collected data"],

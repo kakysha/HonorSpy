@@ -17,9 +17,11 @@ function HonorSpy:OnInitialize()
 			currentStandings = {},
 			last_reset = 0,
 			minimapButton = {hide = false},
+			estHonorCol = {show = false},
 			actualCommPrefix = "",
 			fakePlayers = {},
-			goodPlayers = {}
+			goodPlayers = {},
+			poolBoost = 0
 		},
 		char = {
 			today_kills = {},
@@ -97,6 +99,9 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	player.thisWeekHonor = thisWeekHonor;
 	player.lastWeekHonor = lastWeekHonor;
 	player.standing = standing;
+	if ( inspectedPlayerName == playerName ) then
+		player.estHonor = HonorSpy.db.char.estimated_honor
+	end
 
 	player.rankProgress = GetInspectPVPRankProgress();
 	ClearInspectPlayer();
@@ -235,13 +240,15 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", 
 function HonorSpy:BuildStandingsTable(sort_by)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
+		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.estHonor or "", player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
 	end
 	
 	local sort_column = 3; -- ThisWeekHonor
-	if (sort_by == L["Standing"]) then sort_column = 4; end
-	if (sort_by == L["Rank"]) then sort_column = 6; end
+	if (sort_by == L["EstHonor"]) then sort_column = 4; end
+	if (sort_by == L["Standing"]) then sort_column = 5; end
+	if (sort_by == L["Rank"]) then sort_column = 7; end
 	local sort_func = function(a,b)
+		if sort_column == 4 then return math.max(a[3],tonumber(a[4]) or 0) > math.max(b[3],tonumber(b[4]) or 0) end
 		return a[sort_column] > b[sort_column]
 	end
 	table.sort(t, sort_func)
@@ -254,11 +261,13 @@ function HonorSpy:GetBrackets(pool_size)
 			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
 	local brk =  {1, 0.845, 0.697, 0.566, 0.436, 0.327, 0.228, 0.159, 0.100, 0.060, 0.035, 0.020, 0.008, 0.003} -- brackets percentage
 	
+	pool_size = pool_size + HonorSpy.db.factionrealm.poolBoost
+
 	if (not pool_size) then
 		return brk
 	end
 	for i = 1,14 do
-		brk[i] = math.floor(brk[i]*pool_size+.5)
+		brk[i] = math.min(math.floor(brk[i]*pool_size+.5), #HonorSpy:BuildStandingsTable())
 	end
 	return brk
 end
@@ -271,37 +280,55 @@ function HonorSpy:Estimate(playerOfInterest)
 
 	
 	local standing = -1;
-	local t = HonorSpy:BuildStandingsTable()
-	local avg_lastchecked = 0;
+	local t = HonorSpy:BuildStandingsTable(L["EstHonor"])
 	local pool_size = #t;
+	local curHonor = 0;
 
 	for i = 1, pool_size do
 		if (playerOfInterest == t[i][1]) then
 			standing = i
+			curHonor = math.max(t[i][3], tonumber(t[i][4]) or 0)
 		end
 	end
+	
 	if (standing == -1) then
 		return
 	end;
+
+	local pool_size = pool_size
 
 	local RP  = {0, 400} -- RP for each bracket
 	local Ranks = {0, 2000} -- RP for each rank
 
 	local bracket = 1;
+	local top_bracket = 14;
 	local inside_br_progress = 0;
+	
 	local brk = self:GetBrackets(pool_size)
-
+	
 	for i = 2,14 do
+		if (brk[i] == 0) then
+			top_bracket = i
+		end
 		if (standing > brk[i]) then
-			inside_br_progress = (brk[i-1] - standing)/(brk[i-1] - brk[i])
 			break
-		end;
+		end
 		bracket = i;
 	end
-	if (bracket == 14 and standing == 1) then inside_br_progress = 1 end;
+
+	local btm_break_point_honor = math.max(t[brk[bracket]][3], tonumber(t[brk[bracket]][4]) or 0)
+	local top_break_point_honor = 0
+	
+	if bracket ~= top_bracket then
+		top_break_point_honor = math.max(t[brk[bracket + 1]][3], tonumber(t[brk[bracket + 1]][4]) or 0)
+	else
+		top_break_point_honor = math.max(t[1][3], tonumber(t[1][4]) or 0)
+	end
+
+	inside_br_progress = (curHonor - btm_break_point_honor)/(top_break_point_honor - btm_break_point_honor)
 	for i = 3,14 do
-		RP[i] = (i-2) * 1000;
-		Ranks[i] = (i-2) * 5000;
+		RP[i] = (i-2) * 1000
+		Ranks[i] = (i-2) * 5000
 	end
 	local award = RP[bracket] + 1000 * inside_br_progress;
 	local RP = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].RP;
