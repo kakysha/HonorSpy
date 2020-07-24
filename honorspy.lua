@@ -257,17 +257,21 @@ function HonorSpy:BuildStandingsTable(sort_by)
 end
 
 -- REPORT
+function HonorSpy:GetPoolBoostForToday() -- estimates pool boost to the date (as final pool boost should be only achieved at the end of the week)
+	return  math.floor((GetServerTime() - HonorSpy.db.factionrealm.last_reset) / (7*24*60*60) * (HonorSpy.db.factionrealm.poolBoost or 0)+.5)
+end
+
 function HonorSpy:GetBrackets(pool_size)
 			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
 	local brk =  {1, 0.845, 0.697, 0.566, 0.436, 0.327, 0.228, 0.159, 0.100, 0.060, 0.035, 0.020, 0.008, 0.003} -- brackets percentage
 	
-	pool_size = pool_size + (HonorSpy.db.factionrealm.poolBoost or 0)
+	pool_size = pool_size + HonorSpy:GetPoolBoostForToday()
 
 	if (not pool_size) then
 		return brk
 	end
 	for i = 1,14 do
-		brk[i] = math.min(math.floor(brk[i]*pool_size+.5), #HonorSpy:BuildStandingsTable())
+		brk[i] = math.floor(brk[i]*pool_size+.5)
 	end
 	return brk
 end
@@ -290,42 +294,35 @@ function HonorSpy:Estimate(playerOfInterest)
 			curHonor = math.max(t[i][3], tonumber(t[i][4]) or 0)
 		end
 	end
-	
 	if (standing == -1) then
 		return
 	end;
 
-	local pool_size = pool_size
-
 	local RP  = {0, 400} -- RP for each bracket
 	local Ranks = {0, 2000} -- RP for each rank
-
 	local bracket = 1;
-	local top_bracket = 14;
 	local inside_br_progress = 0;
-	
 	local brk = self:GetBrackets(pool_size)
 	
 	for i = 2,14 do
-		if (brk[i] == 0) then
-			top_bracket = i
-		end
 		if (standing > brk[i]) then
 			break
 		end
 		bracket = i;
 	end
-
 	local btm_break_point_honor = math.max(t[brk[bracket]][3], tonumber(t[brk[bracket]][4]) or 0)
 	local top_break_point_honor = 0
-	
-	if bracket ~= top_bracket then
+	if brk[bracket + 1] then -- do we even have next bracket?
 		top_break_point_honor = math.max(t[brk[bracket + 1]][3], tonumber(t[brk[bracket + 1]][4]) or 0)
 	else
 		top_break_point_honor = math.max(t[1][3], tonumber(t[1][4]) or 0)
 	end
+	if curHonor == top_break_point_honor then
+		inside_br_progress = 1
+	else
+		inside_br_progress = (curHonor - btm_break_point_honor)/(top_break_point_honor - btm_break_point_honor)
+	end
 
-	inside_br_progress = (curHonor - btm_break_point_honor)/(top_break_point_honor - btm_break_point_honor)
 	for i = 3,14 do
 		RP[i] = (i-2) * 1000
 		Ranks[i] = (i-2) * 5000

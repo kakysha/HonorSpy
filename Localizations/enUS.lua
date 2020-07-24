@@ -72,5 +72,6 @@ L["Shows the Estimated Honor column in the table. This data will only be populat
 L["Estimated Honor"] = true
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = true
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = true
+L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
 
 end

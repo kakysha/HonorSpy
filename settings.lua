@@ -63,7 +63,7 @@ options.args["poolBoost"] = {
 options.args["sep1"] = {
 	order = 7,
 	type = "description",
-	name = "\n"
+	name = L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] .. "\n\n"
 }
 
 options.args["export"] = {

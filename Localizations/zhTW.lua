@@ -72,5 +72,6 @@ L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "通過公會�
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "妳將不再加入‘HonorSpySync’頻道，並且只與妳的公會成員同步數據。更改後請重載登陸"
 L["Show Estimated Honor"] = true
 L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."] = true
+L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
 
 end
