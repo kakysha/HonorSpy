@@ -312,7 +312,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	end
 	local btm_break_point_honor = math.max(t[brk[bracket]][3], tonumber(t[brk[bracket]][4]) or 0)
 	local top_break_point_honor = 0
-	if brk[bracket + 1] then -- do we even have next bracket?
+	if brk[bracket + 1] and t[brk[bracket + 1]] then -- do we even have next bracket?
 		top_break_point_honor = math.max(t[brk[bracket + 1]][3], tonumber(t[brk[bracket + 1]][4]) or 0)
 	else
 		top_break_point_honor = math.max(t[1][3], tonumber(t[1][4]) or 0)

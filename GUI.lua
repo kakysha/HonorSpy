@@ -85,7 +85,7 @@ function GUI:Toggle()
 	if (mainFrame and mainFrame:IsShown()) then
 		GUI:Hide()
 	else
-		GUI:Show()
+		GUI:Show(false, L["EstHonor"])
 	end
 end
 
