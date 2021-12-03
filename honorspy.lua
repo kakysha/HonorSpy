@@ -473,7 +473,6 @@ function HonorSpy:PLAYER_DEAD()
 	end
 end
 
-local ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
 function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 	-- not found, fake
 	if (msg == ERR_FRIEND_NOT_FOUND) then
@@ -497,16 +496,10 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     	HonorSpy.db.factionrealm.fakePlayers[friend] = nil
     	if (friend == nameToTest) then
     		HonorSpy:removeTestedFriends()
+    		nameToTest = nil
     	end
     	return true
     end
-		local friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
-		if (friend) then
-			local match = friend and friend == nameToTest
-			UnmuteSoundFile(567518)
-			nameToTest = nil
-			return match
-		end
 end
 
 function HonorSpy:removeTestedFriends()
@@ -532,7 +525,6 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
-		MuteSoundFile(567518)
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
 		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
 	end
