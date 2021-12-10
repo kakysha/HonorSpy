@@ -1,4 +1,4 @@
-## Interface: 11305
+## Interface: 11401
 ## Title: HonorSpy
 
 ## Notes: Records PvP standings of all players
