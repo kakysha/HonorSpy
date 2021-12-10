@@ -21,7 +21,9 @@ function HonorSpy:OnInitialize()
 			actualCommPrefix = "",
 			fakePlayers = {},
 			goodPlayers = {},
-			poolBoost = 0
+			poolBoost = 0,
+			isSom = false,
+			somChecked = false
 		},
 		char = {
 			today_kills = {},
@@ -29,7 +31,12 @@ function HonorSpy:OnInitialize()
 			original_honor = 0
 		}
 	}, true)
-
+		
+	if (not self.db.factionrealm.someChecked) then
+		self.db.factionrealm.isSom = IsSomRealm();
+		self.db.factionrealm.someChecked = true;
+	end
+	
 	self:SecureHook("InspectUnit");
 	self:SecureHook("UnitPopup_ShowMenu");
 
@@ -287,7 +294,8 @@ function HonorSpy:Estimate(playerOfInterest)
 	local t = HonorSpy:BuildStandingsTable(L["EstHonor"])
 	local pool_size = #t;
 	local curHonor = 0;
-
+	local rp_factor = 1000;
+	
 	for i = 1, pool_size do
 		if (playerOfInterest == t[i][1]) then
 			standing = i
@@ -303,6 +311,12 @@ function HonorSpy:Estimate(playerOfInterest)
 	local bracket = 1;
 	local inside_br_progress = 0;
 	local brk = self:GetBrackets(pool_size)
+	
+	-- change rank 2 and rp_factor if season of mastery
+	if (HonorSpy.db.factionrealm.isSom == true) then
+		RP[2] = 800
+		rp_factor = 2000
+	end
 	
 	for i = 2,14 do
 		if (standing > brk[i]) then
@@ -324,10 +338,10 @@ function HonorSpy:Estimate(playerOfInterest)
 	end
 
 	for i = 3,14 do
-		RP[i] = (i-2) * 1000
+		RP[i] = (i-2) * rp_factor
 		Ranks[i] = (i-2) * 5000
 	end
-	local award = RP[bracket] + 1000 * inside_br_progress;
+	local award = RP[bracket] + rp_factor * inside_br_progress;
 	local RP = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].RP;
 	local EstRP = math.floor(RP*0.8+award+.5);
 	local Rank = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rank;
@@ -525,6 +539,7 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
+		MuteSoundFile(567518) --added back, removal potential cause of online friends spam
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
 		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
 	end
@@ -634,6 +649,19 @@ function DrawMinimapIcon()
 			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Me']);
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
+end
+
+function IsSomRealm()
+	local realm = GetRealmName()
+	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows","Jom Gabbar"}
+	local is_som = false;
+	for i = 1,8 do
+		if (realm == som_realms[i]) then
+			is_som = true
+			break;
+		end
+	end
+	return is_som
 end
 
 function PrintWelcomeMsg()
