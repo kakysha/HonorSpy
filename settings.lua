@@ -60,23 +60,44 @@ options.args["poolBoost"] = {
 	set = function(info, v) HonorSpy.db.factionrealm.poolBoost = tonumber(v); end
 }
 
-options.args["sep1"] = {
+options.args["sep2"] = {
 	order = 7,
 	type = "description",
 	name = L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] .. "\n\n"
 }
 
-options.args["export"] = {
+options.args["sep3"] = {
 	order = 8,
+	type = "description",
+	name = "\n"
+}
+
+options.args["som_realm"] = {
+	order = 9,
+	type = "toggle",
+	name = L["Season of Mastery"],
+	desc = L["Implements the ranking changes applied to Season of Mastery."],
+	get = function() return HonorSpy.db.factionrealm.isSom end,
+	set = function(info, v) HonorSpy.db.factionrealm.isSom = v; ReloadUI() end,
+}
+
+options.args["sep4"] = {
+	order = 10,
+	type = "description",
+	name = L["Enables Season of Mastery ranking changes."] .. '\n\n'
+}
+
+options.args["export"] = {
+	order = 11,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 9,
+	order = 12,
 	type = "execute",
-	name = L["_ purge all data"],
+	name = L["Purge all data"],
 	desc = L["Delete all collected data"],
 	confirm = true,
 	confirmText = L["Delete all collected data"] .. '?',
