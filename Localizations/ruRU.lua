@@ -73,8 +73,8 @@ L["Estimated Honor"] = "Ожидаемая Честь"
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "Синхронизировать с Гильдией, вместо отдельного канала HonorSpySync"
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "Вы больше не будете подключаться к каналу HonorSpySync, а будете синхронизировать данные только с согильдийцами. Требуется релог при изменении."
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = "Разница между размером пула в HonorSpy и реальным пулом на сервере к концу недели. Это число будет постепенно добавляться к предполагаемому пулу, к концу недели достигнув значения 'количество игроков в таблице' + 'искуственное увеличение пула'"
-L["Season of Mastery"] = true
-L["Implements the ranking changes applied to Season of Mastery."] = true
-L["Enables Season of Mastery ranking changes."] = true
+L["Season of Mastery"] = "Сезон мастерства"
+L["Implements the ranking changes applied to Season of Mastery."] = "Реализует изменения рейтинга, применяемые к сезону мастерства."
+L["Enables Season of Mastery ranking changes."] = "Позволяет сезон ранжирования изменений Мастерства."
 
 end
