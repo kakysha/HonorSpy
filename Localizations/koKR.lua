@@ -73,8 +73,8 @@ L["Estimated Honor"] = "예상 명예점수"
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "별도의 'HonorSpySync' 채널이 아닌 길드 채널을 통해 동기화하기"
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "더 이상 'HonorSpySync'채널에 참여하지 않으며 길드원을 통해서만 데이터를 동기화합니다. 변경사항 적용을 위해 다시 로그인 하여야 합니다."
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
-L["Season of Mastery"] = true
-L["Implements the ranking changes applied to Season of Mastery."] = true
-L["Enables Season of Mastery ranking changes."] = true
+L["Season of Mastery"] = "마스터리의 시즌"
+L["Implements the ranking changes applied to Season of Mastery."] = "구현 순위 변화는 특화 시즌에 적용."
+L["Enables Season of Mastery ranking changes."] = "마스터리 시즌 순위 변경을 활성화합니다."
 
 end
