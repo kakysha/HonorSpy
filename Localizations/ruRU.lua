@@ -58,7 +58,7 @@ L["Export to CSV"] = "Экспортировать в CSV"
 L["Show window with current data in CSV format"] = "Показать окно с текущими данными в CSV формате"
 L["Report My Standing"] = "Сообщить мою позицию"
 L["Reports your current standing as emote"] = "покажет вашу текущую позицию в чат"
-L["_ purge all data"] = "_ очистить все данные"
+L["Purge all data"] = "_ очистить все данные"
 L["Delete all collected data"] = "Удалить все собранные данные"
 L["Limit Rows"] = "лимит строк в таблице"
 L["Limits number of rows shown in table, from 1 to 9999"] = "Ограничивает количество строк отображаемых в таблице, от 1 до 9999"
@@ -73,5 +73,8 @@ L["Estimated Honor"] = "Ожидаемая Честь"
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "Синхронизировать с Гильдией, вместо отдельного канала HonorSpySync"
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "Вы больше не будете подключаться к каналу HonorSpySync, а будете синхронизировать данные только с согильдийцами. Требуется релог при изменении."
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = "Разница между размером пула в HonorSpy и реальным пулом на сервере к концу недели. Это число будет постепенно добавляться к предполагаемому пулу, к концу недели достигнув значения 'количество игроков в таблице' + 'искуственное увеличение пула'"
+L["Season of Mastery"] = true
+L["Implements the ranking changes applied to Season of Mastery."] = true
+L["Enables Season of Mastery ranking changes."] = true
 
 end
