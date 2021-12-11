@@ -492,14 +492,6 @@ function HonorSpy:PLAYER_DEAD()
 	end
 end
 
-local ERR_FRIEND_ONLINE_PATTERN = "";
-
-if (som_realm) then 
-	ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
-else
-	ERR_FRIEND_ONLINE_PATTERN = ""
-end
-
 function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 	-- not found, fake
 	if (msg == ERR_FRIEND_NOT_FOUND) then
@@ -518,25 +510,16 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     if (not friend) then
     	friend = msg:match(string.gsub(ERR_FRIEND_ALREADY_S, "(%%s)", "(.+)"))
     end
+	
     if (friend) then
     	HonorSpy.db.factionrealm.goodPlayers[friend] = true
     	HonorSpy.db.factionrealm.fakePlayers[friend] = nil
     	if (friend == nameToTest) then
     		HonorSpy:removeTestedFriends()
-    		nameToTest = nil
+    		-- nameToTest = nil   --This was the cause of the online spam
     	end
     	return true
     end
-	
-	if (som_realm) then
-		local friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
-		if (friend) then
-			local match = friend and friend == nameToTest
-			UnmuteSoundFile(567518)
-			nameToTest = nil
-			return match
-		end
-	end
 end
 
 function HonorSpy:removeTestedFriends()
@@ -562,9 +545,7 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
-		if (som_realm) then
-			MuteSoundFile(567518)
-		end
+		-- MuteSoundFile(567518)
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
 		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
 	end
