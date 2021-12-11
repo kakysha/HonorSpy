@@ -655,7 +655,7 @@ end
 
 function IsSomRealm()
 	local realm = GetRealmName()
-	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows","Jom Gabbar"}
+	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows (AU)","Jom Gabbar"}
 	local is_som = false;
 	for i = 1,8 do
 		if (realm == som_realms[i]) then
