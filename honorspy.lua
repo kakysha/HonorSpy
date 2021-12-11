@@ -10,6 +10,7 @@ local playerName = UnitName("player");
 local callback = nil
 local nameToTest = nil
 local startRemovingFakes = false
+local som_realm = false
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -31,10 +32,12 @@ function HonorSpy:OnInitialize()
 			original_honor = 0
 		}
 	}, true)
-		
-	if (not self.db.factionrealm.someChecked) then
-		self.db.factionrealm.isSom = IsSomRealm();
-		self.db.factionrealm.someChecked = true;
+	
+	som_realm = IsSomRealm();
+	
+	if (not self.db.factionrealm.somChecked) then
+		self.db.factionrealm.isSom = som_realm;
+		self.db.factionrealm.somChecked = true;
 	end
 	
 	self:SecureHook("InspectUnit");
@@ -489,6 +492,14 @@ function HonorSpy:PLAYER_DEAD()
 	end
 end
 
+local ERR_FRIEND_ONLINE_PATTERN = "";
+
+if (som_realm) then 
+	ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
+else
+	ERR_FRIEND_ONLINE_PATTERN = ""
+end
+
 function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 	-- not found, fake
 	if (msg == ERR_FRIEND_NOT_FOUND) then
@@ -516,6 +527,16 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     	end
     	return true
     end
+	
+	if (som_realm) then
+		local friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
+		if (friend) then
+			local match = friend and friend == nameToTest
+			UnmuteSoundFile(567518)
+			nameToTest = nil
+			return match
+		end
+	end
 end
 
 function HonorSpy:removeTestedFriends()
@@ -541,7 +562,9 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
-		MuteSoundFile(567518) --added back, removal potential cause of online friends spam
+		if (som_realm) then
+			MuteSoundFile(567518)
+		end
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
 		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
 	end
