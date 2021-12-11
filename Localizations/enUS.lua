@@ -58,7 +58,7 @@ L["Export to CSV"] = true
 L["Show window with current data in CSV format"] = true
 L["Report My Standing"] = true
 L["Reports your current standing as emote"] = true
-L["_ purge all data"] = true
+L["Purge all data"] = true
 L["Delete all collected data"] = true
 L["Limit Rows"] = true
 L["Limits number of rows shown in table, from 1 to 9999"] = true
@@ -73,5 +73,8 @@ L["Estimated Honor"] = true
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = true
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = true
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
+L["Season of Mastery"] = true
+L["Implements the ranking changes applied to Season of Mastery."] = true
+L["Enables Season of Mastery ranking changes."] = true
 
 end

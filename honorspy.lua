@@ -10,6 +10,7 @@ local playerName = UnitName("player");
 local callback = nil
 local nameToTest = nil
 local startRemovingFakes = false
+local som_realm = false
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -31,10 +32,12 @@ function HonorSpy:OnInitialize()
 			original_honor = 0
 		}
 	}, true)
-		
-	if (not self.db.factionrealm.someChecked) then
-		self.db.factionrealm.isSom = IsSomRealm();
-		self.db.factionrealm.someChecked = true;
+	
+	som_realm = IsSomRealm();
+	
+	if (not self.db.factionrealm.somChecked) then
+		self.db.factionrealm.isSom = som_realm;
+		self.db.factionrealm.somChecked = true;
 	end
 	
 	self:SecureHook("InspectUnit");
@@ -295,6 +298,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	local pool_size = #t;
 	local curHonor = 0;
 	local rp_factor = 1000;
+	local decay_factor = 0.8;
 	
 	for i = 1, pool_size do
 		if (playerOfInterest == t[i][1]) then
@@ -316,6 +320,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	if (HonorSpy.db.factionrealm.isSom == true) then
 		RP[2] = 800
 		rp_factor = 2000
+		decay_factor = 0.6
 	end
 	
 	for i = 2,14 do
@@ -343,7 +348,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	end
 	local award = RP[bracket] + rp_factor * inside_br_progress;
 	local RP = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].RP;
-	local EstRP = math.floor(RP*0.8+award+.5);
+	local EstRP = math.floor(RP*decay_factor+award+.5);
 	local Rank = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rank;
 	local EstRank = 14;
 	local Progress = math.floor(HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rankProgress*100);
@@ -487,6 +492,14 @@ function HonorSpy:PLAYER_DEAD()
 	end
 end
 
+local ERR_FRIEND_ONLINE_PATTERN = "";
+
+if (som_realm) then 
+	ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
+else
+	ERR_FRIEND_ONLINE_PATTERN = ""
+end
+
 function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 	-- not found, fake
 	if (msg == ERR_FRIEND_NOT_FOUND) then
@@ -514,6 +527,16 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     	end
     	return true
     end
+	
+	if (som_realm) then
+		local friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
+		if (friend) then
+			local match = friend and friend == nameToTest
+			UnmuteSoundFile(567518)
+			nameToTest = nil
+			return match
+		end
+	end
 end
 
 function HonorSpy:removeTestedFriends()
@@ -539,7 +562,9 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
-		MuteSoundFile(567518) --added back, removal potential cause of online friends spam
+		if (som_realm) then
+			MuteSoundFile(567518)
+		end
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
 		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
 	end
@@ -653,7 +678,7 @@ end
 
 function IsSomRealm()
 	local realm = GetRealmName()
-	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows","Jom Gabbar"}
+	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows (AU)","Jom Gabbar"}
 	local is_som = false;
 	for i = 1,8 do
 		if (realm == som_realms[i]) then

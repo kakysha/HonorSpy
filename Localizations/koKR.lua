@@ -58,7 +58,7 @@ L["Export to CSV"] = "CSV 로 내보내기"
 L["Show window with current data in CSV format"] = "현재 데이터를 CSV 포맷으로 별도의 창에 보여줍니다"
 L["Report My Standing"] = "나의 순위 보고"
 L["Reports your current standing as emote"] = "감정표현을 이용하여 당신의 현재 순위를 보고합니다"
-L["_ purge all data"] = "모든 데이터 삭제"
+L["Purge all data"] = "모든 데이터 삭제"
 L["Delete all collected data"] = "수집한 모든 데이터를 삭제합니다"
 L["Limit Rows"] = "행 갯수 제한"
 L["Limits number of rows shown in table, from 1 to 9999"] = "표시되는 행의 갯수를 1부터 9999 까지 제한합니다."
@@ -73,5 +73,8 @@ L["Estimated Honor"] = "예상 명예점수"
 L["Sync over GUILD instead of separate 'HonorSpySync' channel"] = "별도의 'HonorSpySync' 채널이 아닌 길드 채널을 통해 동기화하기"
 L["You won't join 'HonorSpySync' channel anymore and will only sync data with your guildmates. Relog after changing this."] = "더 이상 'HonorSpySync'채널에 참여하지 않으며 길드원을 통해서만 데이터를 동기화합니다. 변경사항 적용을 위해 다시 로그인 하여야 합니다."
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
+L["Season of Mastery"] = "마스터리의 시즌"
+L["Implements the ranking changes applied to Season of Mastery."] = "구현 순위 변화는 특화 시즌에 적용."
+L["Enables Season of Mastery ranking changes."] = "마스터리 시즌 순위 변경을 활성화합니다."
 
 end

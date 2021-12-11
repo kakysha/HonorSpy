@@ -58,7 +58,7 @@ L["Export to CSV"] = "导出到CSV文件"
 L["Show window with current data in CSV format"] = "显示CSV格式的当前数据的窗口"
 L["Report My Standing"] = "报告我的排名"
 L["Reports your current standing as emote"] = "用表情报告你当前的排名状态"
-L["_ purge all data"] = "清除所有数据"
+L["Purge all data"] = "清除所有数据"
 L["Delete all collected data"] = "删除所有收集的数据"
 L["Limit Rows"] = "行数限制"
 L["Limits number of rows shown in table, from 1 to 9999"] = "限制表中显示的行数，从1到9999"
@@ -73,5 +73,8 @@ L["You won't join 'HonorSpySync' channel anymore and will only sync data with yo
 L["Show Estimated Honor"] = true
 L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."] = true
 L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] = true
+L["Season of Mastery"] = "精通季节"
+L["Implements the ranking changes applied to Season of Mastery."] = "实施应用于精通赛季的排名变化"
+L["Enables Season of Mastery ranking changes."] = "启用精通赛季排名变化"
 
 end
