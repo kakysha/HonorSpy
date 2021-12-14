@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 Frame Container
 -------------------------------------------------------------------------------]]
-local Type, Version = "Frame", 26
+local Type, Version = "Frame", 28
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -83,6 +83,7 @@ local methods = {
 	["OnAcquire"] = function(self)
 		self.frame:SetParent(UIParent)
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
+		self.frame:SetFrameLevel(100) -- Lots of room to draw under it
 		self:SetTitle()
 		self:SetStatusText()
 		self:ApplyStatus()
@@ -179,13 +180,14 @@ local PaneBackdrop  = {
 }
 
 local function Constructor()
-	local frame = CreateFrame("Frame", nil, UIParent)
+	local frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	frame:Hide()
 
 	frame:EnableMouse(true)
 	frame:SetMovable(true)
 	frame:SetResizable(true)
 	frame:SetFrameStrata("FULLSCREEN_DIALOG")
+	frame:SetFrameLevel(100) -- Lots of room to draw under it
 	frame:SetBackdrop(FrameBackdrop)
 	frame:SetBackdropColor(0, 0, 0, 1)
 	frame:SetMinResize(400, 200)
@@ -201,7 +203,7 @@ local function Constructor()
 	closebutton:SetWidth(100)
 	closebutton:SetText(CLOSE)
 
-	local statusbg = CreateFrame("Button", nil, frame)
+	local statusbg = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate" or nil)
 	statusbg:SetPoint("BOTTOMLEFT", 15, 15)
 	statusbg:SetPoint("BOTTOMRIGHT", -132, 15)
 	statusbg:SetHeight(24)

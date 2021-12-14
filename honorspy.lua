@@ -24,7 +24,7 @@ function HonorSpy:OnInitialize()
 			goodPlayers = {},
 			poolBoost = 0,
 			isSom = false,
-			somChecked = false
+			som_Checked = false
 		},
 		char = {
 			today_kills = {},
@@ -35,9 +35,9 @@ function HonorSpy:OnInitialize()
 	
 	som_realm = IsSomRealm();
 	
-	if (not self.db.factionrealm.somChecked) then
+	if (not self.db.factionrealm.som_Checked) then
 		self.db.factionrealm.isSom = som_realm;
-		self.db.factionrealm.somChecked = true;
+		self.db.factionrealm.som_Checked = true;
 	end
 	
 	self:SecureHook("InspectUnit");
@@ -659,9 +659,9 @@ end
 
 function IsSomRealm()
 	local realm = GetRealmName()
-	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows (AU)","Jom Gabbar"}
+	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows (AU)","Jom Gabbar","Dreadnaught", "Kingsfall","Quel’Serrar", "Bonescythe", "Ironfoe"}
 	local is_som = false;
-	for i = 1,8 do
+	for i = 1,13 do
 		if (realm == som_realms[i]) then
 			is_som = true
 			break;
