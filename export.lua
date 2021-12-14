@@ -9,7 +9,7 @@ function HonorSpy:ExportCSV()
 
 	-- If we haven't created these frames, then lets do so now.
 	if (not _G["ARLCopyFrame"]) then
-		local frame = CreateFrame("Frame", "ARLCopyFrame", UIParent)
+		local frame = CreateFrame("Frame", "ARLCopyFrame", UIParent,"BackdropTemplate")
 		tinsert(UISpecialFrames, "ARLCopyFrame")
 		frame:SetBackdrop(PaneBackdrop)
 		frame:SetBackdropColor(0,0,0,1)
