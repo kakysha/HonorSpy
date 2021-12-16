@@ -11,6 +11,8 @@ local callback = nil
 local nameToTest = nil
 local startRemovingFakes = false
 local som_realm = false
+local ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
+local last_test = time()
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -435,11 +437,14 @@ function store_player(playerName, player)
 	
 	local player = table.copy(player);
 	local localPlayer = HonorSpy.db.factionrealm.currentStandings[playerName];
-	if (localPlayer == nil or localPlayer.last_checked < player.last_checked) then
-		HonorSpy.db.factionrealm.currentStandings[playerName] = player;
-		HonorSpy:TestNextFakePlayer();
-	end
-end
+	
+	if (player.last_checked > GetServerTime()) then return end
+		if (localPlayer == nil or localPlayer.last_checked < player.last_checked) then
+			HonorSpy.db.factionrealm.currentStandings[playerName] = player;
+			nameToTest = nil
+			HonorSpy:TestNextFakePlayer();
+		end
+end 
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
@@ -516,10 +521,29 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     	HonorSpy.db.factionrealm.fakePlayers[friend] = nil
     	if (friend == nameToTest) then
     		HonorSpy:removeTestedFriends()
-    		-- nameToTest = nil   --This was the cause of the online spam
+			UnmuteSoundFile(567518)
     	end
+		nameToTest = nil
     	return true
     end
+	
+	friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
+	if (friend) then
+		if ((time() - last_test) < 6) then
+			UnmuteSoundFile(567518)
+			nameToTest = nil
+			return true
+		end
+	end
+	
+	friend = msg:match(ERR_FRIEND_ERROR)
+	if (friend) then
+		if ((time() - last_test) < 6) then
+			UnmuteSoundFile(567518)
+			nameToTest = nil
+			return true
+		end
+	end
 end
 
 function HonorSpy:removeTestedFriends()
@@ -545,9 +569,10 @@ function HonorSpy:TestNextFakePlayer()
 		end
 	end
 	if (nameToTest) then
-		-- MuteSoundFile(567518)
+		last_test = time()
+		MuteSoundFile(567518)
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
-		HS_wait(1, function() HonorSpy:TestNextFakePlayer() end) 
+		HS_wait(2, function() HonorSpy:TestNextFakePlayer() end) 
 	end
 end
 
