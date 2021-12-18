@@ -12,7 +12,10 @@ local nameToTest = nil
 local startRemovingFakes = false
 local som_realm = false
 local ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
-local last_test = time()
+local last_test = time() - 300
+local checkingPlayers = false;
+local addingPlayer = false;
+local muteTimer = C_Timer.NewTimer(1,function () end)
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -435,16 +438,29 @@ end
 function store_player(playerName, player)
 	if (player == nil or playerName == nil or playerName:find("[%d%p%s%c%z]") or isFakePlayer(playerName) or not playerIsValid(player)) then return end
 	
-	local player = table.copy(player);
-	local localPlayer = HonorSpy.db.factionrealm.currentStandings[playerName];
-	
-	if (player.last_checked > GetServerTime()) then return end
+	if(addingPlayer) then
+		C_Timer.After(0.1,function() store_player(playerName, player); end)
+	else
+		addingPlayer = true
+		
+		local player = table.copy(player);
+		local localPlayer = HonorSpy.db.factionrealm.currentStandings[playerName];
+				
 		if (localPlayer == nil or localPlayer.last_checked < player.last_checked) then
 			HonorSpy.db.factionrealm.currentStandings[playerName] = player;
-			nameToTest = nil
-			HonorSpy:TestNextFakePlayer();
+			if (not checkingPlayers and (time() - last_test >= 300)) then
+				HonorSpy:TestNextFakePlayer();
+			else
+				if(not HonorSpy.db.factionrealm.goodPlayers[playerName] and not HonorSpy.db.factionrealm.fakePlayers[playerName]) then
+					HonorSpy:TestNextFakePlayer();
+				end
+			end
+			addingPlayer = false;
+		else
+			addingPlayer = false;
 		end
-end 
+	end
+end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
@@ -510,6 +526,7 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 		nameToTest = nil
 		return true
 	end
+	
 	-- added or was in friends already, not fake
     local friend = msg:match(string.gsub(ERR_FRIEND_ADDED_S, "(%%s)", "(.+)"))
     if (not friend) then
@@ -517,33 +534,44 @@ function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
     end
 	
     if (friend) then
+		--HonorSpy:Print("Player '" .. friend .. "' is a valid player")
     	HonorSpy.db.factionrealm.goodPlayers[friend] = true
     	HonorSpy.db.factionrealm.fakePlayers[friend] = nil
+		
     	if (friend == nameToTest) then
-    		HonorSpy:removeTestedFriends()
-			UnmuteSoundFile(567518)
+			local f = C_FriendList.GetFriendInfo(friend)
+			if (f.notes == "HonorSpy testing") then
+				C_FriendList.RemoveFriend(f.name)
+			end
+			f = nil;
+			nameToTest = nil
+			return true
     	end
-		nameToTest = nil
-    	return true
     end
 	
 	friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
-	if (friend) then
-		if ((time() - last_test) < 6) then
-			UnmuteSoundFile(567518)
-			nameToTest = nil
-			return true
+	if (friend) then		
+		local f = C_FriendList.GetFriendInfo(friend)
+		if(nameToTest and not f) then
+			if (nameToTest == friend) then
+				return true;
+			end
+		else
+			if (f and (friend == nameToTest or f.notes == "HonorSpy testing")) then
+				HonorSpy.db.factionrealm.goodPlayers[friend] = true
+				HonorSpy.db.factionrealm.fakePlayers[friend] = nil
+				return true;
+			end
+		end
+		if (checkingPlayers) then
+			PlaySoundFile(567518)
 		end
 	end
 	
 	friend = msg:match(ERR_FRIEND_ERROR)
 	if (friend) then
-		if ((time() - last_test) < 6) then
-			UnmuteSoundFile(567518)
-			nameToTest = nil
-			return true
-		end
-	end
+		return true
+	end	
 end
 
 function HonorSpy:removeTestedFriends()
@@ -560,19 +588,31 @@ function HonorSpy:removeTestedFriends()
 end
 
 function HonorSpy:TestNextFakePlayer()
-	if (nameToTest or not startRemovingFakes) then return end
-
+	if (not startRemovingFakes) then
+		return
+	elseif (nameToTest) then
+		checkingPlayers = true;
+		return
+	end
+	
+	checkingPlayers = true;
+	last_test = time()
+	
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
 		if (not HonorSpy.db.factionrealm.fakePlayers[playerName] and not HonorSpy.db.factionrealm.goodPlayers[playerName] and playerName ~= UnitName("player")) then
 			nameToTest = playerName
 			break
 		end
 	end
+	
 	if (nameToTest) then
-		last_test = time()
 		MuteSoundFile(567518)
 		C_FriendList.AddFriend(nameToTest, "HonorSpy testing")
-		HS_wait(2, function() HonorSpy:TestNextFakePlayer() end) 
+		C_Timer.After(1,function () HonorSpy:TestNextFakePlayer() end)
+	else
+		HonorSpy:removeTestedFriends()
+		checkingPlayers = false;
+		UnmuteSoundFile(567518)
 	end
 end
 
