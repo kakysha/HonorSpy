@@ -468,13 +468,33 @@ function store_player(playerName, player)
 end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
-	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) == 2) then
+	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
 		return -- discard any message from players not from the same realm or connected realms (connected on CERA only)
 	end
 	local ok, playerName, player = self:Deserialize(message);
 	if (not ok) then
 		return;
 	end
+    -- If a player on a connected realm sends this player data, the realms will be all wrong
+    if UnitRealmRelationship(sender) ~= 1 then
+        _, _, _, sendersRealm = sender:find("(%a+)%-(%a+)")
+        if not sendersRealm or sendersRealm == "" then return end
+        if playerName:find("%-") then 
+            local _, _, name, realm = playerName:find("(%a+)%-(%a+)")
+            if not realm or realm == "" or not name or name == "" then return end
+            if realm == GetRealmName() then
+                -- Example here: Player is from Arugal, message is from Felstriker, about a character on Arugal
+                -- Lets just remove the bit about Arugal
+                playerName = name
+                -- If the realm name does not match: Player is from Arugal, message is from Felstriker, about a character on Yojamba
+                -- In this case just allow it as is
+            end
+        else
+            -- Example here: Player is from Arugal, message is from Felstriker, about a character on Felstriker
+            -- Add "-Felstriker" to the name
+            playerName = playerName.."-"..sendersRealm
+        end
+    end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
