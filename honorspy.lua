@@ -439,9 +439,7 @@ function isFakePlayer(playerName)
 end
 
 function store_player(playerName, player)
-	if (player == nil or playerName == nil or playerName:find("[%d%s%c%z]") or isFakePlayer(playerName) or not playerIsValid(player)) then return end
-    -- or playerName:find("[%d%p%s%c%z]")
-    -- Need to allow a single hyphen, but I don't know how to adjust the regex for this
+	if (player == nil or playerName == nil or playerName:gsub("%-","",1):find("[%d%p%s%c%z]") or isFakePlayer(playerName) or not playerIsValid(player)) then return end
 	
 	if(addingPlayer) then
 		C_Timer.After(0.1,function() store_player(playerName, player); end)
