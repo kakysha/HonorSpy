@@ -69,9 +69,12 @@ local inspectedPlayerName = nil; -- name of currently inspected player
 
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
-	if (paused or (realm and realm ~= "")) then
+	if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
 		return
 	end
+    if realm and realm ~= "" and realm ~= GetRealmName() then
+        name = name.."-"..realm -- target on a connected realm
+    end
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
 		ClearInspectPlayer();
 		inspectedPlayerName = nil;
@@ -436,7 +439,7 @@ function isFakePlayer(playerName)
 end
 
 function store_player(playerName, player)
-	if (player == nil or playerName == nil or playerName:find("[%d%p%s%c%z]") or isFakePlayer(playerName) or not playerIsValid(player)) then return end
+	if (player == nil or playerName == nil or playerName:gsub("%-","",1):find("[%d%p%s%c%z]") or isFakePlayer(playerName) or not playerIsValid(player)) then return end
 	
 	if(addingPlayer) then
 		C_Timer.After(0.1,function() store_player(playerName, player); end)
@@ -464,12 +467,32 @@ end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
 	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
-		return -- discard any message from players from different servers (on x-realm BGs)
+		return -- discard any message from players not from the same realm or connected realms (connected on CERA only)
 	end
 	local ok, playerName, player = self:Deserialize(message);
 	if (not ok) then
 		return;
 	end
+    -- If a player on a connected realm sends this player data, the realms will be all wrong
+    if UnitRealmRelationship(sender) ~= 1 then
+        _, _, _, sendersRealm = sender:find("(%a+)%-(%a+)")
+        if not sendersRealm or sendersRealm == "" then return end
+        if playerName:find("%-") then 
+            local _, _, name, realm = playerName:find("(%a+)%-(%a+)")
+            if not realm or realm == "" or not name or name == "" then return end
+            if realm == GetRealmName() then
+                -- Example here: Player is from Arugal, message is from Felstriker, about a character on Arugal
+                -- Lets just remove the bit about Arugal
+                playerName = name
+                -- If the realm name does not match: Player is from Arugal, message is from Felstriker, about a character on Yojamba
+                -- In this case just allow it as is
+            end
+        else
+            -- Example here: Player is from Arugal, message is from Felstriker, about a character on Felstriker
+            -- Add "-Felstriker" to the name
+            playerName = playerName.."-"..sendersRealm
+        end
+    end
 	if (playerName == "filtered_players") then
 		for playerName, player in pairs(player) do
 			store_player(playerName, player);
