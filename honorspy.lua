@@ -357,6 +357,10 @@ function HonorSpy:Estimate(playerOfInterest)
 	local award = RP[bracket] + rp_factor * inside_br_progress;
 	local RP = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].RP;
 	local EstRP = math.floor(RP*decay_factor+award+.5);
+	--Max 2500 RP per week decay.  Applies to Classic Era and Season of Mastery
+	if ((RP-EstRP) > 2500) then
+		EstRP = RP - 2500
+	end
 	local Rank = HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rank;
 	local EstRank = 14;
 	local Progress = math.floor(HonorSpy.db.factionrealm.currentStandings[playerOfInterest].rankProgress*100);
