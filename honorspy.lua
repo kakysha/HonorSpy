@@ -716,6 +716,7 @@ function HonorSpy:CheckNeedReset(skipUpdate)
     
     -- Reset just the characters totals
     if (HonorSpy.db.char.last_reset ~= must_reset_on) then
+        HonorSpy.db.char.last_reset = must_reset_on
 		HonorSpy.db.char.original_honor = 0
 		HonorSpy.db.char.estimated_honor = 0
 		HonorSpy.db.char.today_kills = {}
