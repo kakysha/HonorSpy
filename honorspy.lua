@@ -34,7 +34,8 @@ function HonorSpy:OnInitialize()
 		char = {
 			today_kills = {},
 			estimated_honor = 0,
-			original_honor = 0
+			original_honor = 0,
+			last_reset = 0,
 		}
 	}, true)
 	
@@ -276,7 +277,7 @@ end
 
 -- REPORT
 function HonorSpy:GetPoolBoostForToday() -- estimates pool boost to the date (as final pool boost should be only achieved at the end of the week)
-	return  math.floor((GetServerTime() - HonorSpy.db.factionrealm.last_reset) / (7*24*60*60) * (HonorSpy.db.factionrealm.poolBoost or 0)+.5)
+	return  math.floor((GetServerTime() - HonorSpy.db.char.last_reset) / (7*24*60*60) * (HonorSpy.db.factionrealm.poolBoost or 0)+.5)
 end
 
 function HonorSpy:GetBrackets(pool_size)
@@ -420,7 +421,7 @@ function class_exist(className)
 end
 
 function playerIsValid(player)
-	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.factionrealm.last_reset + 24*60*60
+	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.char.last_reset + 24*60*60
 		or player.last_checked > GetServerTime()
 		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor == 0
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
@@ -707,12 +708,24 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 
 	-- reset weekly standings
 	local must_reset_on = getResetTime()
-	if (HonorSpy.db.factionrealm.last_reset ~= must_reset_on) then
-		HonorSpy:ResetWeek()
+	
+    -- Backward compatibility
+    if (HonorSpy.db.char.last_reset == 0) then
+        HonorSpy.db.char.last_reset = HonorSpy.db.factionrealm.last_reset or 0
+    end
+    
+    -- Reset just the characters totals
+    if (HonorSpy.db.char.last_reset ~= must_reset_on) then
+        HonorSpy.db.char.last_reset = must_reset_on
 		HonorSpy.db.char.original_honor = 0
 		HonorSpy.db.char.estimated_honor = 0
 		HonorSpy.db.char.today_kills = {}
 	end
+    
+    -- Reset the rest of the database only if it hasn't already been done on an alt this week
+    if (HonorSpy.db.factionrealm.last_reset ~= must_reset_on) then
+    	HonorSpy:ResetWeek()
+    end
 
 	-- reset daily honor
 	if (HonorSpy.db.factionrealm.currentStandings[playerName] and HonorSpy.db.char.original_honor ~= HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
