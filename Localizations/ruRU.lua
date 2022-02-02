@@ -5,6 +5,7 @@ if L then
 L["HonorSpy Standings"] = "Таблица HonorSpy"
 L["Name"] = "Игрок"
 L["Honor"] = "Честь"
+L["KnownHonor"] = true
 L["ThisWeekHonor"] = "ЧестьНаЭтойНеделе"
 L["EstHonor"] = "ОжидЧесть"
 L["LstWkHonor"] = "ЧестьНаПрНед"

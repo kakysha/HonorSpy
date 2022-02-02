@@ -5,8 +5,9 @@ if L then
 L["HonorSpy Standings"] = true
 L["Name"] = true
 L["Honor"] = true
-L["ThisWeekHonor"] = true
-L["EstHonor"] = true
+L["KnownHonor"] = true
+L["ThisWeekHonor"] = "EstWeekHonor"
+L["EstHonor"] = "EstTodayHonor"
 L["LstWkHonor"] = true
 L["Standing"] = true
 L["RP"] = true

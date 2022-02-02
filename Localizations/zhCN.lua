@@ -5,6 +5,7 @@ if L then
 L["HonorSpy Standings"] = "荣誉监视榜"
 L["Name"] = "名字"
 L["Honor"] = "荣誉"
+L["KnownHonor"] = true
 L["ThisWeekHonor"] = "本周荣誉"
 L["EstHonor"] = true
 L["LstWkHonor"] = "上周荣誉"
