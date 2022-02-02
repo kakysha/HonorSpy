@@ -29,7 +29,8 @@ function HonorSpy:OnInitialize()
 			goodPlayers = {},
 			poolBoost = 0,
 			isSom = false,
-			som_Checked = false
+			som_Checked = false,
+            connectedRealms = {},
 		},
 		char = {
 			today_kills = {},
@@ -39,7 +40,7 @@ function HonorSpy:OnInitialize()
 		}
 	}, true)
 	
-	som_realm = IsSomRealm();
+	som_realm = C_Seasons.HasActiveSeason();
 	
 	if (not self.db.factionrealm.som_Checked) then
 		self.db.factionrealm.isSom = som_realm;
@@ -75,6 +76,7 @@ local function StartInspecting(unitID)
 	end
     if realm and realm ~= "" and realm ~= GetRealmName() then
         name = name.."-"..realm -- target on a connected realm
+        HonorSpy.db.factionrealm.connectedRealms[realm] = true
     end
 	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
 		ClearInspectPlayer();
@@ -114,8 +116,14 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	if (player == nil) then return end
 	if (player.class == nil) then player.class = "nil" end
 
-	local _, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
-	player.thisWeekHonor = thisWeekHonor;
+	local todayHK, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
+	
+    if (thisweekHK < 15) and (todayHK >= 15) then
+        thisweekHK = todayHK
+        thisWeekHonor = 1
+    end
+    
+    player.thisWeekHonor = thisWeekHonor;
 	player.lastWeekHonor = lastWeekHonor;
 	player.standing = standing;
 	if ( inspectedPlayerName == playerName ) then
@@ -129,14 +137,14 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	
 	player.last_checked = GetServerTime();
 	player.RP = 0;
-
-	if (thisweekHK >= 15) then
+    
+    if (thisweekHK >= 15) then
 		if (player.rank >= 3) then
 			player.RP = math.ceil((player.rank-2) * 5000 + player.rankProgress * 5000)
 		elseif (player.rank == 2) then
 			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
 		end
-		if (lastPlayer and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
+		if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
 			return
 		end
 		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
@@ -264,10 +272,12 @@ function HonorSpy:BuildStandingsTable(sort_by)
 	
 	local sort_column = 3; -- ThisWeekHonor
 	if (sort_by == L["EstHonor"]) then sort_column = 4; end
+    if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
 	if (sort_by == L["Standing"]) then sort_column = 5; end
 	if (sort_by == L["Rank"]) then sort_column = 7; end
 	local sort_func = function(a,b)
 		if sort_column == 4 then return math.max(a[3],tonumber(a[4]) or 0) > math.max(b[3],tonumber(b[4]) or 0) end
+        if sort_column == -1 then return (a[3] + (tonumber(a[4]) or 0)) > (b[3] + (tonumber(b[4]) or 0)) end
 		return a[sort_column] > b[sort_column]
 	end
 	table.sort(t, sort_func)
@@ -303,7 +313,7 @@ function HonorSpy:Estimate(playerOfInterest)
 
 	
 	local standing = -1;
-	local t = HonorSpy:BuildStandingsTable(L["EstHonor"])
+	local t = HonorSpy:BuildStandingsTable(L["ThisWeekHonor"])
 	local pool_size = #t;
 	local curHonor = 0;
 	local rp_factor = 1000;
@@ -421,7 +431,7 @@ function class_exist(className)
 end
 
 function playerIsValid(player)
-	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.char.last_reset + 24*60*60
+	if (not player.last_checked or type(player.last_checked) ~= "number"-- or player.last_checked < HonorSpy.db.char.last_reset + 24*60*60
 		or player.last_checked > GetServerTime()
 		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor == 0
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
@@ -471,17 +481,24 @@ function store_player(playerName, player)
 end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
-	if (distribution ~= "GUILD" and UnitRealmRelationship(sender) ~= 1) then
-		return -- discard any message from players not from the same realm or connected realms (connected on CERA only)
-	end
+    local connectedRealm = false
+    local _, _, _, sendersRealm = sender:find("(%a+)%-(%a+)")
+    if sendersRealm then
+        if HonorSpy.db.factionrealm.connectedRealms[sendersRealm] then
+            connectedRealm = true
+        else
+            return -- discard any message from players not from the same realm or connected realms (connected on CERA only)
+        end
+    end
+    
 	local ok, playerName, player = self:Deserialize(message);
 	if (not ok) then
 		return;
 	end
+    
     -- If a player on a connected realm sends this player data, the realms will be all wrong
-    if UnitRealmRelationship(sender) ~= 1 then
-        _, _, _, sendersRealm = sender:find("(%a+)%-(%a+)")
-        if not sendersRealm or sendersRealm == "" then return end
+    if connectedRealm then
+        if sendersRealm == "" then return end
         if playerName:find("%-") then 
             local _, _, name, realm = playerName:find("(%a+)%-(%a+)")
             if not realm or realm == "" or not name or name == "" then return end
@@ -696,7 +713,6 @@ function getResetTime()
 end
 
 function HonorSpy:ResetWeek()
-	HonorSpy.db.factionrealm.last_reset = getResetTime();
 	HonorSpy:Purge()
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
@@ -724,13 +740,21 @@ function HonorSpy:CheckNeedReset(skipUpdate)
     
     -- Reset the rest of the database only if it hasn't already been done on an alt this week
     if (HonorSpy.db.factionrealm.last_reset ~= must_reset_on) then
+        HonorSpy.db.factionrealm.last_reset = must_reset_on
     	HonorSpy:ResetWeek()
     end
-
+    
 	-- reset daily honor
-	if (HonorSpy.db.factionrealm.currentStandings[playerName] and HonorSpy.db.char.original_honor ~= HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor) then
-		HonorSpy.db.char.original_honor = HonorSpy.db.factionrealm.currentStandings[playerName].thisWeekHonor
-		HonorSpy.db.char.estimated_honor = HonorSpy.db.char.original_honor
+	local _, thisWeekHonor = GetPVPThisWeekStats()
+    if (HonorSpy.db.char.original_honor ~= thisWeekHonor) then
+        HonorSpy.db.char.original_honor = thisWeekHonor
+        
+        -- backward compatibility
+        if HonorSpy.db.char.estimated_honor > thisWeekHonor then
+            return
+        end
+        
+        HonorSpy.db.char.estimated_honor = thisWeekHonor
 		HonorSpy.db.char.today_kills = {}
 	end
 end
@@ -760,19 +784,6 @@ function DrawMinimapIcon()
 			tooltip:AddLine("|cFFCFCFCFRight Click: |r" .. L['Report Me']);
 		end
 	}), HonorSpy.db.factionrealm.minimapButton);
-end
-
-function IsSomRealm()
-	local realm = GetRealmName()
-	local som_realms = {"Shadowstrike","Lionheart","Barman Shanker","Mutanus","Nightfall","Obsidian Edge","Swamp of Sorrows (AU)","Jom Gabbar","Dreadnaught", "Kingsfall","Quel’Serrar", "Bonescythe", "Ironfoe"}
-	local is_som = false;
-	for i = 1,13 do
-		if (realm == som_realms[i]) then
-			is_som = true
-			break;
-		end
-	end
-	return is_som
 end
 
 function PrintWelcomeMsg()
