@@ -8,7 +8,7 @@
 
 ## Author: kakysha
 ## OptionalDeps: Ace3
-## Version: 1.7.18
+## Version: 1.7.20
 
 ## X-Category: Battlegrounds/PvP
 ## SavedVariables: HonorSpyDB
