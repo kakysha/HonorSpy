@@ -5,6 +5,7 @@ if L then
 L["HonorSpy Standings"] = "Clasificación de HonorSpy"
 L["Name"] = "Nombre"
 L["Honor"] = "Honor"
+L["KnownHonor"] = true
 L["ThisWeekHonor"] = "Esta semana"
 L["EstHonor"] = "HonorEst."
 L["LstWkHonor"] = "Previa semana"

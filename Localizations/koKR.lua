@@ -5,6 +5,7 @@ if L then
 L["HonorSpy Standings"] = "HonorSpy 순위"
 L["Name"] = "이름"
 L["Honor"] = "명예"
+L["KnownHonor"] = true
 L["ThisWeekHonor"] = "이번 주 명예"
 L["EstHonor"] = true
 L["LstWkHonor"] = "지난 주 명예"

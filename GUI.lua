@@ -110,12 +110,14 @@ function GUI:UpdateTableView()
 			brk_delim_inserted = true
 			button.Name:SetText(colorize(format(L["Bracket"] .. " %d", brackets[itemIndex]), "GREY"))
 			button.Honor:SetText();
+            button.EstHonor:SetText();
+            button.EstWeekHonor:SetText();
 			if HonorSpy.db.factionrealm.estHonorCol.show then
-				button.EstHonor:SetText();
 				button.EstHonor:SetWidth(80);
+                button.EstWeekHonor:SetWidth(80);
 			else
-				button.EstHonor:SetText();
 				button.EstHonor:SetWidth(0);
+                button.EstWeekHonor:SetWidth(0);
 			end
 			button.LstWkHonor:SetText();
 			button.Standing:SetText();
@@ -140,13 +142,18 @@ function GUI:UpdateTableView()
 			end
 			button:SetID(itemIndex);
 			button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
-			button.Honor:SetText(colorize(thisWeekHonor, class));
+			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
+            button.Honor:SetText(colorize(thisWeekHonor, class));
 			if HonorSpy.db.factionrealm.estHonorCol.show then 
 				button.EstHonor:SetText(colorize(estHonor, class)); 
 				button.EstHonor:SetWidth(80);
+                button.EstWeekHonor:SetText(colorize((tonumber(estHonor) or 0) + (tonumber(thisWeekHonor) or 0), class));
+                button.EstWeekHonor:SetWidth(80);
 			else 
 				button.EstHonor:SetText();
 				button.EstHonor:SetWidth(0);
+                button.EstWeekHonor:SetText();
+                button.EstWeekHonor:SetWidth(0);
 			end
 			button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
 			button.Standing:SetText(colorize(standing, class));
@@ -181,7 +188,7 @@ function GUI:PrepareGUI()
 	_G["HonorSpyGUI_MainFrame"] = mainFrame
 	tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
 	mainFrame:SetTitle(L["HonorSpy Standings"])
-	if HonorSpy.db.factionrealm.estHonorCol.show then mainFrame:SetWidth(680) else mainFrame:SetWidth(600) end
+	if HonorSpy.db.factionrealm.estHonorCol.show then mainFrame:SetWidth(760) else mainFrame:SetWidth(600) end
 	mainFrame:SetLayout("List")
 	mainFrame:EnableResize(false)
 
@@ -225,6 +232,8 @@ function GUI:PrepareGUI()
 	tableHeader:AddChild(btn)
 
 	if HonorSpy.db.factionrealm.estHonorCol.show then
+        btn:SetText(colorize(L["KnownHonor"], "ORANGE"))
+
 		btn = AceGUI:Create("InteractiveLabel")
 		btn:SetCallback("OnClick", function()
 			GUI:Show(false, L["EstHonor"])
@@ -233,6 +242,15 @@ function GUI:PrepareGUI()
 		btn:SetWidth(80)
 		btn:SetText(colorize(L["EstHonor"], "ORANGE"))
 		tableHeader:AddChild(btn)
+        
+        btn = AceGUI:Create("InteractiveLabel")
+        btn:SetCallback("OnClick", function()
+            GUI:Show(false, L["ThisWeekHonor"])
+        end)
+        btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+        btn:SetWidth(80)
+        btn:SetText(colorize(L["ThisWeekHonor"], "ORANGE"))
+        tableHeader:AddChild(btn)
 	end
 
 	btn = AceGUI:Create("InteractiveLabel")
