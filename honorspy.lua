@@ -16,6 +16,7 @@ local last_test = time() - 300
 local checkingPlayers = false;
 local addingPlayer = false;
 local muteTimer = C_Timer.NewTimer(1,function () end)
+local lastPlayer
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -69,55 +70,7 @@ end
 local inspectedPlayers = {}; -- stores last_checked time of all players met
 local inspectedPlayerName = nil; -- name of currently inspected player
 
-local function StartInspecting(unitID)
-	local name, realm = UnitName(unitID);
-	if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
-		return
-	end
-    if realm and realm ~= "" and realm ~= GetRealmName() then
-        name = name.."-"..realm -- target on a connected realm
-        HonorSpy.db.factionrealm.connectedRealms[realm] = true
-    end
-	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
-		ClearInspectPlayer();
-		inspectedPlayerName = nil;
-	end
-	if (name == nil
-		or name == inspectedPlayerName
-		or not UnitIsPlayer(unitID)
-		or not UnitIsFriend("player", unitID)
-		or not CheckInteractDistance(unitID, 1)
-		or not CanInspect(unitID)) then
-		return
-	end
-	local player = HonorSpy.db.factionrealm.currentStandings[name] or inspectedPlayers[name];
-	if (player == nil) then
-		inspectedPlayers[name] = {last_checked = 0};
-		player = inspectedPlayers[name];
-	end
-	if (GetServerTime() - player.last_checked < 30) then -- 30 seconds until new inspection request
-		return
-	end
-	-- we gonna inspect new player, clear old one
-	ClearInspectPlayer();
-	inspectedPlayerName = name;
-	player.unitID = unitID;
-	NotifyInspect(unitID);
-	RequestInspectHonorData();
-	_, player.rank = GetPVPRankInfo(UnitPVPRank(player.unitID)); -- rank must be get asap while mouse is still over a unit
-	_, player.class = UnitClass(player.unitID); -- same
-end
-
-function HonorSpy:INSPECT_HONOR_UPDATE()
-	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
-		return;
-	end
-	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
-	if (player == nil) then return end
-	if (player.class == nil) then player.class = "nil" end
-
-	local todayHK, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
-	
+local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
     if (thisweekHK < 15) and (todayHK >= 15) then
         thisweekHK = todayHK
         thisWeekHonor = 1
@@ -130,10 +83,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		player.estHonor = HonorSpy.db.char.estimated_honor
 	end
 
-	player.rankProgress = GetInspectPVPRankProgress();
-	ClearInspectPlayer();
-	NotifyInspect("target"); -- change real target back to player's target, broken by prev NotifyInspect call
-	ClearInspectPlayer();
+	player.rankProgress = rankProgress
 	
 	player.last_checked = GetServerTime();
 	player.RP = 0;
@@ -144,15 +94,90 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 		elseif (player.rank == 2) then
 			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
 		end
-		if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
-			return
-		end
-		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
-		store_player(inspectedPlayerName, player)
-		broadcast(self:Serialize(inspectedPlayerName, player))
+		store_player(name, player)
+		broadcast(self:Serialize(name, player))
 	else
-		self.db.factionrealm.currentStandings[inspectedPlayerName] = nil
+		HonorSpy.db.factionrealm.currentStandings[name] = nil
 	end
+end
+
+local function StartInspecting(unitID)
+	local name, realm = UnitName(unitID);
+    
+    if unitID == "player" then
+        -- Instead of waiting for an inspect of self, we can use GetPVPSessionStats and GetPVPThisWeekStats
+        local player = HonorSpy.db.factionrealm.currentStandings[name]
+	    if (player == nil) then return end
+	    if (player.class == nil) then player.class = "nil" end
+
+	    local todayHK = GetPVPSessionStats()
+        local thisweekHK, thisWeekHonor = GetPVPThisWeekStats()
+        local _, _, lastWeekHonor, standing = GetPVPLastWeekStats()
+        local rankProgress = GetPVPRankProgress()
+	
+        processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+    else
+        if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
+            return
+        end
+       
+        if realm and realm ~= "" and realm ~= GetRealmName() then
+            name = name.."-"..realm -- target on a connected realm
+            HonorSpy.db.factionrealm.connectedRealms[realm] = true
+        end
+        if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
+            ClearInspectPlayer();
+            inspectedPlayerName = nil;
+        end
+        if (name == nil
+            or name == inspectedPlayerName
+		    or not UnitIsPlayer(unitID)
+		    or not UnitIsFriend("player", unitID)
+		    or not CheckInteractDistance(unitID, 1)
+		    or not CanInspect(unitID)) then
+		      return
+	    end
+    	local player = HonorSpy.db.factionrealm.currentStandings[name] or inspectedPlayers[name];
+    	if (player == nil) then
+    		inspectedPlayers[name] = {last_checked = 0};
+    		player = inspectedPlayers[name];
+    	end
+    	if (GetServerTime() - player.last_checked < 30) then -- 30 seconds until new inspection request
+    		return
+    	end
+    	-- we gonna inspect new player, clear old one
+    	ClearInspectPlayer();
+    	inspectedPlayerName = name;
+    	player.unitID = unitID;
+    	NotifyInspect(unitID);
+    	RequestInspectHonorData();
+    	_, player.rank = GetPVPRankInfo(UnitPVPRank(player.unitID)); -- rank must be get asap while mouse is still over a unit
+    	_, player.class = UnitClass(player.unitID); -- same
+    end
+end
+
+function HonorSpy:INSPECT_HONOR_UPDATE()
+	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
+		return;
+	end
+	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
+	if (player == nil) then return end
+	if (player.class == nil) then player.class = "nil" end
+
+	local todayHK, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
+    local rankProgress = GetInspectPVPRankProgress()
+	
+    if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
+		return
+	end
+	lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
+    
+    processInspect(player, inspectedPlayerName, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+    
+	ClearInspectPlayer();
+	NotifyInspect("target"); -- change real target back to player's target, broken by prev NotifyInspect call
+	ClearInspectPlayer();
+    
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
 	if callback then
