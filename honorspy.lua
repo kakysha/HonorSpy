@@ -79,7 +79,7 @@ local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, 
     player.thisWeekHonor = thisWeekHonor;
 	player.lastWeekHonor = lastWeekHonor;
 	player.standing = standing;
-	if ( inspectedPlayerName == playerName ) then
+	if ( name == playerName ) then
 		player.estHonor = HonorSpy.db.char.estimated_honor
 	end
 
@@ -95,7 +95,7 @@ local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, 
 			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
 		end
 		store_player(name, player)
-		broadcast(self:Serialize(name, player))
+		broadcast(HonorSpy:Serialize(name, player))
 	else
 		HonorSpy.db.factionrealm.currentStandings[name] = nil
 	end
@@ -106,7 +106,7 @@ local function StartInspecting(unitID)
     
     if unitID == "player" then
         -- Instead of waiting for an inspect of self, we can use GetPVPSessionStats and GetPVPThisWeekStats
-        local player = HonorSpy.db.factionrealm.currentStandings[name]
+        local player = HonorSpy.db.factionrealm.currentStandings[name] or {last_checked = 0, unitID = "player", rank = select(2, GetPVPRankInfo(UnitPVPRank("player"))), class = select(2, UnitClass("player")),}
 	    if (player == nil) then return end
 	    if (player.class == nil) then player.class = "nil" end
 
