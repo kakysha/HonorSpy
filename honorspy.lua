@@ -691,7 +691,6 @@ function HonorSpy:Purge()
 	inspectedPlayers = {};
 	HonorSpy.db.factionrealm.currentStandings={};
 	HonorSpy.db.factionrealm.fakePlayers={};
-	HonorSpy.db.char.original_honor = 0;
 	HonorSpyGUI:Reset();
 	HonorSpy:Print(L["All data was purged"]);
 end
@@ -749,19 +748,6 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 
 	-- reset weekly standings
 	local must_reset_on = getResetTime()
-	
-    -- Backward compatibility
-    if (HonorSpy.db.char.last_reset == 0) then
-        HonorSpy.db.char.last_reset = HonorSpy.db.factionrealm.last_reset or 0
-    end
-    
-    -- Reset just the characters totals
-    if (HonorSpy.db.char.last_reset ~= must_reset_on) then
-        HonorSpy.db.char.last_reset = must_reset_on
-		HonorSpy.db.char.original_honor = 0
-		HonorSpy.db.char.estimated_honor = 0
-		HonorSpy.db.char.today_kills = {}
-	end
     
     -- Reset the rest of the database only if it hasn't already been done on an alt this week
     if (HonorSpy.db.factionrealm.last_reset ~= must_reset_on) then
@@ -773,12 +759,6 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 	local _, thisWeekHonor = GetPVPThisWeekStats()
     if (HonorSpy.db.char.original_honor ~= thisWeekHonor) then
         HonorSpy.db.char.original_honor = thisWeekHonor
-        
-        -- backward compatibility
-        if HonorSpy.db.char.estimated_honor > thisWeekHonor then
-            return
-        end
-        
         HonorSpy.db.char.estimated_honor = thisWeekHonor
 		HonorSpy.db.char.today_kills = {}
 	end
