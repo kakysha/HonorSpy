@@ -1,4 +1,4 @@
-## Interface: 11401
+## Interface: 11402
 ## Title: HonorSpy
 
 ## Notes: Records PvP standings of all players
@@ -8,7 +8,7 @@
 
 ## Author: kakysha
 ## OptionalDeps: Ace3
-## Version: 1.7.20
+## Version: 1.8.1
 
 ## X-Category: Battlegrounds/PvP
 ## SavedVariables: HonorSpyDB

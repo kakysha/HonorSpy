@@ -16,6 +16,7 @@ local last_test = time() - 300
 local checkingPlayers = false;
 local addingPlayer = false;
 local muteTimer = C_Timer.NewTimer(1,function () end)
+local lastPlayer
 
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
@@ -69,43 +70,90 @@ end
 local inspectedPlayers = {}; -- stores last_checked time of all players met
 local inspectedPlayerName = nil; -- name of currently inspected player
 
+local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+    if (thisweekHK < 15) and (todayHK >= 15) then
+        thisweekHK = todayHK
+        thisWeekHonor = 1
+    end
+    
+    player.thisWeekHonor = thisWeekHonor;
+	player.lastWeekHonor = lastWeekHonor;
+	player.standing = standing;
+	if ( name == playerName ) then
+		player.estHonor = HonorSpy.db.char.estimated_honor
+	end
+
+	player.rankProgress = rankProgress
+	
+	player.last_checked = GetServerTime();
+	player.RP = 0;
+    
+    if (thisweekHK >= 15) then
+		if (player.rank >= 3) then
+			player.RP = math.ceil((player.rank-2) * 5000 + player.rankProgress * 5000)
+		elseif (player.rank == 2) then
+			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
+		end
+		store_player(name, player)
+		broadcast(HonorSpy:Serialize(name, player))
+	else
+		HonorSpy.db.factionrealm.currentStandings[name] = nil
+	end
+end
+
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
-	if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
-		return
-	end
-    if realm and realm ~= "" and realm ~= GetRealmName() then
-        name = name.."-"..realm -- target on a connected realm
-        HonorSpy.db.factionrealm.connectedRealms[realm] = true
+    
+    if unitID == "player" then
+        -- Instead of waiting for an inspect of self, we can use GetPVPSessionStats and GetPVPThisWeekStats
+        local player = HonorSpy.db.factionrealm.currentStandings[name] or {last_checked = 0, unitID = "player", rank = select(2, GetPVPRankInfo(UnitPVPRank("player"))), class = select(2, UnitClass("player")),}
+	    if (player == nil) then return end
+	    if (player.class == nil) then player.class = "nil" end
+
+	    local todayHK = GetPVPSessionStats()
+        local thisweekHK, thisWeekHonor = GetPVPThisWeekStats()
+        local _, _, lastWeekHonor, standing = GetPVPLastWeekStats()
+        local rankProgress = GetPVPRankProgress()
+	
+        processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+    else
+        if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
+            return
+        end
+       
+        if realm and realm ~= "" and realm ~= GetRealmName() then
+            name = name.."-"..realm -- target on a connected realm
+            HonorSpy.db.factionrealm.connectedRealms[realm] = true
+        end
+        if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
+            ClearInspectPlayer();
+            inspectedPlayerName = nil;
+        end
+        if (name == nil
+            or name == inspectedPlayerName
+		    or not UnitIsPlayer(unitID)
+		    or not UnitIsFriend("player", unitID)
+		    or not CheckInteractDistance(unitID, 1)
+		    or not CanInspect(unitID)) then
+		      return
+	    end
+    	local player = HonorSpy.db.factionrealm.currentStandings[name] or inspectedPlayers[name];
+    	if (player == nil) then
+    		inspectedPlayers[name] = {last_checked = 0};
+    		player = inspectedPlayers[name];
+    	end
+    	if (GetServerTime() - player.last_checked < 30) then -- 30 seconds until new inspection request
+    		return
+    	end
+    	-- we gonna inspect new player, clear old one
+    	ClearInspectPlayer();
+    	inspectedPlayerName = name;
+    	player.unitID = unitID;
+    	NotifyInspect(unitID);
+    	RequestInspectHonorData();
+    	_, player.rank = GetPVPRankInfo(UnitPVPRank(player.unitID)); -- rank must be get asap while mouse is still over a unit
+    	_, player.class = UnitClass(player.unitID); -- same
     end
-	if (name ~= inspectedPlayerName) then -- changed target, clear currently inspected player
-		ClearInspectPlayer();
-		inspectedPlayerName = nil;
-	end
-	if (name == nil
-		or name == inspectedPlayerName
-		or not UnitIsPlayer(unitID)
-		or not UnitIsFriend("player", unitID)
-		or not CheckInteractDistance(unitID, 1)
-		or not CanInspect(unitID)) then
-		return
-	end
-	local player = HonorSpy.db.factionrealm.currentStandings[name] or inspectedPlayers[name];
-	if (player == nil) then
-		inspectedPlayers[name] = {last_checked = 0};
-		player = inspectedPlayers[name];
-	end
-	if (GetServerTime() - player.last_checked < 30) then -- 30 seconds until new inspection request
-		return
-	end
-	-- we gonna inspect new player, clear old one
-	ClearInspectPlayer();
-	inspectedPlayerName = name;
-	player.unitID = unitID;
-	NotifyInspect(unitID);
-	RequestInspectHonorData();
-	_, player.rank = GetPVPRankInfo(UnitPVPRank(player.unitID)); -- rank must be get asap while mouse is still over a unit
-	_, player.class = UnitClass(player.unitID); -- same
 end
 
 function HonorSpy:INSPECT_HONOR_UPDATE()
@@ -117,42 +165,19 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	if (player.class == nil) then player.class = "nil" end
 
 	local todayHK, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
+    local rankProgress = GetInspectPVPRankProgress()
 	
-    if (thisweekHK < 15) and (todayHK >= 15) then
-        thisweekHK = todayHK
-        thisWeekHonor = 1
-    end
-    
-    player.thisWeekHonor = thisWeekHonor;
-	player.lastWeekHonor = lastWeekHonor;
-	player.standing = standing;
-	if ( inspectedPlayerName == playerName ) then
-		player.estHonor = HonorSpy.db.char.estimated_honor
+    if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
+		return
 	end
-
-	player.rankProgress = GetInspectPVPRankProgress();
+	lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
+    
+    processInspect(player, inspectedPlayerName, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+    
 	ClearInspectPlayer();
 	NotifyInspect("target"); -- change real target back to player's target, broken by prev NotifyInspect call
 	ClearInspectPlayer();
-	
-	player.last_checked = GetServerTime();
-	player.RP = 0;
     
-    if (thisweekHK >= 15) then
-		if (player.rank >= 3) then
-			player.RP = math.ceil((player.rank-2) * 5000 + player.rankProgress * 5000)
-		elseif (player.rank == 2) then
-			player.RP = math.ceil(player.rankProgress * 3000 + 2000)
-		end
-		if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
-			return
-		end
-		lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
-		store_player(inspectedPlayerName, player)
-		broadcast(self:Serialize(inspectedPlayerName, player))
-	else
-		self.db.factionrealm.currentStandings[inspectedPlayerName] = nil
-	end
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
 	if callback then
@@ -666,7 +691,6 @@ function HonorSpy:Purge()
 	inspectedPlayers = {};
 	HonorSpy.db.factionrealm.currentStandings={};
 	HonorSpy.db.factionrealm.fakePlayers={};
-	HonorSpy.db.char.original_honor = 0;
 	HonorSpyGUI:Reset();
 	HonorSpy:Print(L["All data was purged"]);
 end
@@ -724,19 +748,6 @@ function HonorSpy:CheckNeedReset(skipUpdate)
 
 	-- reset weekly standings
 	local must_reset_on = getResetTime()
-	
-    -- Backward compatibility
-    if (HonorSpy.db.char.last_reset == 0) then
-        HonorSpy.db.char.last_reset = HonorSpy.db.factionrealm.last_reset or 0
-    end
-    
-    -- Reset just the characters totals
-    if (HonorSpy.db.char.last_reset ~= must_reset_on) then
-        HonorSpy.db.char.last_reset = must_reset_on
-		HonorSpy.db.char.original_honor = 0
-		HonorSpy.db.char.estimated_honor = 0
-		HonorSpy.db.char.today_kills = {}
-	end
     
     -- Reset the rest of the database only if it hasn't already been done on an alt this week
     if (HonorSpy.db.factionrealm.last_reset ~= must_reset_on) then
@@ -744,16 +755,31 @@ function HonorSpy:CheckNeedReset(skipUpdate)
     	HonorSpy:ResetWeek()
     end
     
+    --[[
+        There are a few different use cases around players daily and weekly honor resetting:
+        1. 
+            Player earns honor on day 1.
+            On day 2 the player logs in and their honor has rolled over into "yesterday" and "this week", and their "today" honor has reset back to zero.
+            On day 3 is the Tuesday/Wednesday reset and the player logs in, their "this week" honor has rolled over into "last week", and their "today" and "this week" honor has reset back to zero.
+        2.
+            Player earns honor on day 1.
+            On day 2 the nightly calculation never worked, the honor they earned the day before is still under "today" unchanged, same with "this week".
+            On day 3 the Tuesday/Wednesday reset happens and their honor catches up, rolls over into "last week", and their "today" and "this week" honor has reset back to zero.
+        3.
+            Player earns honor on day 1.
+            On day 2 the nightly calculation fails. "this week" is still zero.
+            On day 3 the weekly calculation fails. The player still has all the honor they earned the week before under "today" and "this week" still says zero.
+        4.
+            As with (3) except the nightly calculation succeeds instead of the weekly calculation. The players "today" honor moves into "this week".
+            
+        -- this algorithm fails scenario (3). That scenario is at least the rarest issue, so may just have to tolerate it.
+    --]]
+    
 	-- reset daily honor
 	local _, thisWeekHonor = GetPVPThisWeekStats()
-    if (HonorSpy.db.char.original_honor ~= thisWeekHonor) then
+    if (HonorSpy.db.char.original_honor ~= thisWeekHonor) or (HonorSpy.db.char.last_reset ~= must_reset_on) then
+        HonorSpy.db.char.last_reset = must_reset_on
         HonorSpy.db.char.original_honor = thisWeekHonor
-        
-        -- backward compatibility
-        if HonorSpy.db.char.estimated_honor > thisWeekHonor then
-            return
-        end
-        
         HonorSpy.db.char.estimated_honor = thisWeekHonor
 		HonorSpy.db.char.today_kills = {}
 	end
