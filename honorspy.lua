@@ -755,9 +755,30 @@ function HonorSpy:CheckNeedReset(skipUpdate)
     	HonorSpy:ResetWeek()
     end
     
+    --[[
+        There are a few different use cases around players daily and weekly honor resetting:
+        1. 
+            Player earns honor on day 1.
+            On day 2 the player logs in and their honor has rolled over into "yesterday" and "this week", and their "today" honor has reset back to zero.
+            On day 3 is the Tuesday/Wednesday reset and the player logs in, their "this week" honor has rolled over into "last week", and their "today" and "this week" honor has reset back to zero.
+        2.
+            Player earns honor on day 1.
+            On day 2 the nightly calculation never worked, the honor they earned the day before is still under "today" unchanged, same with "this week".
+            On day 3 the Tuesday/Wednesday reset happens and their honor catches up, rolls over into "last week", and their "today" and "this week" honor has reset back to zero.
+        3.
+            Player earns honor on day 1.
+            On day 2 the nightly calculation fails. "this week" is still zero.
+            On day 3 the weekly calculation fails. The player still has all the honor they earned the week before under "today" and "this week" still says zero.
+        4.
+            As with (3) except the nightly calculation succeeds instead of the weekly calculation. The players "today" honor moves into "this week".
+            
+        -- this algorithm fails scenario (3). That scenario is at least the rarest issue, so may just have to tolerate it.
+    --]]
+    
 	-- reset daily honor
 	local _, thisWeekHonor = GetPVPThisWeekStats()
-    if (HonorSpy.db.char.original_honor ~= thisWeekHonor) then
+    if (HonorSpy.db.char.original_honor ~= thisWeekHonor) or (HonorSpy.db.char.last_reset ~= must_reset_on) then
+        HonorSpy.db.char.last_reset = must_reset_on
         HonorSpy.db.char.original_honor = thisWeekHonor
         HonorSpy.db.char.estimated_honor = thisWeekHonor
 		HonorSpy.db.char.today_kills = {}
