@@ -231,11 +231,11 @@ end
 
 -- this is called after eventg	ww
 function CHAT_MSG_COMBAT_HONOR_GAIN_FILTER(_s, e, msg, ...)
-	HonorSpy:CheckNeedReset()
 	local victim, est_honor, awarded_honor = parseHonorMessage(msg)
 	if (not victim) then
 		return
 	end
+    C_Timer.After(1, HonorSpy.CheckNeedReset) -- At this point, GetPVPSessionStats() hasn't always yet updated with the new HK
 	return false, format("%s kills: %d, honor: |cff00FF96%d", msg, HonorSpy.db.char.today_kills[victim] or 0, est_honor), ...
 end
 
