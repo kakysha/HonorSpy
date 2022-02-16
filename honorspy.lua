@@ -101,6 +101,9 @@ local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, 
 	end
 end
 
+-- store the last checked details about the player, so we can only re-broadcast if something actually changed, or enough time has passed
+local lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked
+
 local function StartInspecting(unitID)
 	local name, realm = UnitName(unitID);
     
@@ -114,8 +117,18 @@ local function StartInspecting(unitID)
         local thisweekHK, thisWeekHonor = GetPVPThisWeekStats()
         local _, _, lastWeekHonor, standing = GetPVPLastWeekStats()
         local rankProgress = GetPVPRankProgress()
-	
-        processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+
+        if (lastPlayerTodayHK ~= todayHK) or
+            (lastPlayerEstHonor ~= player.estHonor) or
+            (lastPlayerThisweekHK ~= thisweekHK) or
+            (lastPlayerThisWeekHonor ~= thisWeekHonor) or
+            (lastPlayerLastWeekHonor ~= lastWeekHonor) or
+            (lastPlayerStanding ~= standing) or
+            (lastPlayerRankProgress ~= rankProgress) or
+            (lastPlayerChecked and ((GetServerTime() - lastPlayerChecked) < 60)) then
+                processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
+                lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked = todayHK, player.estHonor, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress, GetServerTime()
+        end
     else
         if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
             return
