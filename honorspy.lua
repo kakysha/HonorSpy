@@ -125,7 +125,7 @@ local function StartInspecting(unitID)
             (lastPlayerLastWeekHonor ~= lastWeekHonor) or
             (lastPlayerStanding ~= standing) or
             (lastPlayerRankProgress ~= rankProgress) or
-            (lastPlayerChecked and ((GetServerTime() - lastPlayerChecked) < 60)) then
+            (lastPlayerChecked and ((GetServerTime() - lastPlayerChecked) > 60)) then
                 processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
                 lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked = todayHK, player.estHonor, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress, GetServerTime()
         end
