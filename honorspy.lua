@@ -133,6 +133,9 @@ local function StartInspecting(unitID)
         if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
             return
         end
+        
+        -- Disable inspections while in a BG
+        if C_PvP.IsPVPMap() then return end
        
         if realm and realm ~= "" and realm ~= GetRealmName() then
             name = name.."-"..realm -- target on a connected realm
