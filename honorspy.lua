@@ -65,6 +65,8 @@ function HonorSpy:OnInitialize()
 	HonorSpyGUI:PrepareGUI()
 	PrintWelcomeMsg();
 	DBHealthCheck()
+
+	C_Timer.NewTicker(60*60, function() HonorSpy:broadcastPlayers(true) end)
 end
 
 local inspectedPlayers = {}; -- stores last_checked time of all players met
