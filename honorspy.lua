@@ -301,6 +301,17 @@ local options = {
 			get = false,
 			set = function(info, playerName) HonorSpy:Report(playerName) end
 		},
+		pool = {
+			type = 'input',
+			name = L['Poolsize'],
+			desc = L['Set the number of boosted character in the pool'],
+			usage = L['Number of booster character in the pool'],
+			pattern = "%d",
+			get = false,
+			set = function(info, count)
+				HonorSpy.db.factionrealm.poolBoost = tonumber(count)
+			end
+		},
 	}
 }
 LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", "hs"})
