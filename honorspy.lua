@@ -29,6 +29,7 @@ function HonorSpy:OnInitialize()
 			fakePlayers = {},
 			goodPlayers = {},
 			poolBoost = 0,
+			spreadPoolBoostOverWeek = true,
 			isSom = false,
 			som_Checked = false,
             connectedRealms = {},
@@ -326,15 +327,20 @@ function HonorSpy:BuildStandingsTable(sort_by)
 end
 
 -- REPORT
-function HonorSpy:GetPoolBoostForToday() -- estimates pool boost to the date (as final pool boost should be only achieved at the end of the week)
-	return  math.floor((GetServerTime() - HonorSpy.db.char.last_reset) / (7*24*60*60) * (HonorSpy.db.factionrealm.poolBoost or 0)+.5)
+function HonorSpy:GetPoolBoostCount()
+	-- estimates pool boost to the date (as final pool boost should be only achieved at the end of the week)
+	if (HonorSpy.db.factionrealm.spreadPoolBoostOverWeek) then
+		return  math.floor((GetServerTime() - HonorSpy.db.char.last_reset) / (7*24*60*60) * (HonorSpy.db.factionrealm.poolBoost or 0)+.5)
+	end
+
+	return HonorSpy.db.factionrealm.poolBoost
 end
 
 function HonorSpy:GetBrackets(pool_size)
 			  -- 1   2       3      4	  5		 6		7	   8		9	 10		11		12		13	14
 	local brk =  {1, 0.845, 0.697, 0.566, 0.436, 0.327, 0.228, 0.159, 0.100, 0.060, 0.035, 0.020, 0.008, 0.003} -- brackets percentage
 	
-	pool_size = pool_size + HonorSpy:GetPoolBoostForToday()
+	pool_size = pool_size + HonorSpy:GetPoolBoostCount()
 
 	if (not pool_size) then
 		return brk
