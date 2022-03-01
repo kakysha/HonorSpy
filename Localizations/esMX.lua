@@ -29,6 +29,8 @@ L["Player %s not found in table"] = "No se encuentra el jugador %s en la tabla"
 
 L["Pool Booster Count"] = "Recuento de potenciadores de grupo"
 L["Number of characters to add to Pool"] = "Número de jugadores para agregar al grupo"
+L["Spread the poolboost count over the week"] = true
+L["As final pool boost should be only achieved at the end of the week"] = true
 
 L["Report"] = "Informar"
 L["Report for player"] = "Informa para jugador"
