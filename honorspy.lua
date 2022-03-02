@@ -176,6 +176,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
 		return;
 	end
+
 	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
 	if (player == nil) then return end
 	if (player.class == nil) then player.class = "nil" end
@@ -316,9 +317,16 @@ function HonorSpy:BuildStandingsTable(sort_by)
     if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
 	if (sort_by == L["Standing"]) then sort_column = 5; end
 	if (sort_by == L["Rank"]) then sort_column = 7; end
+    if (sort_by == L["Name"]) then sort_column = 1; end
 	local sort_func = function(a,b)
+        if sort_column == 1 then return a[1] < b[1] end
 		if sort_column == 4 then return math.max(a[3],tonumber(a[4]) or 0) > math.max(b[3],tonumber(b[4]) or 0) end
         if sort_column == -1 then return (a[3] + (tonumber(a[4]) or 0)) > (b[3] + (tonumber(b[4]) or 0)) end
+        if sort_column == 5 then
+            if a[5] == b[5] then
+                return a[6] < b[6]
+            end
+        end
 		return a[sort_column] > b[sort_column]
 	end
 	table.sort(t, sort_func)
