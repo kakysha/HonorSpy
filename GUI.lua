@@ -46,7 +46,7 @@ function GUI:Show(skipUpdate, sort_column)
 		poolSizeText = format(
 			L['Natural Pool Size'] .. ":" .. colorize(' %d', "RED") .. " - " .. 
 			L['Boosted Pool Size'] .. ":" .. colorize(' %d', "GREEN"), 
-			#rows, #rows + HonorSpy:GetPoolBoostForToday())
+			#rows, #rows + HonorSpy:GetPoolBoostCount())
 	else
 		poolSizeText = format(
 			L['Pool Size'] .. ":" .. colorize(' %d', "ORANGE"),#rows)
