@@ -141,7 +141,11 @@ function GUI:UpdateTableView()
 				last_seen_human = ""..last_seen..L["s"]
 			end
 			button:SetID(itemIndex);
-			button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
+			local trimmedName = name
+            if trimmedName:find("-") then
+                 trimmedName = trimmedName:sub(0, trimmedName:find("-") + 1)
+            end
+            button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(trimmedName, class));
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
             button.Honor:SetText(colorize(thisWeekHonor, class));
 			if HonorSpy.db.factionrealm.estHonorCol.show then 
@@ -218,6 +222,10 @@ function GUI:PrepareGUI()
 	mainFrame:AddChild(tableHeader)
 
 	local btn = AceGUI:Create("InteractiveLabel")
+    btn:SetCallback("OnClick", function()
+			GUI:Show(false, L["Name"])
+		end)
+		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(150)
 	btn:SetText(colorize(L["Name"], "ORANGE"))
 	tableHeader:AddChild(btn)
