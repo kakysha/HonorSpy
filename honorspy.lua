@@ -590,6 +590,10 @@ end
 -- Broadcast on death
 local last_send_time = 0;
 function HonorSpy:PLAYER_DEAD()
+	HonorSpy:broadcastPlayers(true)
+end
+
+function HonorSpy:broadcastPlayers(skipYell)
 	local filtered_players, count = {}, 0;
 	if (time() - last_send_time < 10*60) then return end;
 	last_send_time = time();
@@ -598,12 +602,12 @@ function HonorSpy:PLAYER_DEAD()
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
-			broadcast(self:Serialize("filtered_players", filtered_players), true)
+			broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
 			filtered_players, count = {}, 0;
 		end
 	end
 	if (count > 0) then
-		broadcast(self:Serialize("filtered_players", filtered_players), true)
+		broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
 	end
 end
 
