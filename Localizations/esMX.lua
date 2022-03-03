@@ -31,6 +31,9 @@ L["Pool Booster Count"] = "Recuento de potenciadores de grupo"
 L["Number of characters to add to Pool"] = "Número de jugadores para agregar al grupo"
 L["Spread the poolboost count over the week"] = true
 L["As final pool boost should be only achieved at the end of the week"] = true
+L['Poolsize'] = true
+L['Set the number of boosted character in the pool'] = true
+L['Number of booster character in the pool'] = true
 
 L["Report"] = "Informar"
 L["Report for player"] = "Informa para jugador"
