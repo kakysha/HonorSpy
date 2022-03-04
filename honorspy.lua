@@ -844,7 +844,7 @@ function DrawMinimapIcon()
 			if (button == "RightButton") then
 				HonorSpy:Report()
 			elseif (button == "MiddleButton") then
-				HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
+				HonorSpy:Report(UnitIsPlayer("target") and GetUnitName("target", true) or nil)
 			else 
 				HonorSpy:CheckNeedReset()
 				HonorSpyGUI:Toggle()
