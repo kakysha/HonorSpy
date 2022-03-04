@@ -211,7 +211,7 @@ function GUI:PrepareGUI()
 	reportBtn:SetRelativeWidth(0.19)
 	reportBtn.text:SetFontObject("SystemFont_NamePlate")
 	reportBtn:SetCallback("OnClick", function()
-		HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
+		HonorSpy:Report(UnitIsPlayer("target") and GetUnitName("target", true) or nil)
 	end)
 	playerStandingsGrp:AddChild(reportBtn)
 
