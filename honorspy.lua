@@ -108,6 +108,7 @@ end
 local lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked
 
 local function StartInspecting(unitID)
+    if not UnitPlayerControlled(unitID) then return end
 	local name, realm = UnitName(unitID);
     
     if unitID == "player" then
