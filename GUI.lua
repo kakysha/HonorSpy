@@ -141,11 +141,9 @@ function GUI:UpdateTableView()
 				last_seen_human = ""..last_seen..L["s"]
 			end
 			button:SetID(itemIndex);
-			local trimmedName = name
-            if trimmedName:find("-") then
-                 trimmedName = trimmedName:sub(0, trimmedName:find("-") + 1)
-            end
-            button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(trimmedName, class));
+            button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
+            button.Name:SetNonSpaceWrap(false)
+            button.Name:SetWordWrap(false)
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
             button.Honor:SetText(colorize(thisWeekHonor, class));
 			if HonorSpy.db.factionrealm.estHonorCol.show then 
