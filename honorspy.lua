@@ -108,6 +108,7 @@ end
 local lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked
 
 local function StartInspecting(unitID)
+    if not UnitPlayerControlled(unitID) then return end
 	local name, realm = UnitName(unitID);
     
     if unitID == "player" then
@@ -176,6 +177,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	if (inspectedPlayerName == nil or paused or not HasInspectHonorData()) then
 		return;
 	end
+
 	local player = self.db.factionrealm.currentStandings[inspectedPlayerName] or inspectedPlayers[inspectedPlayerName];
 	if (player == nil) then return end
 	if (player.class == nil) then player.class = "nil" end
@@ -327,9 +329,16 @@ function HonorSpy:BuildStandingsTable(sort_by)
     if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
 	if (sort_by == L["Standing"]) then sort_column = 5; end
 	if (sort_by == L["Rank"]) then sort_column = 7; end
+    if (sort_by == L["Name"]) then sort_column = 1; end
 	local sort_func = function(a,b)
+        if sort_column == 1 then return a[1] < b[1] end
 		if sort_column == 4 then return math.max(a[3],tonumber(a[4]) or 0) > math.max(b[3],tonumber(b[4]) or 0) end
         if sort_column == -1 then return (a[3] + (tonumber(a[4]) or 0)) > (b[3] + (tonumber(b[4]) or 0)) end
+        if sort_column == 5 then
+            if a[5] == b[5] then
+                return a[6] < b[6]
+            end
+        end
 		return a[sort_column] > b[sort_column]
 	end
 	table.sort(t, sort_func)
@@ -366,8 +375,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
 	end
-	playerOfInterest = string.utf8upper(string.utf8sub(playerOfInterest, 1, 1))..string.utf8lower(string.utf8sub(playerOfInterest, 2))
-
+	playerOfInterest = string.utf8lower(playerOfInterest)
 	
 	local standing = -1;
 	local t = HonorSpy:BuildStandingsTable(L["ThisWeekHonor"])
@@ -377,8 +385,9 @@ function HonorSpy:Estimate(playerOfInterest)
 	local decay_factor = 0.8;
 	
 	for i = 1, pool_size do
-		if (playerOfInterest == t[i][1]) then
+		if (playerOfInterest == string.utf8lower(t[i][1])) then
 			standing = i
+            playerOfInterest = t[i][1]
 			curHonor = math.max(t[i][3], tonumber(t[i][4]) or 0)
 		end
 	end
@@ -835,7 +844,7 @@ function DrawMinimapIcon()
 			if (button == "RightButton") then
 				HonorSpy:Report()
 			elseif (button == "MiddleButton") then
-				HonorSpy:Report(UnitIsPlayer("target") and UnitName("target") or nil)
+				HonorSpy:Report(UnitIsPlayer("target") and GetUnitName("target", true) or nil)
 			else 
 				HonorSpy:CheckNeedReset()
 				HonorSpyGUI:Toggle()
