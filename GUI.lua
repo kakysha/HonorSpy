@@ -143,7 +143,8 @@ function GUI:UpdateTableView()
 			button:SetID(itemIndex);
 			local trimmedName = name
             if trimmedName:find("-") then
-                 trimmedName = trimmedName:sub(0, trimmedName:find("-") + 1)
+                local nameLen = strsplit("-", trimmedName):len()
+                trimmedName = trimmedName:sub(0, trimmedName:find("-") + 1 + (12-nameLen))
             end
             button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(trimmedName, class));
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
