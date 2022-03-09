@@ -100,6 +100,7 @@ function GUI:UpdateTableView()
 	local buttons = HybridScrollFrame_GetButtons(scroll);
 	local offset = HybridScrollFrame_GetOffset(scroll);
 	local brk_delim_inserted = false
+	local bracketSeparatorButtonDisplayedCount = 0;
 
 	for buttonIndex = 1, #buttons do
 		local button = buttons[buttonIndex];
@@ -127,7 +128,8 @@ function GUI:UpdateTableView()
 			button.Background:SetTexture("Interface/Glues/CharacterCreate/CharacterCreateMetalFrameHorizontal")
 			button.Highlight:SetTexture()
 			button:Show();
-		
+			bracketSeparatorButtonDisplayedCount = bracketSeparatorButtonDisplayedCount + 1
+
 		elseif (itemIndex <= #rows) then
 			local name, class, thisWeekHonor, estHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
 			local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
@@ -178,7 +180,7 @@ function GUI:UpdateTableView()
 	end
 
 	local buttonHeight = scroll.buttonHeight;
-	local totalHeight = #rows * buttonHeight;
+	local totalHeight = (#rows + bracketSeparatorButtonDisplayedCount) * buttonHeight
 	local shownHeight = #buttons * buttonHeight;
 
 	HybridScrollFrame_Update(scroll, totalHeight, shownHeight);
