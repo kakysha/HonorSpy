@@ -883,6 +883,51 @@ local function DBHealthCheck()
 	HS_wait(5, function() startRemovingFakes = true; HonorSpy:TestNextFakePlayer(); end)
 end
 
+function HonorSpy:CombineConnectedRealms()
+    local currentRealm = GetRealmName()
+    local connectedRealms = HonorSpy.db.factionrealm.connectedRealms -- {["Felstriker"] = true, ["Yojamba"] = true,}
+    local currentfactionrealm = HonorSpyDB.factionrealm[UnitFactionGroup("player").." - "..currentRealm].currentStandings
+    
+    for connectedRealm in pairs(connectedRealms) do
+        if HonorSpyDB.factionrealm[UnitFactionGroup("player").." - "..connectedRealm] then
+            local connectedfactionrealm = HonorSpyDB.factionrealm[UnitFactionGroup("player").." - "..connectedRealm].currentStandings
+        
+            for namerealm, data in pairs(connectedfactionrealm) do
+                if namerealm:find("%-") then 
+                    local _, _, name, realm = namerealm:find("(%a+)%-(%a+)")
+                    if not realm or realm == "" or not name or name == "" then print("error 1") return end
+                    if realm == currentRealm then
+                        -- Example here: Player is from Arugal, message is from Felstriker, about a character on Arugal
+                        -- Lets just remove the bit about Arugal
+                        namerealm = name
+                        -- If the realm name does not match: Player is from Arugal, message is from Felstriker, about a character on Yojamba
+                        -- In this case just allow it as is
+                    end
+                else
+                    -- Example here: Player is from Arugal, message is from Felstriker, about a character on Felstriker
+                    -- Add "-Felstriker" to the name
+                    namerealm = namerealm.."-"..connectedRealm
+                end
+                
+                local exists = false
+                for namerealm2, data2 in pairs(currentfactionrealm) do
+                    if namerealm == namerealm2 then
+                        if data.last_checked < data2.last_checked then
+                            currentfactionrealm[namerealm] = data2
+                        end
+                        exists = true
+                        break
+                    end
+                end
+                
+                if not exists then
+                    currentfactionrealm[namerealm] = data
+                end
+            end
+        end
+    end
+end
+
 function HonorSpy:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("HonorSpyDB", {
 		factionrealm = {
