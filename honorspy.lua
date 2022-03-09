@@ -56,6 +56,7 @@ function HonorSpy:OnInitialize()
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
 	self:RegisterEvent("INSPECT_HONOR_UPDATE");
 	self:RegisterEvent("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_EVENT);
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", COMBAT_LOG_EVENT_UNFILTERED_EVENT);
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_HONOR_GAIN", CHAT_MSG_COMBAT_HONOR_GAIN_FILTER);
 	self:RegisterComm(commPrefix, "OnCommReceive")
 	self:RegisterEvent("PLAYER_DEAD");
@@ -204,6 +205,19 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	end
 end
 
+local realmCache = {}
+function COMBAT_LOG_EVENT_UNFILTERED_EVENT(e)
+    if not UnitIsPVP("player") then return end
+    
+    local _, _, _, _, _, _, _, destGUID = CombatLogGetCurrentEventInfo()
+    if destGUID == nil or destGUID == "" or destGUID == " " then return end
+    
+    local _, _, _, _, _, name, realm = GetPlayerInfoByGUID(destGUID)
+    if not name then return end
+    
+    realmCache[name] = realm
+end
+
 -- parse message
 -- COMBATLOG_HONORGAIN = "%s dies, honorable kill Rank: %s (Estimated Honor Points: %d)";
 -- COMBATLOG_HONORAWARD = "You have been awarded %d honor points.";
@@ -214,6 +228,11 @@ local function parseHonorMessage(msg)
 	honor_gain_pattern = string.gsub(honor_gain_pattern, "(%%d)", "(%%d+)")
     local victim, rank, est_honor = msg:match(honor_gain_pattern)
     if (victim) then
+        if not victim:find("-") then
+            if realmCache[victim] and realmCache[victim] ~= "" and realmCache[victim] ~= GetRealmName() then
+                victim = victim.."-"..realmCache[victim]
+            end
+        end
     	est_honor = math.max(0, math.floor(est_honor * (1-0.10*((HonorSpy.db.char.today_kills[victim] or 1)-1)) + 0.5))
     end
 
