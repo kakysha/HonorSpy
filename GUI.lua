@@ -127,7 +127,7 @@ function GUI:UpdateTableView()
 			button.Background:SetTexture("Interface/Glues/CharacterCreate/CharacterCreateMetalFrameHorizontal")
 			button.Highlight:SetTexture()
 			button:Show();
-		
+
 		elseif (itemIndex <= #rows) then
 			local name, class, thisWeekHonor, estHonor, lastWeekHonor, standing, RP, rank, last_checked = unpack(rows[itemIndex])
 			local last_seen, last_seen_human = (GetServerTime() - last_checked), ""
@@ -146,12 +146,16 @@ function GUI:UpdateTableView()
             button.Name:SetWordWrap(false)
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
             button.Honor:SetText(colorize(thisWeekHonor, class));
-			if HonorSpy.db.factionrealm.estHonorCol.show then 
-				button.EstHonor:SetText(colorize(estHonor, class)); 
+			if HonorSpy.db.factionrealm.estHonorCol.show then
 				button.EstHonor:SetWidth(80);
-                button.EstWeekHonor:SetText(colorize((tonumber(estHonor) or 0) + (tonumber(thisWeekHonor) or 0), class));
                 button.EstWeekHonor:SetWidth(80);
-			else 
+				if (tonumber(estHonor) ~= nil) then
+					local estTodayHonor = estHonor - thisWeekHonor
+					if (estTodayHonor < 0) then estTodayHonor = 0 end
+					button.EstHonor:SetText(colorize(estTodayHonor, class));
+					button.EstWeekHonor:SetText(colorize(estHonor, class));
+				end
+			else
 				button.EstHonor:SetText();
 				button.EstHonor:SetWidth(0);
                 button.EstWeekHonor:SetText();
