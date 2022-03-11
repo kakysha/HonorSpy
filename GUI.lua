@@ -85,7 +85,7 @@ function GUI:Toggle()
 	if (mainFrame and mainFrame:IsShown()) then
 		GUI:Hide()
 	else
-		GUI:Show(false, L["EstHonor"])
+		GUI:Show(false, L["ThisWeekHonor"])
 	end
 end
 
@@ -113,11 +113,14 @@ function GUI:UpdateTableView()
             button.EstHonor:SetText();
             button.EstWeekHonor:SetText();
 			if HonorSpy.db.factionrealm.estHonorCol.show then
-				button.EstHonor:SetWidth(80);
                 button.EstWeekHonor:SetWidth(80);
 			else
-				button.EstHonor:SetWidth(0);
                 button.EstWeekHonor:SetWidth(0);
+			end
+            if HonorSpy.db.factionrealm.estTodayHonorCol.show then
+				button.EstHonor:SetWidth(80);
+			else
+				button.EstHonor:SetWidth(0);
 			end
 			button.LstWkHonor:SetText();
 			button.Standing:SetText();
@@ -147,26 +150,36 @@ function GUI:UpdateTableView()
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
             button.Honor:SetText(colorize(thisWeekHonor, class));
 			if HonorSpy.db.factionrealm.estHonorCol.show then
-				button.EstHonor:SetWidth(80);
-                button.EstWeekHonor:SetWidth(80);
+                button.EstWeekHonor:SetWidth(100);
 				if (tonumber(estHonor) ~= nil) then
 					local estTodayHonor = estHonor - thisWeekHonor
 					-- This may happen when blizz value is up to date but estimation is not
 					if (estTodayHonor < 0) then
-						estHonor = thisWeekHonor
-						estTodayHonor = 0
-					end
-					button.EstHonor:SetText(colorize(estTodayHonor, class));
+                        estHonor = thisWeekHonor  
+                    end
 					button.EstWeekHonor:SetText(colorize(estHonor, class));
 				else
-					button.EstHonor:SetText();
 					button.EstWeekHonor:SetText();
+				end
+			else
+				button.EstWeekHonor:SetText();
+                button.EstWeekHonor:SetWidth(0);
+			end
+            if HonorSpy.db.factionrealm.estTodayHonorCol.show then
+				button.EstHonor:SetWidth(100);
+				if (tonumber(estHonor) ~= nil) then
+					local estTodayHonor = estHonor - thisWeekHonor
+					-- This may happen when blizz value is up to date but estimation is not
+					if (estTodayHonor < 0) then 
+                        estTodayHonor = 0 
+                    end
+					button.EstHonor:SetText(colorize(estTodayHonor, class));
+				else
+					button.EstHonor:SetText();
 				end
 			else
 				button.EstHonor:SetText();
 				button.EstHonor:SetWidth(0);
-				button.EstWeekHonor:SetText();
-                button.EstWeekHonor:SetWidth(0);
 			end
 			button.LstWkHonor:SetText(colorize(lastWeekHonor, class));
 			button.Standing:SetText(colorize(standing, class));
@@ -201,7 +214,10 @@ function GUI:PrepareGUI()
 	_G["HonorSpyGUI_MainFrame"] = mainFrame
 	tinsert(UISpecialFrames, "HonorSpyGUI_MainFrame")	-- allow ESC close
 	mainFrame:SetTitle(L["HonorSpy Standings"])
-	if HonorSpy.db.factionrealm.estHonorCol.show then mainFrame:SetWidth(760) else mainFrame:SetWidth(600) end
+    local pixels = 600
+    if HonorSpy.db.factionrealm.estHonorCol.show then pixels = 700 end
+    if HonorSpy.db.factionrealm.estTodayHonorCol.show then pixels = pixels + 100 end
+    mainFrame:SetWidth(pixels)
 	mainFrame:SetLayout("List")
 	mainFrame:EnableResize(false)
 
@@ -239,33 +255,37 @@ function GUI:PrepareGUI()
 	btn:SetText(colorize(L["Name"], "ORANGE"))
 	tableHeader:AddChild(btn)
 
-	btn = AceGUI:Create("InteractiveLabel")
-	btn:SetCallback("OnClick", function()
+	local knownHonorbtn = AceGUI:Create("InteractiveLabel")
+	knownHonorbtn:SetCallback("OnClick", function()
 		GUI:Show(false, L["Honor"])
 	end)
-	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-	btn:SetWidth(80)
-	btn:SetText(colorize(L["Honor"], "ORANGE"))
-	tableHeader:AddChild(btn)
-
-	if HonorSpy.db.factionrealm.estHonorCol.show then
-        btn:SetText(colorize(L["KnownHonor"], "ORANGE"))
+	knownHonorbtn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
+	knownHonorbtn:SetWidth(80)
+	knownHonorbtn:SetText(colorize(L["Honor"], "ORANGE"))
+	tableHeader:AddChild(knownHonorbtn)
+    
+	if HonorSpy.db.factionrealm.estTodayHonorCol.show then
+        knownHonorbtn:SetText(colorize(L["KnownHonor"], "ORANGE"))
 
 		btn = AceGUI:Create("InteractiveLabel")
 		btn:SetCallback("OnClick", function()
 			GUI:Show(false, L["EstHonor"])
 		end)
 		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-		btn:SetWidth(80)
+		btn:SetWidth(100)
 		btn:SetText(colorize(L["EstHonor"], "ORANGE"))
 		tableHeader:AddChild(btn)
+	end
+
+    if HonorSpy.db.factionrealm.estHonorCol.show then
+        knownHonorbtn:SetText(colorize(L["KnownHonor"], "ORANGE"))
         
         btn = AceGUI:Create("InteractiveLabel")
         btn:SetCallback("OnClick", function()
             GUI:Show(false, L["ThisWeekHonor"])
         end)
         btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
-        btn:SetWidth(80)
+        btn:SetWidth(100)
         btn:SetText(colorize(L["ThisWeekHonor"], "ORANGE"))
         tableHeader:AddChild(btn)
 	end

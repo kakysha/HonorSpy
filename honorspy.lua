@@ -366,19 +366,39 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", 
 function HonorSpy:BuildStandingsTable(sort_by)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		table.insert(t, {playerName, player.class, player.thisWeekHonor or 0, player.estHonor or "", player.lastWeekHonor or 0, player.standing or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
+		table.insert(t, {playerName, player.class, tonumber(player.thisWeekHonor) or 0, tonumber(player.estHonor) or 0, tonumber(player.lastWeekHonor) or 0, tonumber(player.standing) or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
 	end
 	
-	local sort_column = 3; -- ThisWeekHonor
+	local sort_column = 3; -- KnownHonor
 	if (sort_by == L["EstHonor"]) then sort_column = 4; end
     if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
 	if (sort_by == L["Standing"]) then sort_column = 5; end
-	if (sort_by == L["Rank"]) then sort_column = 7; end
+	if (sort_by == L["Rank"]) then sort_column = 8; end
     if (sort_by == L["Name"]) then sort_column = 1; end
 	local sort_func = function(a,b)
         if sort_column == 1 then return a[1] < b[1] end
-		if sort_column == 4 then return math.max(a[3],tonumber(a[4]) or 0) > math.max(b[3],tonumber(b[4]) or 0) end
-        if sort_column == -1 then return (a[3] + (tonumber(a[4]) or 0)) > (b[3] + (tonumber(b[4]) or 0)) end
+		if sort_column == 4 then
+            local c = a[4]-a[3]
+            if c < 0 then c = 0 end
+            local d = b[4]-b[3]
+            if d < 0 then d = 0 end
+            return c > d 
+        end
+        if sort_column == -1 then
+            local c = a[4]-a[3]
+            if c < 0 then
+                c = a[3]
+            else
+                c = a[4]
+            end
+            local d = b[4]-b[3]
+            if d < 0 then
+                d = b[3]
+            else
+                d = b[4]
+            end
+            return c > d
+        end
         if sort_column == 5 then
             if a[5] == b[5] then
                 return a[6] < b[6]
@@ -935,6 +955,7 @@ function HonorSpy:OnInitialize()
 			last_reset = 0,
 			minimapButton = {hide = false},
 			estHonorCol = {show = false},
+            estTodayHonorCol = {show = false},
 			actualCommPrefix = "",
 			fakePlayers = {},
 			goodPlayers = {},
