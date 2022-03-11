@@ -152,7 +152,10 @@ function GUI:UpdateTableView()
 				if (tonumber(estHonor) ~= nil) then
 					local estTodayHonor = estHonor - thisWeekHonor
 					-- This may happen when blizz value is up to date but estimation is not
-					if (estTodayHonor < 0) then estTodayHonor = 0 end
+					if (estTodayHonor < 0) then
+						estHonor = thisWeekHonor
+						estTodayHonor = 0
+					end
 					button.EstHonor:SetText(colorize(estTodayHonor, class));
 					button.EstWeekHonor:SetText(colorize(estHonor, class));
 				else
