@@ -21,13 +21,13 @@
 					</Anchors>
 				</FontString>
 				<FontString parentKey="EstHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
-					<Size x="80"/>
+					<Size x="100"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.Honor"/>
 					</Anchors>
 				</FontString>
                 <FontString parentKey="EstWeekHonor" inherits="GameFontHighlightSmall" justifyH="LEFT">
-                    <Size x="80"/>
+                    <Size x="100"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.EstHonor"/>
                     </Anchors>

@@ -35,20 +35,29 @@ options.args["estHonorCol"] = {
 	set = function(info, v) HonorSpy.db.factionrealm.estHonorCol.show = v; HonorSpyGUI:PrepareGUI() end,
 }
 
+options.args["estTodayHonorCol"] = {
+    order = 4,
+	type = "toggle",
+	name = "Show Estimated Todays Honor",
+	desc = "Shows the Estimated Todays Honor column in the table. This data will only be populated by other people with HonorSpy.",
+	get = function() return HonorSpy.db.factionrealm.estTodayHonorCol.show end,
+	set = function(info, v) HonorSpy.db.factionrealm.estTodayHonorCol.show = v; HonorSpyGUI:PrepareGUI() end,
+}
+
 options.args["estHonorColDesc"] = {
-	order = 4,
+	order = 5,
 	type = "description",
 	name = L["Shows the Estimated Honor column in the table. This data will only be populated by other people with HonorSpy."] .. '\n\n'
 }
 
 options.args["sep1"] = {
-	order = 5,
+	order = 6,
 	type = "description",
 	name = "\n"
 }
 
 options.args["poolBoost"] = {
-	order = 6,
+	order = 7,
 	type = "range",
 	name = L["Pool Booster Count"],
 	desc = L["Number of characters to add to Pool"],
@@ -61,7 +70,7 @@ options.args["poolBoost"] = {
 }
 
 options.args["spreadPoolBoostOverWeek"] = {
-	order = 7,
+	order = 8,
 	type = "toggle",
 	name = L["Spread the poolboost count over the week"],
 	desc = L["As final pool boost should be only achieved at the end of the week"],
@@ -70,19 +79,19 @@ options.args["spreadPoolBoostOverWeek"] = {
 }
 
 options.args["sep2"] = {
-	order = 8,
+	order = 9,
 	type = "description",
 	name = L["This is how big the discrepancy is at the end of PvP week between HonorSpy pool size and real server pool size. Pool size will slowly be growing during the week reaching the final value of 'gathered number of players' + 'pool boost size'."] .. "\n\n"
 }
 
 options.args["sep3"] = {
-	order = 9,
+	order = 10,
 	type = "description",
 	name = "\n"
 }
 
 options.args["som_realm"] = {
-	order = 10,
+	order = 11,
 	type = "toggle",
 	name = L["Season of Mastery"],
 	desc = L["Implements the ranking changes applied to Season of Mastery."],
@@ -91,20 +100,20 @@ options.args["som_realm"] = {
 }
 
 options.args["sep4"] = {
-	order = 11,
+	order = 12,
 	type = "description",
 	name = L["Enables Season of Mastery ranking changes."] .. '\n\n'
 }
 
 options.args["export"] = {
-	order = 12,
+	order = 13,
 	type = "execute",
 	name = L["Export to CSV"],
 	desc = L["Show window with current data in CSV format"],
 	func = function() HonorSpy:ExportCSV() end,
 }
 options.args["purge_data"] = {
-	order = 13,
+	order = 14,
 	type = "execute",
 	name = L["Purge all data"],
 	desc = L["Delete all collected data"],
