@@ -21,7 +21,7 @@ local colors = {
 	["NORMAL"] = "f2ca45"
 }
 
-local playerName = UnitName("player")
+local playerName = HonorSpyUtils:getFullUnitName("player")
 
 function GUI:Show(skipUpdate, sort_column)
 	if (not skipUpdate) then
@@ -146,7 +146,9 @@ function GUI:UpdateTableView()
 				last_seen_human = ""..last_seen..L["s"]
 			end
 			button:SetID(itemIndex);
-            button.Name:SetText(colorize(itemIndex .. ')  ', "GREY") .. colorize(name, class));
+            button.Name:SetText(
+				colorize(itemIndex .. ')  ', "GREY") .. colorize(HonorSpyUtils:getDisplayName(name), class)
+			);
             button.Name:SetNonSpaceWrap(false)
             button.Name:SetWordWrap(false)
 			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
@@ -238,7 +240,7 @@ function GUI:PrepareGUI()
 	reportBtn:SetRelativeWidth(0.19)
 	reportBtn.text:SetFontObject("SystemFont_NamePlate")
 	reportBtn:SetCallback("OnClick", function()
-		HonorSpy:Report(UnitIsPlayer("target") and GetUnitName("target", true) or nil)
+		HonorSpy:Report(UnitIsPlayer("target") and HonorSpyUtils:getFullUnitName("target", true) or nil)
 	end)
 	playerStandingsGrp:AddChild(reportBtn)
 

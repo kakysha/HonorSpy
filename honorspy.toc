@@ -18,6 +18,7 @@
 Libs\embeds.xml
 Localizations\embeds.xml
 
+utils.lua
 honorspy.lua
 GUI.lua
 settings.lua
