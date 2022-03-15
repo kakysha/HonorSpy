@@ -650,6 +650,7 @@ local function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 	
 	friend = msg:match(ERR_FRIEND_ONLINE_PATTERN)
 	if (friend) then
+		local friendFullName = HonorSpyUtils:getCompleteName(friend)
 		local f = C_FriendList.GetFriendInfo(friend)
 		if(nameToTest and not f) then
 			if (nameToTest == friend) then
@@ -657,8 +658,8 @@ local function FAKE_PLAYERS_FILTER(_s, e, msg, ...)
 			end
 		else
 			if (f and (friend == nameToTest or f.notes == "HonorSpy testing")) then
-				HonorSpy.db.factionrealm.goodPlayers[friend] = true
-				HonorSpy.db.factionrealm.fakePlayers[friend] = nil
+				HonorSpy.db.factionrealm.goodPlayers[friendFullName] = true
+				HonorSpy.db.factionrealm.fakePlayers[friendFullName] = nil
 				return true;
 			end
 		end
