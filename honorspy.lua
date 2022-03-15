@@ -440,19 +440,17 @@ function HonorSpy:Estimate(playerOfInterest)
 	if (not playerOfInterest) then
 		playerOfInterest = playerName
 	end
-	playerOfInterest = string.utf8lower(playerOfInterest)
-	
+
 	local standing = -1;
 	local t = HonorSpy:BuildStandingsTable(L["ThisWeekHonor"])
 	local pool_size = #t;
 	local curHonor = 0;
 	local rp_factor = 1000;
 	local decay_factor = 0.8;
-	
+
 	for i = 1, pool_size do
-		if (playerOfInterest == string.utf8lower(t[i][1])) then
+		if (playerOfInterest == t[i][1]) then
 			standing = i
-            playerOfInterest = t[i][1]
 			curHonor = math.max(t[i][3], tonumber(t[i][4]) or 0)
 		end
 	end
@@ -527,8 +525,7 @@ function HonorSpy:Report(playerOfInterest, skipUpdate)
 	if (playerOfInterest == playerName) then
 		HonorSpy:UpdatePlayerData() -- will update for next time, this report gonna be for old data
 	end
-	playerOfInterest = string.utf8upper(string.utf8sub(playerOfInterest, 1, 1))..string.utf8lower(string.utf8sub(playerOfInterest, 2))
-	
+
 	local pool_size, standing, bracket, RP, EstRP, Rank, Progress, EstRank, EstProgress = HonorSpy:Estimate(playerOfInterest)
 	if (not standing) then
 		self:Print(format(L["Player %s not found in table"], playerOfInterest));
