@@ -562,10 +562,9 @@ function table.copy(t)
 end
 
 function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
-    local connectedRealm = false
-	local senderName, sendersRealm = HonorSpyUtils:getRealmFromFullUnitName(sender)
+	local sendersRealm = HonorSpyUtils:getRealmFromFullUnitName(sender)
 
-	if (distribution ~= "GUILD" and HonorSpy.db.factionrealm.connectedRealms[sendersRealm] == nil) then
+	if (distribution ~= "GUILD" and sendersRealm and HonorSpy.db.factionrealm.connectedRealms[sendersRealm] == nil) then
 		return -- discard any message from players not from the same realm or connected realms (connected on ERA only)
 	end
     
