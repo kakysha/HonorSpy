@@ -105,7 +105,7 @@ function GUI:UpdateTableView()
 		local button = buttons[buttonIndex];
 		local itemIndex = buttonIndex + offset;
 
-		if (itemIndex > 1 and brackets[itemIndex] and brackets[itemIndex-1] ~= brackets[itemIndex] and not brk_delim_inserted) then
+		if (itemIndex <= #rows and itemIndex > 1 and brackets[itemIndex] and brackets[itemIndex-1] ~= brackets[itemIndex] and not brk_delim_inserted) then
 			offset = offset-1
 			brk_delim_inserted = true
 			button.Name:SetText(colorize(format(L["Bracket"] .. " %d", brackets[itemIndex]), "GREY"))
@@ -204,7 +204,7 @@ function GUI:UpdateTableView()
 	end
 
 	local buttonHeight = scroll.buttonHeight;
-	local totalHeight = #rows * buttonHeight;
+	local totalHeight = (#rows + (14 - brackets[#rows])) * buttonHeight
 	local shownHeight = #buttons * buttonHeight;
 
 	HybridScrollFrame_Update(scroll, totalHeight, shownHeight);
