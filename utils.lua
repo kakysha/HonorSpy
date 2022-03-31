@@ -15,6 +15,8 @@ function HonorSpyUtils:getFullUnitName(unit)
     if (realm == nil) then
         realm = GetRealmName()
     end
+    
+    realm = realm:gsub(" ", "")
 
     return name .. "-" .. realm, name, realm
 end
