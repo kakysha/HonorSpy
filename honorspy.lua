@@ -176,10 +176,10 @@ local function StartInspecting(unitID)
         end
     else
         if (
-			paused or
-			(not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID))) or
-			(true == currentlyInspecting and GetTime() - lastInspectTime < 1)
-		) then
+            paused or
+            (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID))) or
+            (true == currentlyInspecting and GetTime() - lastInspectTime < 1)
+        ) then
             return
         end
        
@@ -207,9 +207,9 @@ local function StartInspecting(unitID)
     		return
     	end
     	-- we gonna inspect new player, clear old one
-		lastInspectTime = GetTime()
-		currentlyInspecting = true
     	ClearInspectPlayer();
+        lastInspectTime = GetTime()
+        currentlyInspecting = true
     	inspectedPlayerName = name;
     	player.unitID = unitID;
     	NotifyInspect(unitID);
