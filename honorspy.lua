@@ -178,7 +178,7 @@ local function StartInspecting(unitID)
         if (
             paused or
             (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID))) or
-            (true == currentlyInspecting and GetTime() - lastInspectTime < 1)
+            (currentlyInspecting and GetTime() - lastInspectTime < 1)
         ) then
             return
         end
