@@ -13,6 +13,8 @@ local startRemovingFakes = false
 local som_realm = false
 local ERR_FRIEND_ONLINE_PATTERN = ERR_FRIEND_ONLINE_SS:gsub("%%s", "(.+)"):gsub("([%[%]])", "%%%1")
 local last_test = time() - 300
+local lastInspectTime = 0
+local currentlyInspecting = false
 local checkingPlayers = false;
 local addingPlayer = false;
 local muteTimer = C_Timer.NewTimer(1,function () end)
@@ -173,7 +175,11 @@ local function StartInspecting(unitID)
                 lastPlayerTodayHK, lastPlayerEstHonor, lastPlayerThisweekHK, lastPlayerThisWeekHonor, lastPlayerLastWeekHonor, lastPlayerStanding, lastPlayerRankProgress, lastPlayerChecked = todayHK, player.estHonor, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress, GetServerTime()
         end
     else
-        if (paused or (not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID)))) then
+        if (
+			paused or
+			(not C_PlayerInfo.UnitIsSameServer(PlayerLocation:CreateFromUnit(unitID))) or
+			(true == currentlyInspecting and GetTime() - lastInspectTime < 1)
+		) then
             return
         end
        
@@ -201,6 +207,8 @@ local function StartInspecting(unitID)
     		return
     	end
     	-- we gonna inspect new player, clear old one
+		lastInspectTime = GetTime()
+		currentlyInspecting = true
     	ClearInspectPlayer();
     	inspectedPlayerName = name;
     	player.unitID = unitID;
@@ -233,6 +241,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	ClearInspectPlayer();
 	NotifyInspect("target"); -- change real target back to player's target, broken by prev NotifyInspect call
 	ClearInspectPlayer();
+	currentlyInspecting = false
     
 	inspectedPlayers[inspectedPlayerName] = {last_checked = player.last_checked};
 	inspectedPlayerName = nil;
