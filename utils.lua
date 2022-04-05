@@ -25,7 +25,7 @@ function HonorSpyUtils:getDisplayName(playerName)
 
     local name, realm = HonorSpyUtils:splitNameAndServer(playerName)
 
-    if (realm == GetRealmName() or realm == nil) then
+    if (realm == (GetRealmName():gsub(" ", "")) or realm == nil) then
         return name
     end
 
