@@ -4,7 +4,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
 local libDeflate = LibStub("LibDeflate")
 
 local addonName = GetAddOnMetadata("HonorSpy", "Title");
-local commPrefix = addonName .. "6";
+local commPrefix = addonName .. "7";
 
 local paused = false; -- pause all inspections when user opens inspect frame
 local playerName = HonorSpyUtils:getFullUnitName("player");
