@@ -383,7 +383,8 @@ function HonorSpy:BuildStandingsTable(sort_by)
 	local sort_column = 3; -- KnownHonor
 	if (sort_by == L["EstHonor"]) then sort_column = 4; end
     if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
-	if (sort_by == L["Standing"]) then sort_column = 5; end
+	if (sort_by == L["LstWkHonor"]) then sort_column = 5; end
+	if (sort_by == L["Standing"]) then sort_column = 6; end
 	if (sort_by == L["Rank"]) then sort_column = 8; end
     if (sort_by == L["Name"]) then sort_column = 1; end
 	local sort_func = function(a,b)
@@ -418,6 +419,12 @@ function HonorSpy:BuildStandingsTable(sort_by)
             if a[5] == b[5] then
                 return a[6] < b[6]
             end
+        end
+        if sort_column == 6 then
+            if a[6] == 0 or b[6] == 0 then
+                return a[5] > b[5]
+            end
+            return a[6] < b[6]
         end
 		return a[sort_column] > b[sort_column]
 	end
