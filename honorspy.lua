@@ -44,6 +44,42 @@ local function class_exist(className)
 	return false
 end
 
+-- Adds Hexadecimal string length as prefix to check on receiving end
+local function prefixMessage(message)
+	return string.format("%04x", #message) .. message
+end
+
+-- Splits the original message and it's length prefix
+local function splitPrefixAndMessage(prefixedMessage)
+	return string.sub(prefixedMessage, 1, 4), string.sub(prefixedMessage, 5)
+end
+
+-- prefix, compress and encode message for comms
+local function prepareMessageForComms(message)
+	message = prefixMessage(message)
+	message = libDeflate:CompressZlib(message)
+	message = libDeflate:EncodeForWoWAddonChannel(message)
+
+	return message
+end
+
+-- Uncompress the message and checks if it's length match the prefix value
+-- Returns nil if the message is corrupted
+local function decodeDecompressAndCheckMessage(message, decodeAndDecompress)
+	if (decodeAndDecompress) then
+		message = libDeflate:DecodeForWoWAddonChannel(message)
+		if (nil == message) then return end
+		message = libDeflate:DecompressZlib(message)
+		if (nil == message) then return end
+	end
+
+	-- Manually check the length of the original message
+	local prefix, originalMessage = splitPrefixAndMessage(message)
+	if (tonumber("0x" .. prefix) ~= #originalMessage) then print('fail3') return end
+
+	return originalMessage
+end
+
 local function playerIsValid(player)
 	if (not player.last_checked or type(player.last_checked) ~= "number"-- or player.last_checked < HonorSpy.db.char.last_reset + 24*60*60
 		or player.last_checked > GetServerTime()
@@ -96,17 +132,22 @@ local function store_player(playerName, player)
 	end
 end
 
-local function broadcast(msg, skip_yell)
+local function broadcast(originalMessage, skip_yell)
+
+	local encodedMessage = prepareMessageForComms(originalMessage)
 	if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "INSTANCE_CHAT");
+		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "INSTANCE_CHAT");
 	elseif (IsInRaid()) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "RAID");
+		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "RAID");
 	end
 	if (GetGuildInfo("player") ~= nil) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "GUILD");
+		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "GUILD");
 	end
+
 	if (not skip_yell) then
-		HonorSpy:SendCommMessage(commPrefix, msg, "YELL");
+		-- No compression / encoding for yells
+		local prefixedMessage = prefixMessage(originalMessage)
+		HonorSpy:SendCommMessage(commPrefix, prefixedMessage, "YELL");
 	end
 end
 
@@ -569,14 +610,21 @@ function table.copy(t)
   return setmetatable(u, getmetatable(t))
 end
 
-function HonorSpy:OnCommReceive(prefix, message, distribution, sender)
+function HonorSpy:OnCommReceive(prefix, compressedMessage, distribution, sender)
 	local sendersRealm = HonorSpyUtils:getRealmFromFullUnitName(sender)
+
+	-- Do not process messages from the players himself
+	if HonorSpyUtils:getCompleteName(sender) == playerName then return end
 
 	if (distribution ~= "GUILD" and sendersRealm and HonorSpy.db.factionrealm.connectedRealms[sendersRealm] == nil) then
 		return -- discard any message from players not from the same realm or connected realms (connected on ERA only)
 	end
-    
-	local ok, playerName, player = self:Deserialize(message);
+
+	-- Decompress message, reject if corrupted. No decode/decompress for yells
+	local originalMessage = decodeDecompressAndCheckMessage(compressedMessage, distribution ~= "YELL")
+	if (nil == originalMessage) then return end
+
+	local ok, playerName, player = self:Deserialize(originalMessage);
 	if (not ok) then
 		return;
 	end
