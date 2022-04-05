@@ -1,6 +1,7 @@
 HonorSpy = LibStub("AceAddon-3.0"):NewAddon("HonorSpy", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceComm-3.0", "AceSerializer-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale("HonorSpy", true)
+local libDeflate = LibStub("LibDeflate")
 
 local addonName = GetAddOnMetadata("HonorSpy", "Title");
 local commPrefix = addonName .. "6";
