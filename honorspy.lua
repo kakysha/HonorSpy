@@ -610,18 +610,18 @@ function table.copy(t)
   return setmetatable(u, getmetatable(t))
 end
 
-function HonorSpy:OnCommReceive(prefix, compressedMessage, distribution, sender)
+function HonorSpy:OnCommReceive(prefix, commMessage, distribution, sender)
 	local sendersRealm = HonorSpyUtils:getRealmFromFullUnitName(sender)
 
 	-- Do not process messages from the players himself
-	if HonorSpyUtils:getCompleteName(sender) == playerName then return end
+	if (HonorSpyUtils:getCompleteName(sender) == playerName) then return end
 
 	if (distribution ~= "GUILD" and sendersRealm and HonorSpy.db.factionrealm.connectedRealms[sendersRealm] == nil) then
 		return -- discard any message from players not from the same realm or connected realms (connected on ERA only)
 	end
 
 	-- Decompress message, reject if corrupted. No decode/decompress for yells
-	local originalMessage = decodeDecompressAndCheckMessage(compressedMessage, distribution ~= "YELL")
+	local originalMessage = decodeDecompressAndCheckMessage(commMessage, distribution ~= "YELL")
 	if (nil == originalMessage) then return end
 
 	local ok, playerName, player = self:Deserialize(originalMessage);
