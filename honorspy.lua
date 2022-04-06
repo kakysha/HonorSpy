@@ -1061,5 +1061,10 @@ function HonorSpy:OnInitialize()
 	PrintWelcomeMsg();
 	DBHealthCheck()
 
-	C_Timer.NewTicker(60*60, function() HonorSpy:broadcastPlayers(true) end)
+	C_Timer.NewTicker(60*60, function()
+		-- Do not broadcast if player is busy to not interfere with more important addon comms
+		if(not IsInInstance() and not InCombatLockdown()) then
+			HonorSpy:broadcastPlayers(true)
+		end
+	end)
 end
