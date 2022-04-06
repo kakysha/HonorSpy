@@ -597,7 +597,7 @@ end
 
 function HonorSpy:broadcastPlayers(skipYell)
 	local filtered_players, count = {}, 0;
-	if (time() - last_send_time < 10*60) then return end;
+	if (time() - last_send_time < 15*60) then return end;
 	last_send_time = time();
 
 	for playerName, player in pairs(self.db.factionrealm.currentStandings) do
