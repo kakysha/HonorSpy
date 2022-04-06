@@ -75,7 +75,7 @@ local function decodeDecompressAndCheckMessage(message, decodeAndDecompress)
 
 	-- Manually check the length of the original message
 	local prefix, originalMessage = splitPrefixAndMessage(message)
-	if (tonumber("0x" .. prefix) ~= #originalMessage) then print('fail3') return end
+	if (tonumber("0x" .. prefix) ~= #originalMessage) then return end
 
 	return originalMessage
 end
