@@ -1012,5 +1012,9 @@ function HonorSpy:OnInitialize()
 	PrintWelcomeMsg();
 	DBHealthCheck()
 
-	C_Timer.NewTicker(60*60, function() HonorSpy:broadcastPlayers(true) end)
+	C_Timer.NewTicker(60*60, function()
+		if(not IsInInstance() and not InCombatLockdown()) then
+			HonorSpy:broadcastPlayers(true)
+		end
+	end)
 end
