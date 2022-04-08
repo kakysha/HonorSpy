@@ -8,12 +8,13 @@
 
 ## Author: kakysha
 ## OptionalDeps: Ace3
-## Version: 1.9.0
+## Version: 1.9.1
 
 ## X-Category: Battlegrounds/PvP
 ## SavedVariables: HonorSpyDB
 
 ## X-Curse-Project-ID: 348370
+## X-Wago-ID: 7nGvBqGx
 
 Libs\embeds.xml
 Localizations\embeds.xml
