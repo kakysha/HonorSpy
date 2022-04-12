@@ -416,7 +416,8 @@ local options = {
 }
 LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", "hs"})
 
-function HonorSpy:BuildStandingsTable(sort_by)
+-- See GUI.lua for sort_column possible values
+function HonorSpy:BuildStandingsTable(sort_column)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
 		table.insert(
@@ -434,28 +435,25 @@ function HonorSpy:BuildStandingsTable(sort_by)
 			}
 		)
 	end
-	
-	local sort_column = 3; -- KnownHonor
-	if (sort_by == L["EstHonor"]) then sort_column = 4; end
-    if (sort_by == L["ThisWeekHonor"]) then sort_column = -1; end
-	if (sort_by == L["LstWkHonor"]) then sort_column = 5; end
-	if (sort_by == L["Standing"]) then sort_column = 6; end
-	if (sort_by == L["Rank"]) then sort_column = 8; end
-    if (sort_by == L["Name"]) then sort_column = 1; end
+
+	if (nil == sort_column) then
+		sort_column = HonorSpy.sortColumns.honor;
+	end
+
 	local sort_func = function(a,b)
 		local a3 = a[3] or 0
 		local a4 = tonumber(a[4]) or 0
 		local b3 = b[3] or 0
 		local b4 = tonumber(b[4]) or 0
-        if sort_column == 1 then return a[1] < b[1] end
-		if sort_column == 4 then
+        if sort_column == HonorSpy.sortColumns.name then return a[1] < b[1] end
+		if sort_column == HonorSpy.sortColumns.estimatedTodayHonor then
             local c = a4-a3
             if c < 0 then c = 0 end
             local d = b4-b3
             if d < 0 then d = 0 end
             return c > d 
         end
-        if sort_column == -1 then
+        if sort_column == HonorSpy.sortColumns.estimatedWeekHonor then
             local c = a4-a3
             if c < 0 then
                 c = a3
@@ -470,12 +468,12 @@ function HonorSpy:BuildStandingsTable(sort_by)
             end
             return c > d
         end
-        if sort_column == 5 then
+        if sort_column == HonorSpy.sortColumns.lastWeekHonor then
             if a[5] == b[5] then
                 return a[6] < b[6]
             end
         end
-        if sort_column == 6 then
+        if sort_column == HonorSpy.sortColumns.standing then
             if a[6] == 0 or b[6] == 0 then
                 return a[5] > b[5]
             end
@@ -519,7 +517,7 @@ function HonorSpy:Estimate(playerOfInterest)
 	end
 
 	local standing = -1;
-	local t = HonorSpy:BuildStandingsTable(L["ThisWeekHonor"])
+	local t = HonorSpy:BuildStandingsTable(HonorSpy.sortColumns.estimatedWeekHonor)
 	local pool_size = #t;
 	local curHonor = 0;
 	local rp_factor = 1000;

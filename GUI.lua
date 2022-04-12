@@ -21,6 +21,16 @@ local colors = {
 	["NORMAL"] = "f2ca45"
 }
 
+HonorSpy.sortColumns = {
+	honor = 3;
+	estimatedTodayHonor = 4,
+	estimatedWeekHonor = -1,
+	lastWeekHonor = 5,
+	standing = 6,
+	rank = 8,
+	name = 1,
+}
+
 local playerName = HonorSpyUtils:getFullUnitName("player")
 
 function GUI:Show(skipUpdate, sort_column)
@@ -85,7 +95,7 @@ function GUI:Toggle()
 	if (mainFrame and mainFrame:IsShown()) then
 		GUI:Hide()
 	else
-		GUI:Show(false, L["ThisWeekHonor"])
+		GUI:Show(false, HonorSpy.sortColumns.estimatedWeekHonor)
 	end
 end
 
@@ -254,7 +264,7 @@ function GUI:PrepareGUI()
 
 	local btn = AceGUI:Create("InteractiveLabel")
     btn:SetCallback("OnClick", function()
-			GUI:Show(false, L["Name"])
+			GUI:Show(false, HonorSpy.sortColumns.name)
 		end)
 		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(150)
@@ -263,7 +273,7 @@ function GUI:PrepareGUI()
 
 	local knownHonorbtn = AceGUI:Create("InteractiveLabel")
 	knownHonorbtn:SetCallback("OnClick", function()
-		GUI:Show(false, L["Honor"])
+		GUI:Show(false, HonorSpy.sortColumns.honor)
 	end)
 	knownHonorbtn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	knownHonorbtn:SetWidth(80)
@@ -275,7 +285,7 @@ function GUI:PrepareGUI()
 
 		btn = AceGUI:Create("InteractiveLabel")
 		btn:SetCallback("OnClick", function()
-			GUI:Show(false, L["EstHonor"])
+			GUI:Show(false, HonorSpy.sortColumns.estimatedTodayHonor)
 		end)
 		btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 		btn:SetWidth(100)
@@ -288,7 +298,7 @@ function GUI:PrepareGUI()
         
         btn = AceGUI:Create("InteractiveLabel")
         btn:SetCallback("OnClick", function()
-            GUI:Show(false, L["ThisWeekHonor"])
+            GUI:Show(false, HonorSpy.sortColumns.estimatedWeekHonor)
         end)
         btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
         btn:SetWidth(100)
@@ -301,13 +311,13 @@ function GUI:PrepareGUI()
 	btn:SetText(colorize(L["LstWkHonor"], "ORANGE"))
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetCallback("OnClick", function()
-		GUI:Show(false, L["LstWkHonor"])
+		GUI:Show(false, HonorSpy.sortColumns.lastWeekHonor)
 	end)
 	tableHeader:AddChild(btn)
 
 	btn = AceGUI:Create("InteractiveLabel")
 	btn:SetCallback("OnClick", function()
-		GUI:Show(false, L["Standing"])
+		GUI:Show(false, HonorSpy.sortColumns.standing)
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(70)
@@ -321,7 +331,7 @@ function GUI:PrepareGUI()
 
 	btn = AceGUI:Create("InteractiveLabel")
 	btn:SetCallback("OnClick", function()
-		GUI:Show(false, L["Rank"])
+		GUI:Show(false, HonorSpy.sortColumns.rank)
 	end)
 	btn.highlight:SetColorTexture(0.3, 0.3, 0.3, 0.5)
 	btn:SetWidth(50)
