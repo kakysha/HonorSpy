@@ -419,7 +419,20 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable("HonorSpy", options, {"honorspy", 
 function HonorSpy:BuildStandingsTable(sort_by)
 	local t = { }
 	for playerName, player in pairs(HonorSpy.db.factionrealm.currentStandings) do
-		table.insert(t, {playerName, player.class, tonumber(player.thisWeekHonor) or 0, tonumber(player.estHonor), tonumber(player.lastWeekHonor) or 0, tonumber(player.standing) or 0, player.RP or 0, player.rank or 0, player.last_checked or 0})
+		table.insert(
+			t,
+			{
+				playerName,
+				player.class,
+				tonumber(player.thisWeekHonor) or 0,
+				tonumber(player.estHonor) or "",
+				tonumber(player.lastWeekHonor) or 0,
+				tonumber(player.standing) or 0,
+				player.RP or 0,
+				player.rank or 0,
+				player.last_checked or 0
+			}
+		)
 	end
 	
 	local sort_column = 3; -- KnownHonor
@@ -431,9 +444,9 @@ function HonorSpy:BuildStandingsTable(sort_by)
     if (sort_by == L["Name"]) then sort_column = 1; end
 	local sort_func = function(a,b)
 		local a3 = a[3] or 0
-		local a4 = a[4] or 0
+		local a4 = tonumber(a[4]) or 0
 		local b3 = b[3] or 0
-		local b4 = b[4] or 0
+		local b4 = tonumber(b[4]) or 0
         if sort_column == 1 then return a[1] < b[1] end
 		if sort_column == 4 then
             local c = a4-a3
