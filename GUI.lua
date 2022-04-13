@@ -159,7 +159,6 @@ function GUI:UpdateTableView()
 			);
             button.Name:SetNonSpaceWrap(false)
             button.Name:SetWordWrap(false)
-			if tonumber(thisWeekHonor) == 1 then thisWeekHonor = 0 end
             button.Honor:SetText(colorize(thisWeekHonor, class));
 			if HonorSpy.db.factionrealm.estHonorCol.show then
                 button.EstWeekHonor:SetWidth(100);
