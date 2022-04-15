@@ -83,7 +83,7 @@ end
 local function playerIsValid(player)
 	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.char.last_reset
 		or player.last_checked > GetServerTime()
-		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor == 0
+		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor < 0
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
 		or not player.standing or type(player.standing) ~= "number"
 		or not player.RP or type(player.RP) ~= "number"
