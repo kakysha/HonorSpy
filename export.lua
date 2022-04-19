@@ -41,7 +41,7 @@ function HonorSpy:ExportCSV()
 	local exportwindow = _G["ARLCopyFrame"]
 	local editbox = _G["ARLCopyEdit"]
 
-	local data = HonorSpy:BuildStandingsTable();
+	local data = HonorSpy:BuildStandingsTable(HonorSpy.sortColumns.estimatedWeekHonor);
 	local text = "";
 	for _, row in pairs(data) do
 		text = ""
