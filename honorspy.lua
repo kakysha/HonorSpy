@@ -84,6 +84,8 @@ local function playerIsValid(player)
 	if (not player.last_checked or type(player.last_checked) ~= "number" or player.last_checked < HonorSpy.db.char.last_reset
 		or player.last_checked > GetServerTime()
 		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor < 0
+		-- Avoids storing players that were not reset properly by blizzard in the first 12h after the weekly reset
+		or (player.last_checked < HonorSpy.db.char.last_reset + 12 * 60 * 60 and player.thisWeekHonor > 1)
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
 		or not player.standing or type(player.standing) ~= "number"
 		or not player.RP or type(player.RP) ~= "number"
