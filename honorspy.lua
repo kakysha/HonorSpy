@@ -476,8 +476,11 @@ function HonorSpy:BuildStandingsTable(sort_column)
             end
         end
         if sort_column == HonorSpy.sortColumns.standing then
-            if a[6] == 0 or b[6] == 0 then
-                return a[5] > b[5]
+            if a[6] == 0 and b[6] > 0 then
+                return false
+            end
+            if b[6] == 0 and a[6] > 0 then
+                return true
             end
             return a[6] < b[6]
         end
