@@ -853,7 +853,7 @@ function HonorSpy:ResetWeek()
 	HonorSpy:Print(L["Weekly data was reset"]);
 end
 
-function HonorSpy:CheckNeedReset(skipUpdate)
+function HonorSpy:CheckNeedReset(skipUpdate, confirmReset)
 	if (not skipUpdate) then
 		HonorSpy:UpdatePlayerData(function() HonorSpy:CheckNeedReset(true) end)
 	end
@@ -886,9 +886,16 @@ function HonorSpy:CheckNeedReset(skipUpdate)
             
         -- this algorithm fails scenario (3). That scenario is at least the rarest issue, so may just have to tolerate it.
     --]]
-    
-	-- reset daily honor
+
 	local _, thisWeekHonor = GetPVPThisWeekStats()
+	-- GetPVPThisWeekStats rarely and wrongly returns 0 during the week. Double check for the actual value.
+	if (HonorSpy.db.char.original_honor ~= thisWeekHonor and 0 == thisWeekHonor and confirmReset ~= true) then
+		C_Timer.After(5, function()
+			HonorSpy:CheckNeedReset(true, true)
+		end)
+		return
+	end
+	-- reset daily honor
     if (HonorSpy.db.char.original_honor ~= thisWeekHonor) or (HonorSpy.db.char.last_reset ~= must_reset_on) then
         HonorSpy.db.char.last_reset = must_reset_on
         HonorSpy.db.char.original_honor = thisWeekHonor
