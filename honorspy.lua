@@ -669,12 +669,13 @@ function HonorSpy:broadcastPlayers(skipYell)
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
-			broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
+			HonorSpy:addWork(broadcast, self:Serialize("filtered_players", filtered_players), skipYell )
 			filtered_players, count = {}, 0;
 		end
 	end
 	if (count > 0) then
-		broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
+		HonorSpy:addWork(broadcast, self:Serialize("filtered_players", filtered_players), skipYell )
+
 	end
 end
 
