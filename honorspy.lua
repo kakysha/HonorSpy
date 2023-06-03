@@ -85,7 +85,7 @@ local function playerIsValid(player)
 		or player.last_checked > GetServerTime()
 		or not player.thisWeekHonor or type(player.thisWeekHonor) ~= "number" or player.thisWeekHonor < 0
 		-- Avoids storing players that were not reset properly by blizzard in the first 12h after the weekly reset
-		or (player.last_checked < HonorSpy.db.char.last_reset + 12 * 60 * 60 and player.thisWeekHonor > 1)
+		or (player.last_checked < HonorSpy.db.char.last_reset + 12 * 60 * 60 and player.thisWeekHonor > 0)
 		or not player.lastWeekHonor or type(player.lastWeekHonor) ~= "number"
 		or not player.standing or type(player.standing) ~= "number"
 		or not player.RP or type(player.RP) ~= "number"
@@ -156,7 +156,6 @@ end
 local function processInspect(player, name, todayHK, thisweekHK, thisWeekHonor, lastWeekHonor, standing, rankProgress)
     if (thisweekHK < 15) and (todayHK >= 15) then
         thisweekHK = todayHK
-        thisWeekHonor = 1
     end
     
     player.thisWeekHonor = thisWeekHonor;
@@ -267,7 +266,7 @@ function HonorSpy:INSPECT_HONOR_UPDATE()
 	local todayHK, _, _, _, thisweekHK, thisWeekHonor, _, lastWeekHonor, standing = GetInspectHonorData();
     local rankProgress = GetInspectPVPRankProgress()
 	
-    if (lastPlayer and (thisWeekHonor ~= 1) and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
+    if (lastPlayer and lastPlayer.honor == thisWeekHonor and lastPlayer.name ~= inspectedPlayerName) then
 		return
 	end
 	lastPlayer = {name = inspectedPlayerName, honor = thisWeekHonor}
