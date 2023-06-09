@@ -137,11 +137,13 @@ end
 local function broadcast(originalMessage, skip_yell)
 
 	local encodedMessage = prepareMessageForComms(originalMessage)
+
 	if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "INSTANCE_CHAT");
 	elseif (IsInRaid()) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "RAID");
 	end
+
 	if (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "GUILD");
 	end
