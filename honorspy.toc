@@ -21,6 +21,7 @@ Localizations\embeds.xml
 
 utils.lua
 honorspy.lua
+workHandler.lua
 GUI.lua
 settings.lua
 export.lua

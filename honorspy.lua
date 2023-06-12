@@ -137,11 +137,13 @@ end
 local function broadcast(originalMessage, skip_yell)
 
 	local encodedMessage = prepareMessageForComms(originalMessage)
+
 	if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "INSTANCE_CHAT");
 	elseif (IsInRaid()) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "RAID");
 	end
+
 	if (GetGuildInfo("player") ~= nil) then
 		HonorSpy:SendCommMessage(commPrefix, encodedMessage, "GUILD");
 	end
@@ -668,12 +670,13 @@ function HonorSpy:broadcastPlayers(skipYell)
 		filtered_players[playerName] = player;
 		count = count + 1;
 		if (count == 10) then
-			broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
+			HonorSpy:addWork(broadcast, self:Serialize("filtered_players", filtered_players), skipYell)
 			filtered_players, count = {}, 0;
 		end
 	end
 	if (count > 0) then
-		broadcast(self:Serialize("filtered_players", filtered_players), skipYell)
+		HonorSpy:addWork(broadcast, self:Serialize("filtered_players", filtered_players), skipYell)
+
 	end
 end
 
