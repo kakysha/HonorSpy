@@ -810,7 +810,7 @@ local function getResetTime()
 	local currentUnixTime = GetServerTime()
 	local regionId = GetCurrentRegion()
 	local resetDay = 3 -- wed
-	local resetHour = 7 -- 7 AM UTC
+	local resetHour = 4 -- 4 AM UTC (5 AM CET) https://eu.forums.blizzard.com/en/wow/t/weekly-reset-time-changing-to-0500-cet-on-16-november/398498
 
 	if (regionId == 1) then -- US + BR + Oceania: 3 PM UTC Tue (7 AM PST Tue)
 		resetDay = 2
